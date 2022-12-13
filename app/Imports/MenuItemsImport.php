@@ -24,19 +24,20 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
     */
     public function model(array $row)
     {   
+
+        $code = $row["menu_code"];
+        $data_array_segments = array();
+        $data_array_ingredients = array();
+
         $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
 		$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
         $category = MenuCategory::firstOrCreate(['category_description' => $row["category"]]);
         $product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => $row["product_type"]]);
         $transaction_type = MenuTransactionType::firstOrCreate(['menu_transaction_type_description' => $row["transaction_type"]]);
         $menu_type = MenuType::firstOrCreate(['menu_type_description' => $row["menu_type"]]);
-        
-        $code = '';
-        $data_array_segments = array();
-        $data_array_ingredients = array();
 
         if(is_null($row["menu_code"])){
-            $next_id = DB::table('menu_items')->select('id')->orderBy('id','DESC')->first();
+            $next_id = MenuItem::select('id')->orderBy('id','DESC')->first();
             if($row["category"] == "PROMO"){
                 $code = '6'.str_pad($next_id->id, 5, "0", STR_PAD_LEFT);
             }
@@ -50,7 +51,6 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
                 $code .='DT';
             }
             
-            $row["menu_code"] = $code;
         }
 
         foreach($segmentations as $segment){
@@ -84,7 +84,7 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
             'created_at' => date('Y-m-d H:i:s')
         ];
         
-        MenuItem::updateOrCreate(['tasteless_menu_code' => $row["menu_code"]],
+        MenuItem::updateOrInsert(['tasteless_menu_code' => (string)$code],
             array_merge($data_array_menu,$data_array_segments,$data_array_ingredients));
     }
 

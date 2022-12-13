@@ -602,7 +602,7 @@ use App\Imports\MenuItemsImport;
 			}
             HeadingRowFormatter::default('slug');
 			Excel::import(new MenuItemsImport, $path);
-			return redirect()->back()->with(['message_type' => 'success', 'message' => 'Upload complete!']);
+			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Upload complete!']);
 	    }
 	    
 	    public function exportItems(Request $request){
