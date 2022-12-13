@@ -73,6 +73,14 @@ class AdminController extends CBController
         $password = Request::input("password");
         $users = DB::table(config('crudbooster.USER_TABLE'))->where("email", $email)->first();
 
+        $col_views =        DB::table('settings_column_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->get();
+        $addform_views =    DB::table('settings_form_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->where('action_type','ADD')->get();
+        $editform_views =   DB::table('settings_form_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->where('action_type','EDIT')->get();
+        $addreadonly =      DB::table('settings_form_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->where('action_type','ADD READONLY')->get();
+        $editreadonly =     DB::table('settings_form_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->where('action_type','EDIT READONLY')->get();
+        $editapproval =     DB::table('settings_form_accesses')->where('cms_privileges_id',$users->id_cms_privileges)->where('action_type','EDIT APPROVAL')->get();
+        $editform_approval_views = json_encode($editapproval);
+
         if (\Hash::check($password, $users->password)) {
             $priv = DB::table("cms_privileges")->where("id", $users->id_cms_privileges)->first();
 
@@ -89,14 +97,36 @@ class AdminController extends CBController
             Session::put('admin_lock', 0);
             Session::put('theme_color', $priv->theme_color);
             Session::put("appname", get_setting('appname'));
+            Session::put('user_column_views',$col_views);
+			Session::put('user_addform_view',$addform_views);
+			Session::put('user_editform_view',$editform_views);
+			Session::put('user_addreadonly',$addreadonly);
+			Session::put('user_editreadonly',$editreadonly);
+			Session::put('user_editform_approval_view',$editform_approval_views);
 
-            CRUDBooster::insertLog(cbLang("log_login", ['email' => $users->email, 'ip' => Request::server('REMOTE_ADDR')]));
+            // CRUDBooster::insertLog(cbLang("log_login", ['email' => $users->email, 'ip' => Request::server('REMOTE_ADDR')]));
+            // $cb_hook_session = new \App\Http\Controllers\CBHook;
+            // $cb_hook_session->afterLogin();
 
-            $cb_hook_session = new \App\Http\Controllers\CBHook;
-            $cb_hook_session->afterLogin();
+            if($users->status != 'INACTIVE') {
+			    
+				CRUDBooster::insertLog(cbLang("log_login",['email'=>$users->email,'ip'=>Request::server('REMOTE_ADDR')]));		
+				$cb_hook_session = new \App\Http\Controllers\CBHook;
+				$cb_hook_session->afterLogin();
+				return redirect(CRUDBooster::adminPath());
+			}
+			else {
+				CRUDBooster::insertLog(cbLang("try_log_login",['email'=>$users->email,'ip'=>Request::server('REMOTE_ADDR')]));
+				Session::flush();
+				return redirect()->route('getLogin')->with('message', trans('crudbooster.user_not_exist'));
+			}
 
             return redirect(CRUDBooster::adminPath());
-        } else {
+        } 
+        elseif($users->status == 'INACTIVE') {
+			return redirect()->route('getLogin')->with('message', trans('crudbooster.user_not_exist'));
+		}
+        else {
             return redirect()->route('getLogin')->with('message', cbLang('alert_password_wrong'));
         }
     }

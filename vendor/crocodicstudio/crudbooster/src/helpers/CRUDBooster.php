@@ -218,6 +218,82 @@ class CRUDBooster
         return Session::get('admin_id');
     }
 
+    public static function myColumnView() {
+		    
+        $views = Session::get('user_column_views');	
+
+        if($views) {
+             foreach($views as $view) {
+                     return $view;
+             }
+            }
+         //return Session::get('user_column_views');
+     }
+     
+     public static function myAddForm() {
+         
+        $adds = Session::get('user_addform_view');	
+
+        if($adds) {
+             foreach($adds as $add) {
+                     return $add;
+             }
+            }
+         //return Session::get('user_addform_view');
+     }
+     
+     public static function myEditForm() {
+         
+        $edits = Session::get('user_editform_view');	
+
+        if($edits) {
+             foreach($edits as $edit) {
+                     return $edit;
+             }
+            }
+            
+         //return Session::get('user_editform_view');
+     }
+
+     public static function myAddReadOnly() {
+         
+        $reads = Session::get('user_addreadonly');	
+
+        if($reads) {
+             foreach($reads as $read) {
+                     return $read;
+             }
+            }
+            
+         //return Session::get('user_addreadonly');
+     }
+
+     public static function myEditReadOnly() {
+         
+       $editreads = Session::get('user_editreadonly');	
+
+        if($editreads) {
+             foreach($editreads as $editread) {
+                     return $editread;
+             }
+            }
+            
+         //return Session::get('user_editreadonly');
+     }
+     
+     public static function myEditFormApproval() {
+         
+        $editreadapprovals = Session::get('user_editform_approval_view');	
+
+        if($editreadapprovals) {
+             foreach($editreadapprovals as $editreadapproval) {
+                     return $editreadapproval;
+             }
+            }
+            
+         //return Session::get('user_editform_approval_view');
+     }
+
     public static function isSuperadmin()
     {
         return Session::get('admin_is_superadmin');
