@@ -30,7 +30,10 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
         $product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => $row["product_type"]]);
         $transaction_type = MenuTransactionType::firstOrCreate(['menu_transaction_type_description' => $row["transaction_type"]]);
         $menu_type = MenuType::firstOrCreate(['menu_type_description' => $row["menu_type"]]);
+        
         $code = '';
+        $data_array_segments = array();
+        $data_array_ingredients = array();
 
         if(is_null($row["menu_code"])){
             $next_id = DB::table('menu_items')->select('id')->orderBy('id','DESC')->first();
@@ -80,7 +83,7 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
             'created_by' => CRUDBooster::myId(),
             'created_at' => date('Y-m-d H:i:s')
         ];
-        // dd(array_merge($data_array_menu,$data_array_segments,$data_array_ingredients));
+        
         MenuItem::updateOrCreate(['tasteless_menu_code' => $row["menu_code"]],
             array_merge($data_array_menu,$data_array_segments,$data_array_ingredients));
     }

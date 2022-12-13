@@ -8,13 +8,17 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use CRUDBooster;
+use DB;
 
 class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
 {
     use Exportable;
 
     public function headings():array{
-        return [
+        $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+		$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
+        
+        $header = [
             'MENU CODE',
             'MENU DESCRIPTION',
             'PRODUCT TYPE',
@@ -27,10 +31,23 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'APPROVED DATE',
             'AVAILABLE CONCEPTS'
         ];
+
+        foreach($segmentations as $segment){
+            array_push($header,$segment->menu_segment_column_description);
+        }
+        foreach($ingredients as $ingredient){
+            array_push($header,'INGREDIENT CODE '.$ingredient->menu_ingredient_description);
+            array_push($header,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
+            array_push($header,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
+        }
+        return $header;
     } 
 
     public function map($data_menu_item): array {
-        return [
+        $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+		$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
+        
+        $data_items = [
             $data_menu_item->tasteless_menu_code,
             $data_menu_item->menu_item_description,
             $data_menu_item->menu_product_type_description,
@@ -43,10 +60,29 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             $data_menu_item->approved_at,
             $data_menu_item->available_concepts
         ];
+        
+        foreach($segmentations as $segment){
+            $seg = $segment->menu_segment_column_name;
+            array_push($data_items, $data_menu_item->$seg);
+        }
+        foreach($ingredients as $ingredient){
+            $ing_code = 'ingredient_code_'.$ingredient->menu_ingredient_description;
+            $ing_name = 'ingredient_name_'.$ingredient->menu_ingredient_description;
+            $ing_qty = 'ingredient_qty_'.$ingredient->menu_ingredient_description;
+
+            array_push($data_items,$data_menu_item->$ing_code);
+            array_push($data_items,$data_menu_item->$ing_name);
+            array_push($data_items,$data_menu_item->$ing_qty);
+        }
+
+        return $data_items;
     }
 
     public function query()
     {
+        $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+		$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
+
         $menu_items = MenuItem::query()
         ->whereNotNull('tasteless_menu_code')
         ->leftJoin('menu_product_types','menu_items.menu_product_types_id','=','menu_product_types.id')
@@ -65,6 +101,16 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'menu_items.status as menu_item_status',
             'menu_items.approved_at',
             'menu_items.available_concepts');
+            
+        foreach($segmentations as $segment){
+            $menu_items->addSelect('menu_items.'.$segment->menu_segment_column_name);
+        }
+
+        foreach($ingredients as $ingredient){
+            $menu_items->addSelect('menu_items.ingredient_code_'.$ingredient->menu_ingredient_description);
+            $menu_items->addSelect('menu_items.ingredient_name_'.$ingredient->menu_ingredient_description);
+            $menu_items->addSelect('menu_items.ingredient_qty_'.$ingredient->menu_ingredient_description);
+        }
 
         if (request()->has('filter_column')) {
             $filter_column = request()->filter_column;
@@ -125,6 +171,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
                 }
             }
         }
+
+
         return $menu_items;
     }
 }
