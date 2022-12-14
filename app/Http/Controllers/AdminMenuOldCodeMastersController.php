@@ -288,7 +288,8 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-
+			$postdata["created_by"]=CRUDBooster::myId();
+			self::createMenuOldCodeColumn($postdata["menu_old_code_column_name"]);
 	    }
 
 	    /* 
@@ -300,8 +301,7 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
-			$postdata["created_by"]=CRUDBooster::myId();
-			self::createMenuOldCodeColumn($postdata["menu_old_code_column_name"]);
+			
 	    }
 
 	    /* 
