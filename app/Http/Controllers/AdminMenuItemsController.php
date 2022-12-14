@@ -563,7 +563,7 @@ use App\Imports\MenuItemsImport;
 				array_push($header,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
 				array_push($header,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
 			}
-		
+			
 			$export = new ExcelTemplate([$header]);
             return Excel::download($export, 'menu-items-'.date("Ymd").'-'.date("h.i.sa").'.csv');
 	    }
