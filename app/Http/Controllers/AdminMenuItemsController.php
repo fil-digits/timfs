@@ -572,6 +572,7 @@ use Illuminate\Support\Facades\Input;
 
 			foreach($group_choices as $choice){
 				array_push($header,$choice->menu_choice_group_column_description);
+				array_push($header,$choice->menu_choice_group_column_description.' SKU');
 			}
 			
 			array_push($header,'MENU TYPE');
@@ -581,6 +582,9 @@ use Illuminate\Support\Facades\Input;
 			foreach($prices as $price){
 				array_push($header,$price->menu_price_column_description);
 			}
+			
+			array_push($header,'ORIGINAL CONCEPT');
+			array_push($header,'STATUS');
 
 			foreach($segmentations as $segment){
 				array_push($header,$segment->menu_segment_column_description);
@@ -592,8 +596,6 @@ use Illuminate\Support\Facades\Input;
 	    
 	    public function uploadItems(Request $request){
 	        set_time_limit(0);
-			$segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
-			$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
 				
 			$errors = array();
 			$path_excel = $request->file('import_file')->store('temp');
@@ -601,15 +603,39 @@ use Illuminate\Support\Facades\Input;
             HeadingRowFormatter::default('none');
             $headings = (new HeadingRowImport)->toArray($path);
             //check headings
-            $header = array('MENU CODE','MENU DESCRIPTION','PRODUCT TYPE','TRANSACTION TYPE','MENU TYPE','CATEGORY','PRICE','ORIGINAL CONCEPT','STATUS','APPROVED DATE','AVAILABLE CONCEPTS');
-			foreach($segmentations as $segment){
-				array_push($header,$segment->menu_segment_column_description);
+            $header = array('MENU CODE');
+			$segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
+			$prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
+			$group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
+
+			
+			foreach($old_item_codes as $old_codes){
+				array_push($header,$old_codes->menu_old_code_column_description);
 			}
 
-			foreach($ingredients as $ingredient){
-					array_push($header,'INGREDIENT CODE '.$ingredient->menu_ingredient_description);
-					array_push($header,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
-					array_push($header,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
+			array_push($header,'POS OLD DESCRIPTION');
+			array_push($header,'MENU DESCRIPTION');
+			array_push($header,'PRODUCT TYPE');
+
+			foreach($group_choices as $choice){
+				array_push($header,$choice->menu_choice_group_column_description);
+				array_push($header,$choice->menu_choice_group_column_description.' SKU');
+			}
+			
+			array_push($header,'MENU TYPE');
+			array_push($header,'MAIN CATEGORY');
+			array_push($header,'SUB CATEGORY');
+
+			foreach($prices as $price){
+				array_push($header,$price->menu_price_column_description);
+			}
+			
+			array_push($header,'ORIGINAL CONCEPT');
+			array_push($header,'STATUS');
+
+			foreach($segmentations as $segment){
+				array_push($header,$segment->menu_segment_column_description);
 			}
 
 			for ($i=0; $i < sizeof($headings[0][0]); $i++) {

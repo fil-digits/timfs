@@ -3,8 +3,13 @@
 namespace App\Imports;
 
 use App\MenuCategory;
+use App\MenuChoiceGroup;
 use App\MenuItem;
+use App\MenuOldCodeMaster;
+use App\MenuPriceMaster;
 use App\MenuProductType;
+use App\MenuSegmentation;
+use App\MenuSubcategory;
 use App\MenuTransactionType;
 use App\MenuType;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -27,57 +32,62 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
 
         $code = $row["menu_code"];
         $data_array_segments = array();
-        $data_array_ingredients = array();
+        $data_array_old_codes = array();
+        $data_array_choice_groups = array();
+        $data_array_prices = array();
 
-        $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
-		$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
-        $category = MenuCategory::firstOrCreate(['category_description' => $row["category"]]);
+        $segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+		$category = MenuCategory::firstOrCreate(['category_description' => $row["main_category"]]);
+        $subcategory = MenuSubcategory::firstOrCreate(['categories_id' => $category->id,'subcategory_description' => $row["sub_category"]]);
         $product_type = MenuProductType::firstOrCreate(['menu_product_type_description' => $row["product_type"]]);
-        $transaction_type = MenuTransactionType::firstOrCreate(['menu_transaction_type_description' => $row["transaction_type"]]);
         $menu_type = MenuType::firstOrCreate(['menu_type_description' => $row["menu_type"]]);
+
+        $old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
+        $prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
+        $group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
+
 
         if(is_null($row["menu_code"])){
             $next_id = MenuItem::select('id')->orderBy('id','DESC')->first();
-            if($row["category"] == "PROMO"){
+            if($row["main_category"] == "PROMO"){
                 $code = '6'.str_pad($next_id->id, 5, "0", STR_PAD_LEFT);
             }
             else{
                 $code = '5'.str_pad($next_id->id, 5, "0", STR_PAD_LEFT);
             }
-            if(in_array($row["transaction_type"],["Delivery","DELIVERY"])){
-                $code .='DL';
-            }
-            else{
-                $code .='DT';
-            }
-            
         }
 
         foreach($segmentations as $segment){
             $seg = strtolower(str_replace(" ", "_", $segment->menu_segment_column_description));
             $data_array_segments[$segment->menu_segment_column_name] = $row[$seg];
         }
-        
-        foreach($ingredients as $ingredient){
-            $ing_code = 'ingredient_code_'.$ingredient->menu_ingredient_description;
-            $ing_name = 'ingredient_name_'.$ingredient->menu_ingredient_description;
-            $ing_qty = 'ingredient_qty_'.$ingredient->menu_ingredient_description;
-            
-            $data_array_ingredients[$ing_code]=$row[$ing_code];
-            $data_array_ingredients[$ing_name]=$row[$ing_name];
-            $data_array_ingredients[$ing_qty]=$row[$ing_qty];
+
+        foreach($old_item_codes as $old_code){
+            $oldCode = strtolower(str_replace(" ", "_", $old_code->menu_old_code_column_description));
+            $data_array_old_codes[$old_code->menu_old_code_column_name] = $row[$oldCode];
+        }
+
+        foreach($prices as $price){
+            $priceDescription = strtolower(str_replace(" ", "_", $price->menu_price_column_description));
+            $data_array_prices[$price->menu_price_column_name] = $row[$priceDescription];
+        }
+
+        foreach($group_choices as $group_choice){
+            $group = strtolower(str_replace(" ", "_", $group_choice->menu_choice_group_column_description));
+            $groupSku = strtolower(str_replace(" ", "_", $group_choice->menu_choice_group_column_description.'_sku'));
+            $data_array_choice_groups['choices_'.$group_choice->menu_choice_group_column_name] = $row[$group];
+            $data_array_choice_groups['choices_sku'.$group_choice->menu_choice_group_column_name] = $row[$groupSku];
         }
 
         $data_array_menu = [
             'action_type' => "Create",
             'menu_item_description' => $row["menu_description"],
+            'pos_old_item_description' => $row["pos_old_description"],
             'menu_categories_id' => $category->id,
+            'menu_subcategories_id' => $subcategory->id,
             'menu_product_types_id' => $product_type->id,
-            'menu_transaction_types_id' => $transaction_type->id,
             'menu_types_id' => $menu_type->id,
-            'menu_selling_price' => $row["price"],
             'original_concept' => $row["original_concept"],
-            'available_concepts' => $row["available_concepts"],
             'status' => $row["status"],
             'approval_status' => 1,
             'created_by' => CRUDBooster::myId(),
@@ -85,7 +95,7 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
         ];
         
         MenuItem::updateOrInsert(['tasteless_menu_code' => (string)$code],
-            array_merge($data_array_menu,$data_array_segments,$data_array_ingredients));
+            array_merge($data_array_menu,$data_array_segments,$data_array_old_codes,$data_array_prices,$data_array_choice_groups));
     }
 
     public function chunkSize(): int
