@@ -29,7 +29,6 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
     */
     public function model(array $row)
     {   
-
         $code = $row["menu_code"];
         $data_array_segments = array();
         $data_array_old_codes = array();
@@ -68,7 +67,9 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
         }
 
         foreach($prices as $price){
-            $priceDescription = strtolower(str_replace(" ", "_", $price->menu_price_column_description));
+            $priceTrim1 = str_replace("-", "", $price->menu_price_column_description);
+            $priceTrim2 = preg_replace('/\s+/', ' ', $priceTrim1);
+            $priceDescription = strtolower(str_replace(" ", "_", $priceTrim2));
             $data_array_prices[$price->menu_price_column_name] = $row[$priceDescription];
         }
 
