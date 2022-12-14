@@ -106,7 +106,7 @@ return [
     'button_save'            => 'Save',
     'button_save_more'       => 'Save & Add More',
     'button_import'          => 'Import Data',
-    'button_export'          => 'Export Selected',
+    'button_export'          => 'Export',
     'button_filter'          => 'Sort & Filter',
     'button_close'           => 'Close',
     'button_submit'          => 'Submit',

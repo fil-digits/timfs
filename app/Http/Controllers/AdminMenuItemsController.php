@@ -7,6 +7,7 @@
 	use App\MenuItem;
 	use App\MenuItemApproval;
 	use App\ApprovalWorkflowSetting;
+use App\Exports\ExcelTemplate;
 use App\Exports\MenuItemsExport;
 use App\Imports\MenuItemsImport;
 	use Illuminate\Support\Facades\Input;
@@ -549,24 +550,22 @@ use App\Imports\MenuItemsImport;
 	    }
 	    
 	    public function uploadTemplate(){
-            Excel::create('item-menu-format'.date("Ymd").'-'.date("h.i.sa"), function ($excel) {
-                $segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
-				$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
-				
-				$excel->sheet('menu-items', function ($sheet) use ($segmentations,$ingredients) {
-				    $header_array = array('MENU CODE','MENU DESCRIPTION','PRODUCT TYPE','TRANSACTION TYPE','MENU TYPE','CATEGORY','PRICE','ORIGINAL CONCEPT','STATUS','APPROVED DATE','AVAILABLE CONCEPTS');
-				    foreach($segmentations as $segment){
-        	       	    array_push($header_array,$segment->menu_segment_column_description);
-        	        }
-        	        foreach($ingredients as $ingredient){
-        	       	    array_push($header_array,'INGREDIENT CODE '.$ingredient->menu_ingredient_description);
-        	       	    array_push($header_array,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
-        	       	    array_push($header_array,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
-        	        }
-                    
-                    $sheet->row(1,  $header_array);
-				});
-			})->download('csv');
+
+			$header = array('MENU CODE','MENU DESCRIPTION','PRODUCT TYPE','TRANSACTION TYPE','MENU TYPE','CATEGORY','PRICE','ORIGINAL CONCEPT','STATUS','APPROVED DATE','AVAILABLE CONCEPTS');
+			$segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+			$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
+			
+			foreach($segmentations as $segment){
+				array_push($header,$segment->menu_segment_column_description);
+			}
+			foreach($ingredients as $ingredient){
+				array_push($header,'INGREDIENT CODE '.$ingredient->menu_ingredient_description);
+				array_push($header,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
+				array_push($header,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
+			}
+		
+			$export = new ExcelTemplate([$header]);
+            return Excel::download($export, 'menu-items-'.date("Ymd").'-'.date("h.i.sa").'.csv');
 	    }
 	    
 	    public function uploadItems(Request $request){
