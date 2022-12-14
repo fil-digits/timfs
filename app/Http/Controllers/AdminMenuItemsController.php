@@ -7,14 +7,14 @@
 	use App\MenuItem;
 	use App\MenuItemApproval;
 	use App\ApprovalWorkflowSetting;
-use App\Exports\ExcelTemplate;
-use App\Exports\MenuItemsExport;
-use App\Imports\MenuItemsImport;
-use App\MenuChoiceGroup;
-use App\MenuOldCodeMaster;
-use App\MenuPriceMaster;
-use App\MenuSegmentation;
-use Illuminate\Support\Facades\Input;
+	use App\Exports\ExcelTemplate;
+	use App\Exports\MenuItemsExport;
+	use App\Imports\MenuItemsImport;
+	use App\MenuChoiceGroup;
+	use App\MenuOldCodeMaster;
+	use App\MenuPriceMaster;
+	use App\MenuSegmentation;
+	use Illuminate\Support\Facades\Input;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 	use Maatwebsite\Excel\Facades\Excel;
@@ -45,22 +45,26 @@ use Illuminate\Support\Facades\Input;
 			$this->table = "menu_items";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
+			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
+			$prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-// 			$this->col[] = ["label"=>"Action Type","name"=>"action_type"];
+
 			$this->col[] = ["label"=>"Tasteless Menu Code","name"=>"tasteless_menu_code"];
+			foreach($old_item_codes as $old_code){
+				$this->col[] = ["label"=>ucwords(strtolower($old_code->menu_old_code_column_description)),"name"=>$old_code->menu_old_code_column_name];
+			}
+			$this->col[] = ["label"=>"POS Old Item Description","name"=>"pos_old_item_description"];
 			$this->col[] = ["label"=>"Menu Item Description","name"=>"menu_item_description"];
 			$this->col[] = ["label"=>"Menu Category","name"=>"menu_categories_id","join"=>"menu_categories,category_description"];
-			
+			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
 			$this->col[] = ["label"=>"Menu Product Type","name"=>"menu_product_types_id","join"=>"menu_product_types,menu_product_type_description"];
-			$this->col[] = ["label"=>"Menu Transaction Type","name"=>"menu_transaction_types_id","join"=>"menu_transaction_types,menu_transaction_type_description"];
 			$this->col[] = ["label"=>"Menu Type","name"=>"menu_types_id","join"=>"menu_types,menu_type_description"];
 			
-// 			$this->col[] = ["label"=>"Menu Subcategory","name"=>"menu_subcategories_id","join"=>"menu_subcategories,subcategory_description"];
-// 			$this->col[] = ["label"=>"Tax Code","name"=>"tax_codes_id","join"=>"tax_codes,tax_code"];
-// 			$this->col[] = ["label"=>"Menu Cost Price","name"=>"menu_cost_price"];
-            $this->col[] = ["label"=>"Original Concept","name"=>"original_concept"];
-			$this->col[] = ["label"=>"Menu Selling Price","name"=>"menu_selling_price"];
+			foreach($prices as $price){
+				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
+			}
+            $this->col[] = ["label"=>"Original Concept","name"=>"original_concept"];;
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
