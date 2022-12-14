@@ -13,6 +13,7 @@
 	use Illuminate\Http\Request;
 	use App\CodeCounter;
 	use App\Exports\BartenderExport;
+use App\Exports\ItemExport;
 use App\Exports\POSExport;
 use App\Exports\QBExport;
 use App\Group;
@@ -63,7 +64,7 @@ use App\Group;
     		$this->col[] = ["label"=>"Brand Description","name"=>"brands_id","join"=>"brands,brand_description","visible" => CRUDBooster::myColumnView()->brand_description ? true : false];
     		$this->col[] = ["label" => "Category Description", "name" => "categories_id", "join" => "categories,category_description", "visible" => CRUDBooster::myColumnView()->category_description ? true : false];
     		$this->col[] = ["label" => "Subcategory Description", "name" => "subcategories_id", "join" => "subcategories,subcategory_description", "visible" => CRUDBooster::myColumnView()->subcategory ? true : false];
-            $this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_type_id", "join" => "fulfillment_methods,fulfillment_method"];
+            $this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_methods_id", "join" => "fulfillment_methods,fulfillment_method"];
             $this->col[] = ["label" => "Packaging Size", "name" => "packaging_size", "visible" => CRUDBooster::myColumnView()->packaging_size ? true : false];
     		$this->col[] = ["label" => "Packaging UOM", "name" => "packagings_id", "join" => "packagings,packaging_code", "visible" => CRUDBooster::myColumnView()->packaging ? true : false];
     		$this->col[] = ["label"=>"Currency","name"=>"currencies_id","join"=>"currencies,currency_code","visible" => CRUDBooster::myColumnView()->currency ? true : false];
@@ -124,7 +125,7 @@ use App\Group;
                 ];
               
                 $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
+    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_methods_id', 'type' => 'select2',
     				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
     				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
     			];
@@ -298,7 +299,7 @@ use App\Group;
                 ];
 				
                 $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
+    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_methods_id', 'type' => 'select2',
     				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
     				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
     			];
@@ -490,7 +491,7 @@ use App\Group;
                     ];
 					
                     $this->form[] = [
-        				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
+        				'label' => 'Fulfillment Type', 'name' => 'fulfillment_methods_id', 'type' => 'select2',
         				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
         				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
         			];
@@ -696,7 +697,7 @@ use App\Group;
 	        $this->index_button = array();
 			if (CRUDBooster::getCurrentMethod() == 'getIndex') 
             {
-				$this->index_button[] = ['label' => 'Export Items', "url" => CRUDBooster::mainpath("export-excel").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-download"];
+				$this->index_button[] = ['label' => 'Export Items', "url" => "javascript:showItemExport()", "icon" => "fa fa-download"];
 				
 				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Encoder (Purchaser)"])){
 					$this->index_button[] = ['label' => 'Upload Module', "url" => CRUDBooster::mainpath("upload-module").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-upload"];
@@ -752,6 +753,10 @@ use App\Group;
 
 				function showQBExport() {
 					$('#modal-qb-export').modal('show');
+				}
+
+				function showItemExport() {
+					$('#modal-items-export').modal('show');
 				}
 
 			";
@@ -845,6 +850,33 @@ use App\Group;
                             <div class='form-group'>
                                 <label>File Name</label>
                                 <input type='text' name='filename' class='form-control' required value='Export QB Format - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-items-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Items</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("item-export").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export Items - ".date('Y-m-d H:i:s')."'/>
                             </div>
 						</div>
 						<div class='modal-footer' align='right'>
@@ -1104,7 +1136,7 @@ use App\Group;
 					   // DB::connection('mysql_trs')->statement('insert into items (tasteless_code, supplier_item_code, myob_item_description, full_item_description, brand_id, group_id, category_id, subcategory_id, uom_id, packaging_id, skustatus_id, currency_id, cost_price, ttp, landed_cost, created_by, updated_by) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['myob_item_description'], $new_items['full_item_description'], $new_items['brands_id'], $new_items['groups_id'], $new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['packagings_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['created_by'], $new_items['updated_by']]);
 			                                   
 			           //--edited by cris 20201009---
-                        DB::connection('mysql_trs')->statement('insert into items (tasteless_code, supplier_item_code,  full_item_description,  brand_id, group_id, fulfillment_type_id, category_id, subcategory_id, uom_id, packaging_id, skustatus_id, currency_id, cost_price, ttp, landed_cost,moq_store,myob_item_description ,created_by, updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_type_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
+                        DB::connection('mysql_trs')->statement('insert into items (tasteless_code, supplier_item_code,  full_item_description,  brand_id, group_id, fulfillment_methods_id, category_id, subcategory_id, uom_id, packaging_id, skustatus_id, currency_id, cost_price, ttp, landed_cost,moq_store,myob_item_description ,created_by, updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_methods_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
                         //-------------------------                         
 			                                    
 			            $segmentation_datas = DB::table('segmentations')->where('status','ACTIVE')->get();
@@ -1311,7 +1343,7 @@ use App\Group;
 					'myob_item_description' => $sku_legend['full_item_description'],
 					'brand_id' 				=> $sku_legend['brands_id'],
 					'group_id' 				=> $sku_legend['groups_id'],
-                    'fulfillment_type_id'   => $sku_legend['fulfillment_type_id'],
+                    'fulfillment_methods_id'   => $sku_legend['fulfillment_methods_id'],
 					'category_id' 			=> $sku_legend['categories_id'],
 					'subcategory_id' 		=> $sku_legend['subcategories_id'],
 					'uom_id' 				=> $sku_legend['uoms_id'],
@@ -1359,16 +1391,16 @@ use App\Group;
 			}else{
 			    
                 // Fullfillment Type
-			    if(!empty($postdata['fulfillment_type_id']))
+			    if(!empty($postdata['fulfillment_methods_id']))
 			    {
 			        // TIMFS item_masters table
 			        DB::table('item_masters')->where('tasteless_code',$postdata["tasteless_code"])->update([
-					    'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
+					    'fulfillment_methods_id'   =>  $postdata['fulfillment_methods_id']
 				    ]);
 				    
 				    // TRS items table
 				    DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-                        'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
+                        'fulfillment_methods_id'   =>  $postdata['fulfillment_methods_id']
                     ]);
 			    }
 
@@ -1668,201 +1700,10 @@ use App\Group;
 			return parent::getEdit($id);
 		}
 
-		public function customExportExcel(Request $request){
-		    
-		    ini_set('max_execution_time', 0); // 0 = Unlimited
-			ini_set('memory_limit',"-1");
-		    
-		    $filter_column = \Request::get('filter_column');
-		    
-			$dbhost = env('DB_HOST');
-			$dbport = env('DB_PORT');
-			$dbname = env('DB_DATABASE');
-			$dbuser = env('DB_USERNAME');
-			$dbpass = env('DB_PASSWORD');
-			
-			$conn = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-
-			if(! $conn ){
-				die('Could not connect: ' . mysqli_error());
-			}
-		
-            $segmentation =  DB::table('segmentations')->where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
-		
-			$sql_query = "SELECT  item_masters.tasteless_code as 'Tasteless Code', 
-				suppliers.last_name as 'Co. Last Name',
-				item_masters.supplier_item_code as 'Supplier Item Code',
-				item_masters.full_item_description as 'Full Item Description',
-				brands.brand_code as 'Brand Code',
-				brands.brand_description as 'Brand Description',
-				groups.group_description as 'Group',
-				categories.category_code as 'Category Code', 
-				categories.category_description as 'Category Description',
-				subcategories.subcategory_description as 'Subcategory Description',
-				item_masters.packaging_dimension as 'Dimension',
-				item_masters.packaging_size as 'Packaging Size',
-				fulfillment_methods.fulfillment_method as 'Fulfillment Type',
-				uoms.uom_code as 'UOM',
-				packagings.packaging_code as 'Packaging',
-				sku_statuses.sku_status_description as 'SKU Status',
-				item_masters.purchase_price as 'Supplier Cost',";
-			
-			$sql_query .= "currencies.currency_code as 'Currency',
-				tax_codes.tax_description as 'VAT Code',
-				item_masters.moq_supplier as 'MOQ Supplier',
-				item_masters.moq_store as 'MOQ Store',";
-					
-			if(CRUDBooster::myColumnView()->ttp){
-			    $sql_query .= "item_masters.ttp as 'Sales Price',
-					item_masters.old_ttp as 'Old Sales Price',
-					item_masters.ttp_price_change as 'Sales Price Change',
-					item_masters.ttp_price_effective_date as 'Sales Price Effective Date',";    
-			}
-			if(CRUDBooster::myColumnView()->ttp_percentage){
-			    $sql_query .= "item_masters.ttp_percentage as 'TTP Markup Percentage',
-				item_masters.old_ttp_percentage as 'Old TTP Markup Percentage',";    
-			}
-			if(CRUDBooster::myColumnView()->landed_cost){
-			    $sql_query .= "item_masters.landed_cost as 'Landed Cost',";    
-			}
-			if(CRUDBooster::myColumnView()->segmentation){
-				foreach($segmentation as $segment){
-				    $sql_query .= "`item_masters`.".$segment->segment_column_name ." AS '".str_replace("'", "\\'",$segment->segment_column_description) ."',";
-				}
-			}
-			$sql_query .= "user1.name as 'Created By',
-				item_masters.created_at as 'Created Date',
-				user2.name as 'Updated By',
-				item_masters.updated_at as 'Updated Date'
-				FROM `item_masters` 						
-				LEFT JOIN `suppliers` ON `item_masters`.suppliers_id = `suppliers`.id
-				LEFT JOIN `trademarks` ON `item_masters`.trademarks_id = `trademarks`.id
-				LEFT JOIN `classifications` ON `item_masters`.classifications_id = `classifications`.id
-				LEFT JOIN `brands` ON `item_masters`.brands_id = `brands`.id
-				LEFT JOIN `groups` ON `item_masters`.groups_id = `groups`.id
-				LEFT JOIN `categories` ON `item_masters`.categories_id = `categories`.id
-				LEFT JOIN `subcategories` ON `item_masters`.subcategories_id = `subcategories`.id
-				LEFT JOIN `types` ON `item_masters`.types_id = `types`.id
-				LEFT JOIN `colors` ON `item_masters`.colors_id = `colors`.id
-				LEFT JOIN `currencies` ON `item_masters`.currencies_id = `currencies`.id
-				LEFT JOIN `sku_statuses` ON `item_masters`.sku_statuses_id = `sku_statuses`.id
-				LEFT JOIN `vendor_types` ON `item_masters`.vendor_types_id = `vendor_types`.id
-				LEFT JOIN `packagings` ON `item_masters`.packagings_id = `packagings`.id
-				LEFT JOIN `fulfillment_methods` ON `item_masters`.fulfillment_type_id = `fulfillment_methods`.id
-				LEFT JOIN `uoms` ON `item_masters`.uoms_id = `uoms`.id
-				LEFT JOIN `inventory_types` ON `item_masters`.inventory_types_id = `inventory_types`.id
-				LEFT JOIN `tax_codes` ON `item_masters`.tax_codes_id = `tax_codes`.id
-				LEFT JOIN `chart_accounts` ON `item_masters`.chart_accounts_id = `chart_accounts`.id
-				LEFT JOIN `cms_users` as user1 ON `item_masters`.created_by = `user1`.id
-				LEFT JOIN `cms_users` as user2 ON `item_masters`.updated_by = `user2`.id";
-		    
-		    $sql_query .="	WHERE `item_masters`.tasteless_code IS NOT NULL AND ";
-		    if(!CRUDBooster::isSuperadmin()){
-		        $sql_query .=" `item_masters`.sku_statuses_id != 2 AND";
-		    }
-    		$sql_query .="`item_masters`.deleted_at IS NULL ";
-		    
-		    if($filter_column){
-				foreach($filter_column as $key=>$fc) {
-
-					$value = @$fc['value'];
-					$type  = @$fc['type'];
-
-					if($type == 'empty') {
-						
-						$sql_query .= "AND ".$key." IS NULL OR ".$key." = ''";
-						continue;
-					}
-
-					if($value=='' || $type=='') continue;
-
-					if($type == 'between') continue;
-
-					switch($type) {
-						default:
-						
-							if($key && $type && $value) $sql_query .= "AND ".$key." ".$type." '".$value."'";
-						break;
-						case 'like':
-						case 'not like':
-							$value = '%'.$value.'%';
-							
-							if($key && $type && $value) $sql_query .= "AND ".$key." ".$type." '".$value."'";
-						break;
-						case 'in':
-						case 'not in':
-							if($value) {
-								$value = explode(',',$value);
-								
-								if($key && $value) $sql_query .= $key." IN (".$value.")";
-							}
-						break;
-					}
-				}
-
-				foreach($filter_column as $key=>$fc) {
-					$value = @$fc['value'];
-					$type  = @$fc['type'];
-	
-					if ($type=='between') {
-						if($key && $value) 
-							$sql_query .= "AND (".$key." BETWEEN '".$value[0]."' AND '".$value[1]."')";
-					}else{
-						continue;
-					}
-				}
-			}
-			
-            $sql_query .=" ORDER BY `item_masters`.tasteless_code ASC";
-            
-		    $resultset = mysqli_query($conn, $sql_query) or die("Database Error:". mysqli_error($conn));
-
-			$filename = "Export IMFS - " . date('Ymd H:i:s') . ".xls";
-			header("Content-Type: application/vnd.ms-excel");
-			header("Content-Disposition: attachment; filename=\"$filename\"");
-
-			$delimiter = "\t";
-			while ($header = mysqli_fetch_field($resultset)) {
-			    echo $header->name."\t";
-			}
-			print "\n";
-			while($row = mysqli_fetch_row($resultset))
-			{
-			    $schema_insert = "";
-			    for($j=0; $j< mysqli_num_fields($resultset);$j++)
-			    {
-			        if(!isset($row[$j])){
-			            $schema_insert .= "".$delimiter;
-			        }elseif ($row[$j] != "") {
-			        	if($j==0 && $row[0] != "") 
-			        	{
-		                	$schema_insert .= '="'."$row[0]".'"'.$delimiter;
-		                }elseif($j==5 && $row[5] != "") 
-		                {
-		                	$schema_insert .= '="'."$row[5]".'"'.$delimiter;
-		                }elseif($j==16 && $row[16] != "") 
-		                {
-		                	$schema_insert .= '="'.floatval(number_format($row[16], 5, '.', '')).'"'.$delimiter;  // purchase_price
-		                }elseif($j==21 && $row[21] != "") 
-		                {
-		                	$schema_insert .= '="'.number_format($row[21], 2, '.', '').'"'.$delimiter;  // ttp
-		                }else{
-			            	$schema_insert .= "$row[$j]".$delimiter;
-			            }
-			        }
-			        else{ 
-			            $schema_insert .= "".$delimiter;
-                    }
-			    }
-			    $schema_insert = str_replace($sep."$", "", $schema_insert);
-			    $schema_insert = preg_replace("/\r\n|\n\r|\n|\r/", " ", $schema_insert);
-			    $schema_insert .= "\t";
-			    print(trim($schema_insert));
-			    print "\n";
-			}
-
-			mysqli_close($conn);
-			exit;
+		public function exportItems(Request $request)
+		{
+			$filename = $request->input('filename');
+			return Excel::download(new ItemExport, $filename.'.xlsx');
 		}
 		
 		public function exportQBFormat(Request $request)
@@ -2193,7 +2034,7 @@ use App\Group;
 						}else{
 
 							// fulfillment type
-							$fulfillment_type_id = DB::table('fulfillment_methods')->where('fulfillment_method',$value->fulfillment_type)->value('id');
+							$fulfillment_methods_id = DB::table('fulfillment_methods')->where('fulfillment_method',$value->fulfillment_type)->value('id');
 
 							$remove_comma = str_replace(",", "",$value->ttp);//TTP
 							$ttp = floatval($remove_comma);
@@ -2229,7 +2070,7 @@ use App\Group;
 							}
 							
 							$data = [
-								'fulfillment_type_id' =>  intval($fulfillment_type_id)
+								'fulfillment_methods_id' =>  intval($fulfillment_methods_id)
 									
 								];
 								
@@ -2239,7 +2080,7 @@ use App\Group;
 								DB::table('item_masters')->where('tasteless_code', $value->tasteless_code)->update($data);
 								DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)
 								->update([ 
-									'fulfillment_type_id' => intval($fulfillment_type_id) 
+									'fulfillment_methods_id' => intval($fulfillment_methods_id) 
 								]);
 
 								DB::commit();

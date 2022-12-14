@@ -33,7 +33,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 	Route::post('admin/item_masters/bartender','AdminItemMastersController@exportBartender')->name('bartender');
 	Route::post('admin/item_masters/posformat','AdminItemMastersController@exportPOSFormat')->name('posformat');
 	Route::post('admin/item_masters/qbformat','AdminItemMastersController@exportQBFormat')->name('qbformat');
-	Route::get('admin/item_masters/export-excel','AdminItemMastersController@customExportExcel')->name('export-excel');
+	Route::post('admin/item_masters/item-export','AdminItemMastersController@exportItems')->name('export-items');
 	
 	//----added by cris 20201006----
     
