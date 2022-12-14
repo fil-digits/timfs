@@ -10,7 +10,11 @@
 use App\Exports\ExcelTemplate;
 use App\Exports\MenuItemsExport;
 use App\Imports\MenuItemsImport;
-	use Illuminate\Support\Facades\Input;
+use App\MenuChoiceGroup;
+use App\MenuOldCodeMaster;
+use App\MenuPriceMaster;
+use App\MenuSegmentation;
+use Illuminate\Support\Facades\Input;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 	use Maatwebsite\Excel\Facades\Excel;
@@ -551,17 +555,35 @@ use App\Imports\MenuItemsImport;
 	    
 	    public function uploadTemplate(){
 
-			$header = array('MENU CODE','MENU DESCRIPTION','PRODUCT TYPE','TRANSACTION TYPE','MENU TYPE','CATEGORY','PRICE','ORIGINAL CONCEPT','STATUS','APPROVED DATE','AVAILABLE CONCEPTS');
-			$segmentations =  DB::table('menu_segmentations')->where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
-			$ingredients = DB::table('menu_ingredients')->where('status','ACTIVE')->orderBy('menu_ingredient_description','ASC')->get();
+			$header = array('MENU CODE');
+			$segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
+			$prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
+			$group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
+
 			
+			foreach($old_item_codes as $old_codes){
+				array_push($header,$old_codes->menu_old_code_column_description);
+			}
+
+			array_push($header,'POS OLD DESCRIPTION');
+			array_push($header,'MENU DESCRIPTION');
+			array_push($header,'PRODUCT TYPE');
+
+			foreach($group_choices as $choice){
+				array_push($header,$choice->menu_choice_group_column_description);
+			}
+			
+			array_push($header,'MENU TYPE');
+			array_push($header,'MAIN CATEGORY');
+			array_push($header,'SUB CATEGORY');
+
+			foreach($prices as $price){
+				array_push($header,$price->menu_price_column_description);
+			}
+
 			foreach($segmentations as $segment){
 				array_push($header,$segment->menu_segment_column_description);
-			}
-			foreach($ingredients as $ingredient){
-				array_push($header,'INGREDIENT CODE '.$ingredient->menu_ingredient_description);
-				array_push($header,'INGREDIENT NAME '.$ingredient->menu_ingredient_description);
-				array_push($header,'INGREDIENT QTY '.$ingredient->menu_ingredient_description);
 			}
 			
 			$export = new ExcelTemplate([$header]);
