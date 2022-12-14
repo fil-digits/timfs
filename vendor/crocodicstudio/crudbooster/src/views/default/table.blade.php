@@ -69,25 +69,25 @@
                 $width = (isset($col['width'])) ?$col['width']: "auto";
 		$style = (isset($col['style'])) ?$col['style']: "";
                 $mainpath = trim(CRUDBooster::mainpath(), '/').$build_query;
-                echo "<th width='$width' $style>";
+                echo "<th style='vertical-align: top' width='$width' $style>";
                 if (isset($sort_column[$field])) {
                     switch ($sort_column[$field]['sorting']) {
                         case 'asc':
                             $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'desc');
-                            echo "<a href='$url' title='Click to sort descending'>$colname &nbsp; <i class='fa fa-sort-desc'></i></a>";
+                            echo "<a href='$url' title='Click to sort descending'>$colname </a>";
                             break;
                         case 'desc':
                             $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                            echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort-asc'></i></a>";
+                            echo "<a href='$url' title='Click to sort ascending'>$colname </a>";
                             break;
                         default:
                             $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                            echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
+                            echo "<a href='$url' title='Click to sort ascending'>$colname </a>";
                             break;
                     }
                 } else {
                     $url = CRUDBooster::urlFilterColumn($field, 'sorting', 'asc');
-                    echo "<a href='$url' title='Click to sort ascending'>$colname &nbsp; <i class='fa fa-sort'></i></a>";
+                    echo "<a href='$url' title='Click to sort ascending'>$colname </a>";
                 }
 
                 echo "</th>";
