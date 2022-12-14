@@ -47,7 +47,7 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			
+
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
 			    $this->form[] = ['label'=>'Menu Old Code Column Name','name'=>'menu_old_code_column_name','type'=>'text','validation'=>'required|min:1|max:15','width'=>'col-sm-4'];
 				$this->form[] = ['label'=>'Menu Old Code Column Description','name'=>'menu_old_code_column_description','type'=>'text','validation'=>'required|min:1|max:30','width'=>'col-sm-4'];
@@ -301,7 +301,7 @@
 	    public function hook_after_add($id) {        
 	        //Your code here
 			$postdata["created_by"]=CRUDBooster::myId();
-			self::createMenuOldCodeColumn($postdata["menu_price_column_name"]);
+			self::createMenuOldCodeColumn($postdata["menu_old_code_column_name"]);
 	    }
 
 	    /* 
