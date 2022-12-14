@@ -10,6 +10,10 @@ use crocodicstudio\crudbooster\fonts\Fontawesome;
 
 class ModulsController extends CBController
 {
+    public function __construct() {
+        DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+    }
+    
     public function cbInit()
     {
         $this->table = 'cms_moduls';
