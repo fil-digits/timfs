@@ -2,7 +2,9 @@
 
 	use Session;
 	use DB;
-	use Excel;
+	use Maatwebsite\Excel\HeadingRowImport;
+    use Maatwebsite\Excel\Imports\HeadingRowFormatter;
+	use Maatwebsite\Excel\Facades\Excel;
 	use CRUDBooster;
 	use App\Brand;
 	use App\ItemMaster;
@@ -10,7 +12,10 @@
 	use App\ApprovalWorkflowSetting;
 	use Illuminate\Http\Request;
 	use App\CodeCounter;
-	use App\Group;
+	use App\Exports\BartenderExport;
+use App\Exports\POSExport;
+use App\Exports\QBExport;
+use App\Group;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -22,6 +27,10 @@
         private $pre_ttp_price = 0;
         private $segmentation_editForm = [];
         private $counter = 0;
+
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
 	    
 	    public function cbInit() {
 
@@ -693,13 +702,13 @@
 					$this->index_button[] = ['label' => 'Upload Module', "url" => CRUDBooster::mainpath("upload-module").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-upload"];
 				}
 				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(), ["Administrator","Manager (Purchaser)","Manager (Accounting)","Encoder (Purchaser)","Encoder (Accounting)","Supervisor (Purchaser)"])){
-    				$this->index_button[] = ['label' => 'Bartender Format', "url" => CRUDBooster::mainpath("bartender").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-download"];
-    				$this->index_button[] = ['label' => 'POS Format', "url" => CRUDBooster::mainpath("posformat").'?'.urldecode(http_build_query(@$_GET)), "icon" => "fa fa-download"];
-    				$this->index_button[] = ['label' => 'QB Item Format', "url" => CRUDBooster::mainpath("qbformat") . '?' . urldecode(http_build_query(@$_GET)), "icon" => "fa fa-download"];
+    				$this->index_button[] = ['label' => 'Bartender Format', 'url'=>"javascript:showBartenderExport()",'icon'=>'fa fa-download'];
+    				$this->index_button[] = ['label' => 'POS Format', "url" => "javascript:showPOSExport()", "icon" => "fa fa-download"];
+    				$this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
 				    
 				}
                 if (!CRUDBooster::isSuperadmin() && in_array(CRUDBooster::myPrivilegeName(), ["View I (TTP)", "View II (Purchase Price)", "View III (TTP and Purchase Price)"])) {
-                    $this->index_button[] = ['label' => 'QB Item Format', "url" => CRUDBooster::mainpath("qbformat") . '?' . urldecode(http_build_query(@$_GET)), "icon" => "fa fa-download"];
+                    $this->index_button[] = ['label' => 'QB Item Format', "url" => "javascript:showQBExport()", "icon" => "fa fa-download"];
                     
                 }
 			}
@@ -732,7 +741,20 @@
 	        |
 	        */
 			$this->script_js = NULL;
+			$this->script_js = "
+				function showBartenderExport() {
+					$('#modal-bartender-export').modal('show');
+				}
 
+				function showPOSExport() {
+					$('#modal-pos-export').modal('show');
+				}
+
+				function showQBExport() {
+					$('#modal-qb-export').modal('show');
+				}
+
+			";
             /*
 	        | ---------------------------------------------------------------------- 
 	        | Include HTML Code before index table 
@@ -752,7 +774,88 @@
 	        |
 	        */
 	        $this->post_index_html = null;
-	        
+	        $this->post_index_html = "
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-bartender-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export Bartender</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("bartender").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export Bartender - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-pos-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export POS Format</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("posformat").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export POS Format - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-qb-export'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Export QB Format</h4>
+						</div>
+
+						<form method='post' target='_blank' action=".CRUDBooster::mainpath("qbformat").">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>File Name</label>
+                                <input type='text' name='filename' class='form-control' required value='Export QB Format - ".date('Y-m-d H:i:s')."'/>
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+			";
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Include Javascript File 
@@ -1762,764 +1865,20 @@
 			exit;
 		}
 		
-		// //-----edited by cris 20200810----------------------------
-	public function exportQBFormat(Request $request)
-	{
-		ini_set('max_execution_time', 0); // 0 = Unlimited
-			ini_set('memory_limit',"-1");
-		    
-		    $filter_column = \Request::get('filter_column');
-		    
-			$dbhost = env('DB_HOST');
-			$dbport = env('DB_PORT');
-			$dbname = env('DB_DATABASE');
-			$dbuser = env('DB_USERNAME');
-			$dbpass = env('DB_PASSWORD');
-			
-			$conn = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname, $dbport);
-
-			if(! $conn ){
-				die('Could not connect: ' . mysqli_error());
-			}
-		
-            $segmentation =  DB::table('segmentations')->where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
-		
-			$sql_query = "SELECT  sku_statuses.sku_status_description as 'Active Status',
-					item_masters.type as 'Type',
-					item_masters.tasteless_code as 'Item',
-					item_masters.full_item_description as 'Description',
-					tax_codes.tax_description as 'Sales Tax Code',
-					accounts.group_description as 'Account',
-					cogs_accounts.group_description as 'Cogs Account',
-					asset_accounts.group_description as 'Asset Account',
-					item_masters.accumulated_depreciation as 'Accumulated Depreciation',
-					item_masters.full_item_description as 'Purchase Description',
-					item_masters.quantity_on_hand as 'Quantity On Hand',
-					uoms.uom_code as 'U/M',
-					uoms_set.uom_code as 'U/M Set',
-					item_masters.purchase_price as 'Supplier Cost',
-					suppliers.last_name as 'Preferred Vendor',
-					item_masters.tax_agency as 'Tax Agency',
-					item_masters.price as 'Price',
-					item_masters.reorder_pt as 'Reorder PT(Min)',
-					item_masters.mpn as 'MPN',
-					groups.group_description as 'Group',
-					item_masters.tasteless_code as 'Barcode',
-					item_masters.packaging_dimension as 'Dimension',
-					item_masters.packaging_size as 'Packaging Size',
-					packagings.packaging_description as 'Packaging UOM',
-					tax_codes.tax_description as 'Tax Status',
-					item_masters.supplier_item_code as 'Supplier Item Code'";
-      
-		     $sql_query .=" FROM `item_masters` 						
-		                LEFT JOIN `suppliers` ON `item_masters`.suppliers_id = `suppliers`.id
-						LEFT JOIN `accounts` ON `item_masters`.accounts_id = `accounts`.id
-						LEFT JOIN `cogs_accounts` ON `item_masters`.cogs_accounts_id = `cogs_accounts`.id
-						LEFT JOIN `asset_accounts` ON `item_masters`.asset_accounts_id = `asset_accounts`.id
-						LEFT JOIN `groups` ON `item_masters`.groups_id = `groups`.id
-						LEFT JOIN `sku_statuses` ON `item_masters`.sku_statuses_id = `sku_statuses`.id
-						LEFT JOIN `packagings` ON `item_masters`.packagings_id = `packagings`.id
-						LEFT JOIN `uoms` ON `item_masters`.uoms_id = `uoms`.id
-						LEFT JOIN `uoms_set` ON `item_masters`.uoms_set_id = `uoms_set`.id
-						LEFT JOIN `tax_codes` ON `item_masters`.tax_codes_id = `tax_codes`.id";
-		    
-		    $sql_query .="	WHERE `item_masters`.tasteless_code IS NOT NULL AND ";
-		    if(!CRUDBooster::isSuperadmin()){
-		        $sql_query .=" `item_masters`.sku_statuses_id != 2 AND";
-		    }
-    		$sql_query .="`item_masters`.deleted_at IS NULL ";
-		    
-		    if($filter_column){
-				foreach($filter_column as $key=>$fc) {
-
-					$value = @$fc['value'];
-					$type  = @$fc['type'];
-
-					if($type == 'empty') {
-						
-						$sql_query .= "AND ".$key." IS NULL OR ".$key." = ''";
-						continue;
-					}
-
-					if($value=='' || $type=='') continue;
-
-					if($type == 'between') continue;
-
-					switch($type) {
-						default:
-							if($key && $type && $value) $sql_query .= "AND ".$key." ".$type." '".$value."'";
-						break;
-						case 'like':
-						case 'not like':
-							$value = '%'.$value.'%';
-							
-							if($key && $type && $value) $sql_query .= "AND ".$key." ".$type." '".$value."'";
-						break;
-						case 'in':
-						case 'not in':
-							if($value) {
-								$value = explode(',',$value);
-								if($key && $value) $sql_query .= $key." IN (".$value.")";
-							}
-						break;
-					}
-				}
-
-				foreach($filter_column as $key=>$fc) {
-					$value = @$fc['value'];
-					$type  = @$fc['type'];
-	
-					if ($type=='between') {
-						if($key && $value) 
-							$sql_query .= "AND (".$key." BETWEEN '".$value[0]."' AND '".$value[1]."')";
-					}else{
-						continue;
-					}
-				}
-			}
-			
-            $sql_query .=" ORDER BY `item_masters`.tasteless_code ASC";
-            
-		    $resultset = mysqli_query($conn, $sql_query) or die("Database Error:". mysqli_error($conn));
-
-			$filename = "Export QB Format - " . date('Ymd H:i:s') . ".xls";
-			header("Content-Type: application/vnd.ms-excel");
-			header("Content-Disposition: attachment; filename=\"$filename\"");
-
-			$delimiter = "\t";
-			while ($header = mysqli_fetch_field($resultset)) {
-			    echo $header->name."\t";
-			}
-			print "\n";
-			while($row = mysqli_fetch_row($resultset))
-			{
-			    $schema_insert = "";
-			    for($j=0; $j< mysqli_num_fields($resultset);$j++)
-			    {
-			        if(!isset($row[$j]))
-			            $schema_insert .= "".$delimiter;
-			        elseif ($row[$j] != "") {
-			        	if($j==0 && $row[0] != "") {
-		                	$schema_insert .= '="'."$row[0]".'"'.$delimiter;
-		                }
-		                elseif($j==5 && $row[5] != "") {
-		                	$schema_insert .= '="'."$row[5]".'"'.$delimiter;
-		                }
-		                else {
-			            	$schema_insert .= "$row[$j]".$delimiter;
-			            }
-			        }
-			        else
-			            $schema_insert .= "".$delimiter;
-			    }
-			    $schema_insert = str_replace($delimiter."$", "", $schema_insert);
-			    $schema_insert = preg_replace("/\r\n|\n\r|\n|\r/", " ", $schema_insert);
-			    $schema_insert .= "\t";
-			    print(trim($schema_insert));
-			    print "\n";
-			}
-
-			mysqli_close($conn);
-			exit;
-	}
-	// //--------------------------------------------------------
-
-		public function exportMYOBFormat(Request $request) {
-			//ob_end_clean();
-			//ob_start();
-			Excel::create('TIMFS-MYOBFormat-' . date("d M Y - h.i.sa"), function ($excel) {
-				// Set the title
-				$excel->setTitle('TastelessIMFS MYOB Format');
-				// Chain the setters
-				$excel->setCreator('Tasteless IMFS')->setCompany('Tasteless');
-				$excel->setDescription('TastelessIMFS MYOB Format Export');
-	
-				$excel->sheet('myobformat', function ($sheet) {
-					// Set auto size for sheet
-					$sheet->setAutoSize(true);
-					$sheet->setColumnFormat(array(
-						'S' => '@', //for supplier item number
-						'Y' => '0.00', // for selling price
-						'BO' => '0.00', //for standard cost	
-					));
-	
-						$data_myob = DB::table('item_masters');
-						$data_myob->select('item_masters.tasteless_code', 
-							'item_masters.supplier_item_code', 
-							'item_masters.myob_item_description', 
-							'item_masters.ttp', 
-							'item_masters.landed_cost', 
-							'item_masters.purchase_price', 
-							'brands.brand_code', 
-							'categories.category_code', 
-							'subcategories.subcategory_code', 
-							'groups.group_description', 
-							'groups.group_short_description', 
-							'packagings.packaging_code', 
-							'suppliers.last_name', 
-							'suppliers.first_name', 
-							'sku_statuses.sku_status_description',
-							'classifications.classification_name', 
-							'tax_codes.tax_code');
-						$data_myob->whereNotNull('item_masters.tasteless_code');
-						$data_myob->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id');
-						$data_myob->leftJoin('categories', 'item_masters.categories_id', '=', 'categories.id');
-						$data_myob->leftJoin('subcategories', 'item_masters.subcategories_id', '=', 'subcategories.id');
-						$data_myob->leftJoin('groups', 'item_masters.groups_id', '=', 'groups.id');
-						$data_myob->leftJoin('packagings', 'item_masters.packagings_id', '=', 'packagings.id');
-						$data_myob->leftJoin('suppliers', 'item_masters.suppliers_id', '=', 'suppliers.id');
-						$data_myob->leftJoin('classifications', 'item_masters.classifications_id', '=', 'classifications.id');
-						$data_myob->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id');
-						$data_myob->leftJoin('tax_codes', 'item_masters.tax_codes_id', '=', 'tax_codes.id');
-	
-						if(\Request::get('filter_column')) {
-	
-							$filter_column = \Request::get('filter_column');
-							$data_myob->where(function($w) use ($filter_column,$fc) {
-								foreach($filter_column as $key=>$fc) {
-	
-									$value = @$fc['value'];
-									$type  = @$fc['type'];
-	
-									if($type == 'empty') {
-										$w->whereNull($key)->orWhere($key,'');
-										continue;
-									}
-	
-									if($value=='' || $type=='') continue;
-	
-									if($type == 'between') continue;
-	
-									switch($type) {
-										default:
-											if($key && $type && $value) $w->where($key,$type,$value);
-										break;
-										case 'like':
-										case 'not like':
-											$value = '%'.$value.'%';
-											if($key && $type && $value) $w->where($key,$type,$value);
-										break;
-										case 'in':
-										case 'not in':
-											if($value) {
-												$value = explode(',',$value);
-												if($key && $value) $w->whereIn($key,$value);
-											}
-										break;
-									}
-								}
-							});
-	
-							foreach($filter_column as $key=>$fc) {
-								$value = @$fc['value'];
-								$type  = @$fc['type'];
-								$sorting = @$fc['sorting'];
-	
-								if($sorting!='') {
-									if($key) {
-										$data_myob->orderby($key,$sorting);
-										$filter_is_orderby = true;
-									}
-								}
-	
-								if ($type=='between') {
-									if($key && $value) $data_myob->whereBetween($key,$value);
-								}
-	
-								else {
-									continue;
-								}
-							}
-						}
-						$data_myob->whereNull('item_masters.deleted_at');
-						$data_myob->orderBy('item_masters.tasteless_code', 'asc');
-	
-						$datas_fmyob = $data_myob->get();
-	
-					$headings = array(
-						'Item Number',
-						'Item Name',
-						'Buy',
-						'Sell',
-						'Inventory',
-						'Asset Acct',
-						'Income Acct',
-						'Expense/COS Acct',
-						'Item Picture',
-						'Description',
-						'Use Desc. On Sale',
-						'Custom List 1',
-						'Custom List 2',
-						'Custom List 3',
-						'Custom Field 1',
-						'Custom Field 2',
-						'Custom Field 3',
-						'Primary Supplier',
-						'Supplier Item Number',
-						'Tax Code When Bought',
-						'Buy Unit Measure',
-						'# Items/Buy Unit',
-						'Reorder Quantity',
-						'Minimum Level',
-						'Selling Price',
-						'Sell Unit Measure',
-						'Tax Code When Sold',
-						'Sell Price Inclusive',
-						'Sales Tax Calc. Method',
-						'# Items/Sell Unit',
-						'Quantity Break 1',
-						'Quantity Break 2',
-						'Quantity Break 3',
-						'Quantity Break 4',
-						'Quantity Break 5',
-						'Price Level A, Qty Break 1',
-						'Price Level B, Qty Break 1',
-						'Price Level C, Qty Break 1',
-						'Price Level D, Qty Break 1',
-						'Price Level E, Qty Break 1',
-						'Price Level F, Qty Break 1',
-						'Price Level A, Qty Break 2',
-						'Price Level B, Qty Break 2',
-						'Price Level C, Qty Break 2',
-						'Price Level D, Qty Break 2',
-						'Price Level E, Qty Break 2',
-						'Price Level F, Qty Break 2',
-						'Price Level A, Qty Break 3',
-						'Price Level B, Qty Break 3',
-						'Price Level C, Qty Break 3',
-						'Price Level D, Qty Break 3',
-						'Price Level E, Qty Break 3',
-						'Price Level F, Qty Break 3',
-						'Price Level A, Qty Break 4',
-						'Price Level B, Qty Break 4',
-						'Price Level C, Qty Break 4',
-						'Price Level D, Qty Break 4',
-						'Price Level E, Qty Break 4',
-						'Price Level F, Qty Break 4',
-						'Price Level A, Qty Break 5',
-						'Price Level B, Qty Break 5',
-						'Price Level C, Qty Break 5',
-						'Price Level D, Qty Break 5',
-						'Price Level E, Qty Break 5',
-						'Price Level F, Qty Break 5',
-						'Inactive Item',
-						'Standard Cost',
-						'Default Ship/Sell Location',
-						'Default Recvd/Auto Location'
-						);
-					foreach ($datas_fmyob as $data_myobformat) {
-						
-						$item_status = 'N';
-						$item_purchase_price = 0.00;
-						$item_ttp = 0.00;
-						$item_vatcode = '';
-						$item_sellprice_incl='';
-	
-						$item_assetaccnt = '15050';
-						$item_incomeaccnt = '43000';
-						$item_expenseaccnt = '53300';
-	
-						$blank_si = ['4000000009','4000000010','4000000011','4000000012','4000000013'];
-	
-						$group_food = substr($data_myobformat->group_description, 0, 4);
-	
-						if($data_myobformat->group_description == 'BEVERAGE'){
-							$item_assetaccnt = '15042';
-							$item_incomeaccnt = '42027';
-							$item_expenseaccnt = '53200';
-						}
-						if($data_myobformat->group_description == 'FINISHED GOODS' || $group_food == 'FOOD'){
-							$item_assetaccnt = '15041';
-							$item_incomeaccnt = '41000';
-							$item_expenseaccnt = '53100';
-						}
-						if(in_array($data_myobformat->tasteless_code,$blank_si)){
-							$item_assetaccnt = '21306';
-							$item_incomeaccnt = '';
-							$item_expenseaccnt = '';
-						}
-						
-						// if($data_myobformat->classification_description == 'DIRECT'){
-						// 	$item_status = 'N';
-						// }
-						if($data_myobformat->tax_code == 'VAT'){
-							$item_sellprice_incl='X';
-						}
-	
-						if($data_myobformat->sku_status_description == 'INACTIVE'){
-							$item_status = 'Y';
-						}
-						
-						if(!is_null($data_myobformat->tax_code)){
-							$item_ttp = $data_myobformat->ttp;
-							$item_purchase_price = $data_myobformat->purchase_price;
-							$item_vatcode = $data_myobformat->tax_code;
-						}
-	
-						$datas[] = array(
-							$data_myobformat->tasteless_code,
-							$data_myobformat->myob_item_description,
-							'B', //buy
-							'S', //sell
-							'I', //inventory
-							$item_assetaccnt, //asset acct
-							$item_incomeaccnt, //income acct
-							$item_expenseaccnt, //expense/cos acct
-							'', //item picture
-							'', //description
-							'', //use desc. on sale
-							'', //custom list 1
-							'', //custom list 2
-							'', //custom list 3
-							'', //custom field 1
-							'', //custom field 2
-							'', //custom field 3
-							$data_myobformat->last_name.' '.$data_myobformat->first_name, //primary supplier
-							$data_myobformat->supplier_item_code, //supplier item number
-							$item_vatcode, //tax code when bought
-							$data_myobformat->packaging_code, //buy unit measure
-							'1', //# items/buy unit
-							'', //reorder quantity
-							'', //minimum level
-							$item_ttp, //selling price
-							$data_myobformat->packaging_code, //sell unit measure
-							$item_vatcode, //tax code when sold
-							$item_sellprice_incl, //sell price inclusive
-							'0', //sales tax calc. method
-							'1', //# items/sell unit
-							'', //quantity break 1
-							'', //quantity break 2
-							'', //quantity break 3
-							'', //quantity break 4
-							'', //quantity break 5
-							$item_ttp, //price level a, qty break 1
-							'', //price level b, qty break 1
-							'', //price level c, qty break 1
-							'', //price level d, qty break 1
-							'', //price level e, qty break 1
-							'', //price level f, qty break 1
-							'', //price level a, qty break 2
-							'', //price level b, qty break 2
-							'', //price level c, qty break 2
-							'', //price level d, qty break 2
-							'', //price level e, qty break 2
-							'', //price level f, qty break 2
-							'', //price level a, qty break 3
-							'', //price level b, qty break 3
-							'', //price level c, qty break 3
-							'', //price level d, qty break 3
-							'', //price level e, qty break 3
-							'', //price level f, qty break 3
-							'', //price level a, qty break 4
-							'', //price level b, qty break 4
-							'', //price level c, qty break 4
-							'', //price level d, qty break 4
-							'', //price level e, qty break 4
-							'', //price level f, qty break 4
-							'', //price level a, qty break 5
-							'', //price level b, qty break 5
-							'', //price level c, qty break 5
-							'', //price level d, qty break 5
-							'', //price level e, qty break 5
-							'', //price level f, qty break 5
-							$item_status, //inactive item
-							$item_purchase_price, //standard cost
-							$data_myobformat->group_location, //default ship/sell location
-							$data_myobformat->group_location, //default recvd/auto location
-						);
-					}
-	
-					$sheet->fromArray($datas, null, 'A1', false, false);
-					$sheet->prependRow(1, $headings);
-					$sheet->row(1, function ($row) {
-						$row->setBackground('#FFFF00');
-						$row->setAlignment('center');
-					});
-					$sheet->cells('A1:BQ1', function ($cells) {
-						// Set font weight to bold
-						$cells->setFontWeight('bold');
-						// Set all borders (top, right, bottom, left)
-						$cells->setBorder('none', 'none', 'solid', 'none');
-					});
-	
-				});
-			})->export('csv');
+		public function exportQBFormat(Request $request)
+		{
+			$filename = $request->input('filename');
+			return Excel::download(new QBExport, $filename.'.xlsx');
 		}
 
 		public function exportPOSFormat(Request $request) {
-	
-			Excel::create('TIMFS-POSFormat-' . date("d M Y - h.i.sa"), function ($excel) {
-				// Set the title
-				$excel->setTitle('TastelessIMFS POS Format');
-				// Chain the setters
-				$excel->setCreator('Tasteless IMFS')->setCompany('Tasteless');
-				$excel->setDescription('TastelessIMFS POS Format Export');
-	
-				$excel->sheet('posformat', function ($sheet) {
-					// Set auto size for sheet
-					$sheet->setAutoSize(true);
-					$sheet->setColumnFormat(array(
-						'H' => '0.00', //for standard cost
-						'I' => '0.00', //for list price
-						'K' => '@', //for barcode 1
-					));
-	
-					$data_pos = DB::table('item_masters')->select('item_masters.tasteless_code', 
-					    'item_masters.supplier_item_code', 
-					    'item_masters.full_item_description', 
-					    'item_masters.ttp', 
-					    'item_masters.landed_cost', 
-					    'item_masters.purchase_price', 
-					    'brands.brand_code', 
-					    'categories.category_code', 
-					    'subcategories.subcategory_code', 
-					    'uoms.uom_code')
-					->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
-					->leftJoin('categories', 'item_masters.categories_id', '=', 'categories.id')
-					->leftJoin('subcategories', 'item_masters.subcategories_id', '=', 'subcategories.id')
-					->leftJoin('uoms', 'item_masters.uoms_id', '=', 'uoms.id');
-	
-					if(\Request::get('filter_column')) {
-	
-						$filter_column = \Request::get('filter_column');
-						$data_pos->where(function($w) use ($filter_column,$fc) {
-							foreach($filter_column as $key=>$fc) {
-	
-								$value = @$fc['value'];
-								$type  = @$fc['type'];
-	
-								if($type == 'empty') {
-									$w->whereNull($key)->orWhere($key,'');
-									continue;
-								}
-	
-								if($value=='' || $type=='') continue;
-	
-								if($type == 'between') continue;
-	
-								switch($type) {
-									default:
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'like':
-									case 'not like':
-										$value = '%'.$value.'%';
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'in':
-									case 'not in':
-										if($value) {
-											$value = explode(',',$value);
-											if($key && $value) $w->whereIn($key,$value);
-										}
-									break;
-								}
-							}
-						});
-	
-						foreach($filter_column as $key=>$fc) {
-							$value = @$fc['value'];
-							$type  = @$fc['type'];
-							$sorting = @$fc['sorting'];
-	
-							if($sorting!='') {
-								if($key) {
-									$data_pos->orderby($key,$sorting);
-									$filter_is_orderby = true;
-								}
-							}
-	
-							if ($type=='between') {
-								if($key && $value) $data_pos->whereBetween($key,$value);
-							}
-	
-							else {
-								continue;
-							}
-						}
-					}
-	
-					$data_pos->whereNull('item_masters.deleted_at');
-					$data_pos->orderBy('item_masters.tasteless_code', 'asc');
-						
-					$datas_fpos = $data_pos->get();
-					$headings = array('Product ID', 
-					    'Product Name', 
-					    'Active Flag', 
-					    'Memo', 
-					    'Tax Type', 
-					    'Sale Flag', 
-					    'Unit of Measure', 
-					    'Standard Cost', 
-					    'List Price', 
-					    'Generic Name', 
-					    'Barcode 1', 
-					    'Barcode 2', 
-					    'Barcode 3', 
-					    'Alternate Code', 
-					    'Product Type', 
-					    'Class ID', 
-					    'Color Highlight', 
-					    'Supplier ID', 
-					    'Reorder Quantity', 
-					    'Track Expiry', 
-					    'Track Warranty', 
-					    'Warranty Duration', 
-					    'Duration Type', 
-					    'Category 1', 
-					    'Category 2', 
-					    'Category 3', 
-					    'Category 4', 
-					    'Category 5', 
-					    'Category 6');
-	
-					foreach ($datas_fpos as $data_posformat) {
-						$datas[] = array(
-							$data_posformat->tasteless_code,
-							$data_posformat->full_item_description,
-							1, '', 0, 1,
-							$data_posformat->uom_code,
-							$data_posformat->landed_cost,
-							$data_posformat->ttp,
-							'',
-							$data_posformat->supplier_itemcode,
-							'', '', '', 0, '', '', '',
-							0, 0, 1, 1, 'Years',
-							$data_posformat->category_code,
-							$data_posformat->subcategory_code,
-							$data_posformat->brand_code,
-							'', '', '',
-						);
-					}
-	
-					$sheet->fromArray($datas, null, 'A1', false, false);
-					$sheet->prependRow(1, $headings);
-					$sheet->row(1, function ($row) {
-						$row->setBackground('#FFFF00');
-						$row->setAlignment('center');
-					});
-					$sheet->cells('A1:AC1', function ($cells) {
-						// Set font weight to bold
-						$cells->setFontWeight('bold');
-						// Set all borders (top, right, bottom, left)
-						$cells->setBorder('none', 'none', 'solid', 'none');
-					});
-	
-				});
-			})->export('csv');
+			$filename = $request->input('filename');
+		   	return Excel::download(new POSExport, $filename.'.xlsx');
 		}
 
 		public function exportBartender(Request $request) {
-			//ob_end_clean();
-			//ob_start();
-			Excel::create('TIMFS-BartenderFormat-' . date("d M Y - h.i.sa"), function ($excel) {
-				// Set the title
-				$excel->setTitle('TastelessIMFS Bartender Format');
-				// Chain the setters
-				$excel->setCreator('Tasteless IMFS')->setCompany('Tasteless');
-				$excel->setDescription('TastelessIMFS Bartender Format Export');
-	
-				$excel->sheet('bartender', function ($sheet) {
-					// Set auto size for sheet
-					$sheet->setAutoSize(true);
-					$sheet->setColumnFormat(array(
-						'B' => '@', //for supplier item code
-						'C' => '0.00', //for ttp
-					));
-	
-					$data_bartender = DB::table('item_masters');
-					// $data_bartender->select('tasteless_code', 'supplier_item_code', 'myob_item_description', 'ttp')->whereNotNull('tasteless_code');
-					$data_bartender->select('tasteless_code', 'supplier_item_code', 'ttp')->whereNotNull('tasteless_code');
-
-					if(\Request::get('filter_column')) {
-	
-						$filter_column = \Request::get('filter_column');
-						$data_bartender->where(function($w) use ($filter_column,$fc) {
-							foreach($filter_column as $key=>$fc) {
-	
-								$value = @$fc['value'];
-								$type  = @$fc['type'];
-	
-								if($type == 'empty') {
-									$w->whereNull($key)->orWhere($key,'');
-									continue;
-								}
-	
-								if($value=='' || $type=='') continue;
-	
-								if($type == 'between') continue;
-	
-								switch($type) {
-									default:
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'like':
-									case 'not like':
-										$value = '%'.$value.'%';
-										if($key && $type && $value) $w->where($key,$type,$value);
-									break;
-									case 'in':
-									case 'not in':
-										if($value) {
-											$value = explode(',',$value);
-											if($key && $value) $w->whereIn($key,$value);
-										}
-									break;
-								}
-							}
-						});
-	
-						foreach($filter_column as $key=>$fc) {
-							$value = @$fc['value'];
-							$type  = @$fc['type'];
-							$sorting = @$fc['sorting'];
-	
-							if($sorting!='') {
-								if($key) {
-									$data_bartender->orderby($key,$sorting);
-									$filter_is_orderby = true;
-								}
-							}
-	
-							if ($type=='between') {
-								if($key && $value) $data_bartender->whereBetween($key,$value);
-							}
-	
-							else {
-								continue;
-							}
-						}
-					}
-						
-					$datas_bartender = $data_bartender->get();
-	
-					// $headings = array('Tasteless Code', 'Supplier Item Code', 'MYOB Item Description', 'Transfer Price');
-					$headings = array('Tasteless Code', 'Supplier Item Code', 'Transfer Price');
-	
-					foreach ($datas_bartender as $data_bartenders) {
-						$datas[] = array(
-							$data_bartenders->tasteless_code,
-							$data_bartenders->supplier_item_code,
-							// $data_bartenders->myob_item_description,
-							$data_bartenders->ttp,
-						);
-					}
-	
-					$sheet->fromArray($datas, null, 'A1', false, false);
-					$sheet->prependRow(1, $headings);
-					$sheet->row(1, function ($row) {
-						$row->setBackground('#FFFF00');
-						$row->setAlignment('center');
-					});
-					$sheet->cells('A1:C1', function ($cells) {
-						// Set font weight to bold
-						$cells->setFontWeight('bold');
-						// Set all borders (top, right, bottom, left)
-						$cells->setBorder('none', 'none', 'solid', 'none');
-					});
-	
-				});
-			})->export('xls');
+			$filename = $request->input('filename');
+		   	return Excel::download(new BartenderExport, $filename.'.xlsx');
 		}
 		
 	    public function downloadSKULegendTemplate() {
@@ -2738,419 +2097,419 @@
 			$this->cbView("upload.update_imfs", $data);
 		}
         
-        		public function imfsUpdate(Request $request) 
-                {
-        			set_time_limit(-1);
-        			$file = $request->file('import_file');
-        				
-        			$validator = \Validator::make(
-        				[
-        					'file' => $file,
-        					'extension' => strtolower($file->getClientOriginalExtension()),
-        				],
-        				[
-        					'file' => 'required',
-        					'extension' => 'required|in:csv',
-        				]
-        			);
+		public function imfsUpdate(Request $request) 
+		{
+			set_time_limit(-1);
+			$file = $request->file('import_file');
+				
+			$validator = \Validator::make(
+				[
+					'file' => $file,
+					'extension' => strtolower($file->getClientOriginalExtension()),
+				],
+				[
+					'file' => 'required',
+					'extension' => 'required|in:csv',
+				]
+			);
+			
+			if ($validator->fails()) {
+				return response()->json(['errors' => $validator->errors()->all()]);
+				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_format_failed"), 'danger');
+			}
+			
+			
+			if ($request->hasFile('import_file')) {
+				$path = $request->file('import_file')->getRealPath();
+				
+				$csv = array_map('str_getcsv', file($path));
+				
+				$dataExcel = Excel::load($path, function($reader) {
+				})->get();
+				
+				//get all tasteless_code
+				$in_db = array();
+				$tasteless_code = DB::table('item_masters')->select('tasteless_code')->where('tasteless_code', '!=', 0)->get()->toArray();
+				// dd(count($tasteless_code));
+				for($i = 0; $i < count($tasteless_code); $i++)
+				{
+						array_push($in_db,$tasteless_code[$i]->tasteless_code);
+				}
+			
+				// $unMatch = [];
+				// $header = array(
+				//     "Active Status",
+				//     "Type",
+				//     "Item",
+				//     "Description",
+				//     "Sales Tax Code",
+				//     "Account",
+				//     "COGS Account",
+				//     "Asset Account",
+				//     "Accumulated Depreciation",
+				//     "Purchase Description",
+				//     "Quantity On Hand",
+				//     "U/M",
+				//     "U/M Set",
+				//     "Cost",
+				//     "Preferred Vendor",
+				//     "Tax Agency",
+				//     "Price",
+				//     "Reorder Pt (Min)",
+				//     "MPN",
+				//     "GROUP",
+				//     "BARCODE",
+				//     "DIMENSION",
+				//     "PACKAGING SIZE",
+				//     "PACKAGING UOM",
+				//     "TAX STATUS",
+				//     "SUPPLIERS ITEM CODE");
+				
+				// for ($i=0; $i < sizeof($csv[0]); $i++) {
+				// 	if (!in_array($csv[0][$i], $header)) {
+				// 		$unMatch[] = $csv[0][$i];
+				// 	}
+				// }
+
+				// if(!empty($unMatch)) {
 					
-        			if ($validator->fails()) {
-        				return response()->json(['errors' => $validator->errors()->all()]);
-        				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_format_failed"), 'danger');
-        			}
-        			
-        			
-        			if ($request->hasFile('import_file')) {
-        				$path = $request->file('import_file')->getRealPath();
-        				
-                        $csv = array_map('str_getcsv', file($path));
-                        
-        				$dataExcel = Excel::load($path, function($reader) {
-        				})->get();
-        				
-                        //get all tasteless_code
-                        $in_db = array();
-                        $tasteless_code = DB::table('item_masters')->select('tasteless_code')->where('tasteless_code', '!=', 0)->get()->toArray();
-                        // dd(count($tasteless_code));
-                        for($i = 0; $i < count($tasteless_code); $i++)
-                        {
-                             array_push($in_db,$tasteless_code[$i]->tasteless_code);
-                        }
-                   
-        				// $unMatch = [];
-        				// $header = array(
-                        //     "Active Status",
-                        //     "Type",
-                        //     "Item",
-                        //     "Description",
-                        //     "Sales Tax Code",
-                        //     "Account",
-                        //     "COGS Account",
-                        //     "Asset Account",
-                        //     "Accumulated Depreciation",
-                        //     "Purchase Description",
-                        //     "Quantity On Hand",
-                        //     "U/M",
-                        //     "U/M Set",
-                        //     "Cost",
-                        //     "Preferred Vendor",
-                        //     "Tax Agency",
-                        //     "Price",
-                        //     "Reorder Pt (Min)",
-                        //     "MPN",
-                        //     "GROUP",
-                        //     "BARCODE",
-                        //     "DIMENSION",
-                        //     "PACKAGING SIZE",
-                        //     "PACKAGING UOM",
-                        //     "TAX STATUS",
-                        //     "SUPPLIERS ITEM CODE");
-                        
-        				// for ($i=0; $i < sizeof($csv[0]); $i++) {
-        				// 	if (!in_array($csv[0][$i], $header)) {
-        				// 		$unMatch[] = $csv[0][$i];
-        				// 	}
-        				// }
-        
-        				// if(!empty($unMatch)) {
-                            
-        				// 	return response()->json(['errors' => trans("crudbooster.alert_upload_price_format_failed")]);
-        				// 	CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_format_failed"), 'danger');
-        				// }
-                     
-        				if(!empty($dataExcel) && $dataExcel->count() <= 2000) 
-                        {	
-        				    $cnt_fail = 0;
-        					DB::connection()->disableQueryLog();
-                        
-                            $new_item = [];
-        
-        					foreach ($dataExcel as $key => $value) 
-                            {	
-        					    $check_upload = false;
-                                // if($value->item ==''){
-                                if(count($value) <= 0){
-                                    $cnt_fail++; 
-        					    }else{
-        
-                                    // fulfillment type
-					                $fulfillment_type_id = DB::table('fulfillment_methods')->where('fulfillment_method',$value->fulfillment_type)->value('id');
+				// 	return response()->json(['errors' => trans("crudbooster.alert_upload_price_format_failed")]);
+				// 	CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_format_failed"), 'danger');
+				// }
+				
+				if(!empty($dataExcel) && $dataExcel->count() <= 2000) 
+				{	
+					$cnt_fail = 0;
+					DB::connection()->disableQueryLog();
+				
+					$new_item = [];
 
-                                    $remove_comma = str_replace(",", "",$value->ttp);//TTP
-                                    $ttp = floatval($remove_comma);
-                                    
-                                    $remove_comma2 = str_replace(",", "",$value->price);//price
-                                    $sales_price = floatval($remove_comma2);
-                    
-                                    $tax_code_id = 0;
-                                    if($value->sales_tax_code == "TAX")
-                                    {
-                                        $tax_code_id = 1;
-                                    }else{
-                                        $tax_code_id = 2;
-                                    }
-                                    $account = strtoupper($value->account);
-                                    $cogs_account = strtoupper($value->cogs_account);
-                                    $asset_account = strtoupper($value->asset_account);
-                                    $uom = strtoupper($value->um);
-                                    $uom_set = strtoupper($value->um_set);
-                                
-                                    $account_id = DB::table('accounts')->where('group_description',$account)->select('id')->first();
-                                    $cogs_account_id = DB::table('cogs_accounts')->where('group_description',$cogs_account)->select('id')->first();
-                                    $asset_account_id = DB::table('asset_accounts')->where('group_description',$asset_account)->select('id')->first();
-                                    $uom_id = DB::table('uoms')->where('uom_description',$uom)->select('id')->first();
-                                    $uom_set_id = DB::table('uoms_set')->where('uom_description',$uom_set)->select('id')->first();
-                                    $preferred_vendor_id = DB::table('suppliers')->where('last_name', 'LIKE', '%' . $value->preferred_vendor . '%')->select('id')->first();
-                                    $group_id = DB::table('groups')->where('group_description',$value->group)->select('id')->first();
-                                    // $packagings_id = DB::table('packagings')->where('packaging_code',$value->packaging_uom)->select('id')->first();
-        
-                                    if(!in_array($value->tasteless_code,$in_db))// if new tasteless_code
-                                    {
-                                        array_push($new_item, $value);
-                                    }
-        							
-        							$data = [
-                                        'fulfillment_type_id' =>  intval($fulfillment_type_id)
-        									
-        								];
-                                        
-        							DB::beginTransaction();			
-        							try {
-                                       
-        								DB::table('item_masters')->where('tasteless_code', $value->tasteless_code)->update($data);
-        								DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)
-								        ->update([ 
-											'fulfillment_type_id' => intval($fulfillment_type_id) 
-										]);
+					foreach ($dataExcel as $key => $value) 
+					{	
+						$check_upload = false;
+						// if($value->item ==''){
+						if(count($value) <= 0){
+							$cnt_fail++; 
+						}else{
 
-                                        DB::commit();
-        							} catch (\Exception $e) {
-        								return response()->json(['errors' => $e]);
-        								DB::rollback();
-        							}
-        						}
-        					}
-        					
-        					if($cnt_fail == 0)
-                            {    
-                                if(!empty($new_item))
-                                {
-                                    $str = '';
-									        
-                                    foreach($new_item as $key=>$ni){
-                                        if(count($new_item) == $key+1){
-                                           $str .= $ni->tasteless_code.' ';
-                                        }else{
-                                            $str .= $ni->tasteless_code.', ';
-                                        }
-                                    }
+							// fulfillment type
+							$fulfillment_type_id = DB::table('fulfillment_methods')->where('fulfillment_method',$value->fulfillment_type)->value('id');
+
+							$remove_comma = str_replace(",", "",$value->ttp);//TTP
+							$ttp = floatval($remove_comma);
+							
+							$remove_comma2 = str_replace(",", "",$value->price);//price
+							$sales_price = floatval($remove_comma2);
+			
+							$tax_code_id = 0;
+							if($value->sales_tax_code == "TAX")
+							{
+								$tax_code_id = 1;
+							}else{
+								$tax_code_id = 2;
+							}
+							$account = strtoupper($value->account);
+							$cogs_account = strtoupper($value->cogs_account);
+							$asset_account = strtoupper($value->asset_account);
+							$uom = strtoupper($value->um);
+							$uom_set = strtoupper($value->um_set);
+						
+							$account_id = DB::table('accounts')->where('group_description',$account)->select('id')->first();
+							$cogs_account_id = DB::table('cogs_accounts')->where('group_description',$cogs_account)->select('id')->first();
+							$asset_account_id = DB::table('asset_accounts')->where('group_description',$asset_account)->select('id')->first();
+							$uom_id = DB::table('uoms')->where('uom_description',$uom)->select('id')->first();
+							$uom_set_id = DB::table('uoms_set')->where('uom_description',$uom_set)->select('id')->first();
+							$preferred_vendor_id = DB::table('suppliers')->where('last_name', 'LIKE', '%' . $value->preferred_vendor . '%')->select('id')->first();
+							$group_id = DB::table('groups')->where('group_description',$value->group)->select('id')->first();
+							// $packagings_id = DB::table('packagings')->where('packaging_code',$value->packaging_uom)->select('id')->first();
+
+							if(!in_array($value->tasteless_code,$in_db))// if new tasteless_code
+							{
+								array_push($new_item, $value);
+							}
+							
+							$data = [
+								'fulfillment_type_id' =>  intval($fulfillment_type_id)
 									
-        
-                                    CRUDBooster::redirect(CRUDBooster::mainpath(), 'Upload success!. New items found: '. $str . ' please manual add these items.', 'success');
-                                    
-									
-                                }else{
-                                    CRUDBooster::redirect(CRUDBooster::mainpath(), 'Update items success!', 'success');
-									
-                                }
+								];
 								
-                            }
-                            else{
+							DB::beginTransaction();			
+							try {
 								
-                                CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_failed"), 'danger');
-        					}
-        
-        					
-        				}else{
-                            CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_more_than_2k_lines"), 'danger');
-        					return response()->json(['errors' => trans("crudbooster.alert_upload_inventory_beyond_total")]);
-        				    CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_failed"), 'danger');
-        				}
-                        unset($in_db);
-                        unset($new_item);
-                    }
-        		}
-            // 	--------------------------
-		
-            public function getUpdateItemsPrice() {
-                $this->cbLoader();			
-                $data['page_title'] = 'Upload Items Prices';
-                $this->cbView("upload.items_prices_upload", $data);
-            }
-			//2022-07-04
-            public function uploadCostPrice(Request $request){
-    
-                set_time_limit(0);
-                $error_cnt = 0;
-                $file = $request->file('import_file');
-                
-                $validator = \Validator::make(
-                    [
-                        'file' => $file,
-                        'extension' => strtolower($file->getClientOriginalExtension()),
-                    ],
-                    [
-                        'file' => 'required',
-                        'extension' => 'required|in:csv',
-                    ]
-                );
-    
-                if ($validator->fails()) {
-                    CRUDBooster::redirect(CRUDBooster::mainpath(),"Invalid template!","danger");
-                }
-    
-                if (Input::hasFile('import_file')){
-                    
-                    $excel_datas = array();
-                    $sku_datas = array(); 
-                    $header = array();
-					$errors = array();
-    
-                    // $segments =  DB::table('segmentations')->where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
-                    $skus =  DB::table('sku_legends')->where('status','ACTIVE')->orderBy('sku_legend','ASC')->get();
-                    
-                    foreach($skus as $sku){
-                        array_push($sku_datas, $sku->sku_legend);
-                    }
-                    $header = ["TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE"];
-    
-                    $path = Input::file('import_file')->getRealPath();
-            
-                    $csv = array_map('str_getcsv', file($path));
-    
-                    $dataExcel = Excel::load($path, function($reader) {
-                    })->get();
-    
-                    $unMatch = [];
-    
-                    for ($i=0; $i < sizeof($csv[0]); $i++) {
-                        if (! in_array($csv[0][$i], $header)) {
-                            $unMatch[] = $csv[0][$i];
-                        }
-                    }
-        
-                    if(!empty($unMatch)) {
-                            CRUDBooster::redirect(CRUDBooster::mainpath(),"Error ! Costing import unsuccessful!","danger");
-                    }
+								DB::table('item_masters')->where('tasteless_code', $value->tasteless_code)->update($data);
+								DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)
+								->update([ 
+									'fulfillment_type_id' => intval($fulfillment_type_id) 
+								]);
 
-					$dataTastelessCodeRaw = Excel::load($path, function($reader) {
-						$reader->select(array('tasteless_code'));
-					})->get()->toArray();
-
-					$dataTastelessCode = collect($dataTastelessCodeRaw)->unique()->values()->all();
-
-					//count the array
-					$ref_count = count($dataTastelessCodeRaw);
-					$ref_unique_count = count($dataTastelessCode);
-					
-					if($ref_count != $ref_unique_count){
-						$error_cnt++;
-						return response()->json(['errors' => 'Error! Duplicate tasteless code has been detected!']);
+								DB::commit();
+							} catch (\Exception $e) {
+								return response()->json(['errors' => $e]);
+								DB::rollback();
+							}
+						}
 					}
-            
-                    if(!empty($dataExcel) && $dataExcel->count() <= 2000) 
-                    {
-						foreach($dataTastelessCode as $key => $value){
-							$items = ItemMaster::where('tasteless_code',$value['tasteless_code'])->first();
-    
-							if(empty($items)){
-								array_push($errors, 'Item code '.$value['tasteless_code'].' not found in item master.');
-								$error_cnt++;
+					
+					if($cnt_fail == 0)
+					{    
+						if(!empty($new_item))
+						{
+							$str = '';
+									
+							foreach($new_item as $key=>$ni){
+								if(count($new_item) == $key+1){
+									$str .= $ni->tasteless_code.' ';
+								}else{
+									$str .= $ni->tasteless_code.', ';
+								}
 							}
+							
+
+							CRUDBooster::redirect(CRUDBooster::mainpath(), 'Upload success!. New items found: '. $str . ' please manual add these items.', 'success');
+							
+							
+						}else{
+							CRUDBooster::redirect(CRUDBooster::mainpath(), 'Update items success!', 'success');
+							
 						}
+						
+					}
+					else{
+						
+						CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_failed"), 'danger');
+					}
 
-						foreach ($dataExcel as $key => $value){
-							//check if sale price is null
-							if(is_null($value->sales_price)){
-								array_push($errors, 'Item code '.$value->tasteless_code.' has blank sales price.');
-								$error_cnt++;
-							}
-							//check if sales price effective date is null
-							if(is_null($value->sales_price_effective_date)){
-								array_push($errors, 'Item code '.$value->tasteless_code.' has blank sales price effective date.');
-								$error_cnt++;
-							}
-							if(!Carbon::parse($value->sales_price_effective_date)){
-								array_push($errors, 'Item code '.$value->tasteless_code.' has invalid sales price effective date.');
-								$error_cnt++;
-							}
-				// 			dd(Carbon::now()->gt(Carbon::parse($value->sales_price_effective_date)));
-				// 			if(Carbon::now()->gte(Carbon::parse($value->sales_price_effective_date))){
-				// 				array_push($errors, 'Item code '.$value->tasteless_code.' has invalid sales price effective date.');
-				// 				$error_cnt++;
-				// 			}
-						}
-    
-                        if($error_cnt == 0)
-                        {
-                            foreach ($dataExcel as $key => $value)
-                            {
-                                $currentItemCode = ItemMaster::where('tasteless_code', $value->tasteless_code)->first();
-                                if($value->sales_price != 0){
-                                    $commi_margin = ($value->sales_price - $currentItemCode->landed_cost)/$value->sales_price;
-                                }else{
-                                    $commi_margin = 0.00;
-                                }
-                               
-                                // History logs for item master
-                                $currentItemCodeArray = []; 
-                                $CheckTableColumn = Schema::getColumnListing('item_masters');
-                                foreach($CheckTableColumn as $keyname){   
-                                    if(!empty($keyname)){
-    
-                                        // if($keyname == "purchase_price"){
-                                        //     array_push($currentItemCodeArray, ['name' => $header[1], 'old' => $currentItemCode->$keyname, 'new' => $value->supplier_cost]);
-                                        // }
-										
-										if($keyname == "ttp"){
-                                            array_push($currentItemCodeArray, ['name' => ucwords($header[1]), 'old' => $currentItemCode->$keyname, 'new' => $value->sales_price]);
-                                        }
-										elseif($keyname == "ttp_price_effective_date"){
-                                            array_push($currentItemCodeArray, ['name' => ucwords($header[2]), 'old' => $currentItemCode->$keyname, 'new' => $value->sales_price_effective_date]);
-                                        }
-                                    }
-                                }
-    
-                                if(count($currentItemCodeArray) > 0){
-                                    $DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
-                                    foreach ($currentItemCodeArray as $key => $ItemVal) {
-                                        $DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
-                                    }
-                                    $DetailsOfItem .= '</tbody></table>';
-                                    
-                                    DB::table('history_item_masterfile')->insert([
-                                        'tasteless_code'	=>	$currentItemCode->tasteless_code,
-                                        'item_id'			=>	$currentItemCode->id,
-                                        'brand_id'			=>	$currentItemCode->brands_id,
-                                        'group_id'			=>	$currentItemCode->groups_id,
-                                        'action'			=>	"Upload (Costing)",
-										'ttp' => $value->sales_price,
-										'ttp_percentage' => $commi_margin,
-										'old_ttp' => $currentItemCode->ttp,
-										'old_ttp_percentage' => $currentItemCode->ttp_percentage,
-                                        'details'			=>	$DetailsOfItem,
-                                        'created_by'		=>	$currentItemCode->created_by,
-                                        'updated_by'		=>	CRUDBooster::myId()
-                                    ]);
-                                }
-								
-								$excel_datas = [
-									// 'purchase_price' => $value->supplier_cost,
-									'old_ttp' => $currentItemCode->ttp,
-									'old_ttp_percentage' => $currentItemCode->ttp_percentage,
-									'ttp_price_change' => $value->sales_price,
-									'ttp_percentage_price_change' => $commi_margin,
-									'ttp_price_effective_date' => date('Y-m-d', strtotime((string)$value->sales_price_effective_date)),
-									'updated_at' => date('Y-m-d H:i:s')
-								];
+					
+				}else{
+					CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_more_than_2k_lines"), 'danger');
+					return response()->json(['errors' => trans("crudbooster.alert_upload_inventory_beyond_total")]);
+					CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_upload_price_failed"), 'danger');
+				}
+				unset($in_db);
+				unset($new_item);
+			}
+		}
+            // 	--------------------------
+	
+		public function getUpdateItemsPrice() {
+			$this->cbLoader();			
+			$data['page_title'] = 'Upload Items Prices';
+			$this->cbView("upload.items_prices_upload", $data);
+		}
+		//2022-07-04
+		public function uploadCostPrice(Request $request){
 
-								$trs_datas = [
-									// 'cost_price' => $value->supplier_cost, 
-									'ttp' => $value->sales_price,
-									'updated_at' => date('Y-m-d H:i:s')
-								];
-								
-                                ItemMaster::where('tasteless_code', '=', (string)$value->tasteless_code)->update($excel_datas);
+			set_time_limit(0);
+			$error_cnt = 0;
+			$file = $request->file('import_file');
+			
+			$validator = \Validator::make(
+				[
+					'file' => $file,
+					'extension' => strtolower($file->getClientOriginalExtension()),
+				],
+				[
+					'file' => 'required',
+					'extension' => 'required|in:csv',
+				]
+			);
 
-								DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)->update($trs_datas);
-                            }
-                        
-                            CRUDBooster::redirect(CRUDBooster::mainpath(),"Success ! Costing import successful!","success");
-                        
-                        }else{
-							return back()->with('error_import', implode("<br>", $errors));
-						}
-                    }
-                    else{
-                        CRUDBooster::redirect(CRUDBooster::mainpath(),"Error ! Costing import unsuccessful!","danger");
-                    }
-                }
-            }
-			//end-2022-07-04
-            public function downloadPriceTemplate() 
-            {
-                Excel::create('costing-format'.date("Ymd").'-'.date("h.i.sa"), function ($excel) {
-                    $excel->sheet('sales', function ($sheet) {
-    
-                        $segmentation_array = [
-							"TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE"
-						];
-                        $segmentation_value_array = [
-							"1000000001","0.00","2022-01-01"
-						];
-						    
-                        $sheet->row(1, $segmentation_array);
-                        $sheet->row(2, $segmentation_value_array);
-                    });
-                })->download('csv');
-            }
-
-			//2022-07-04
-			public function getUploadModule(){
-				$this->cbLoader();
-				$data['page_title'] = 'Upload Module';
-				$this->cbView("upload.upload", $data);
+			if ($validator->fails()) {
+				CRUDBooster::redirect(CRUDBooster::mainpath(),"Invalid template!","danger");
 			}
 
-			//end-2022-07-04
+			if (Input::hasFile('import_file')){
+				
+				$excel_datas = array();
+				$sku_datas = array(); 
+				$header = array();
+				$errors = array();
+
+				// $segments =  DB::table('segmentations')->where('status','ACTIVE')->orderBy('segment_column_description','ASC')->get();
+				$skus =  DB::table('sku_legends')->where('status','ACTIVE')->orderBy('sku_legend','ASC')->get();
+				
+				foreach($skus as $sku){
+					array_push($sku_datas, $sku->sku_legend);
+				}
+				$header = ["TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE"];
+
+				$path = Input::file('import_file')->getRealPath();
+		
+				$csv = array_map('str_getcsv', file($path));
+
+				$dataExcel = Excel::load($path, function($reader) {
+				})->get();
+
+				$unMatch = [];
+
+				for ($i=0; $i < sizeof($csv[0]); $i++) {
+					if (! in_array($csv[0][$i], $header)) {
+						$unMatch[] = $csv[0][$i];
+					}
+				}
+	
+				if(!empty($unMatch)) {
+						CRUDBooster::redirect(CRUDBooster::mainpath(),"Error ! Costing import unsuccessful!","danger");
+				}
+
+				$dataTastelessCodeRaw = Excel::load($path, function($reader) {
+					$reader->select(array('tasteless_code'));
+				})->get()->toArray();
+
+				$dataTastelessCode = collect($dataTastelessCodeRaw)->unique()->values()->all();
+
+				//count the array
+				$ref_count = count($dataTastelessCodeRaw);
+				$ref_unique_count = count($dataTastelessCode);
+				
+				if($ref_count != $ref_unique_count){
+					$error_cnt++;
+					return response()->json(['errors' => 'Error! Duplicate tasteless code has been detected!']);
+				}
+		
+				if(!empty($dataExcel) && $dataExcel->count() <= 2000) 
+				{
+					foreach($dataTastelessCode as $key => $value){
+						$items = ItemMaster::where('tasteless_code',$value['tasteless_code'])->first();
+
+						if(empty($items)){
+							array_push($errors, 'Item code '.$value['tasteless_code'].' not found in item master.');
+							$error_cnt++;
+						}
+					}
+
+					foreach ($dataExcel as $key => $value){
+						//check if sale price is null
+						if(is_null($value->sales_price)){
+							array_push($errors, 'Item code '.$value->tasteless_code.' has blank sales price.');
+							$error_cnt++;
+						}
+						//check if sales price effective date is null
+						if(is_null($value->sales_price_effective_date)){
+							array_push($errors, 'Item code '.$value->tasteless_code.' has blank sales price effective date.');
+							$error_cnt++;
+						}
+						if(!Carbon::parse($value->sales_price_effective_date)){
+							array_push($errors, 'Item code '.$value->tasteless_code.' has invalid sales price effective date.');
+							$error_cnt++;
+						}
+			// 			dd(Carbon::now()->gt(Carbon::parse($value->sales_price_effective_date)));
+			// 			if(Carbon::now()->gte(Carbon::parse($value->sales_price_effective_date))){
+			// 				array_push($errors, 'Item code '.$value->tasteless_code.' has invalid sales price effective date.');
+			// 				$error_cnt++;
+			// 			}
+					}
+
+					if($error_cnt == 0)
+					{
+						foreach ($dataExcel as $key => $value)
+						{
+							$currentItemCode = ItemMaster::where('tasteless_code', $value->tasteless_code)->first();
+							if($value->sales_price != 0){
+								$commi_margin = ($value->sales_price - $currentItemCode->landed_cost)/$value->sales_price;
+							}else{
+								$commi_margin = 0.00;
+							}
+							
+							// History logs for item master
+							$currentItemCodeArray = []; 
+							$CheckTableColumn = Schema::getColumnListing('item_masters');
+							foreach($CheckTableColumn as $keyname){   
+								if(!empty($keyname)){
+
+									// if($keyname == "purchase_price"){
+									//     array_push($currentItemCodeArray, ['name' => $header[1], 'old' => $currentItemCode->$keyname, 'new' => $value->supplier_cost]);
+									// }
+									
+									if($keyname == "ttp"){
+										array_push($currentItemCodeArray, ['name' => ucwords($header[1]), 'old' => $currentItemCode->$keyname, 'new' => $value->sales_price]);
+									}
+									elseif($keyname == "ttp_price_effective_date"){
+										array_push($currentItemCodeArray, ['name' => ucwords($header[2]), 'old' => $currentItemCode->$keyname, 'new' => $value->sales_price_effective_date]);
+									}
+								}
+							}
+
+							if(count($currentItemCodeArray) > 0){
+								$DetailsOfItem = '<table class="table table-striped"><thead><tr><th>Column Name</th><th>Old Value</th><th>New Value</th></thead><tbody>';
+								foreach ($currentItemCodeArray as $key => $ItemVal) {
+									$DetailsOfItem .= "<tr><td>".$ItemVal['name']."</td><td>".$ItemVal['old']."</td><td>".$ItemVal['new']."</td></tr>";
+								}
+								$DetailsOfItem .= '</tbody></table>';
+								
+								DB::table('history_item_masterfile')->insert([
+									'tasteless_code'	=>	$currentItemCode->tasteless_code,
+									'item_id'			=>	$currentItemCode->id,
+									'brand_id'			=>	$currentItemCode->brands_id,
+									'group_id'			=>	$currentItemCode->groups_id,
+									'action'			=>	"Upload (Costing)",
+									'ttp' => $value->sales_price,
+									'ttp_percentage' => $commi_margin,
+									'old_ttp' => $currentItemCode->ttp,
+									'old_ttp_percentage' => $currentItemCode->ttp_percentage,
+									'details'			=>	$DetailsOfItem,
+									'created_by'		=>	$currentItemCode->created_by,
+									'updated_by'		=>	CRUDBooster::myId()
+								]);
+							}
+							
+							$excel_datas = [
+								// 'purchase_price' => $value->supplier_cost,
+								'old_ttp' => $currentItemCode->ttp,
+								'old_ttp_percentage' => $currentItemCode->ttp_percentage,
+								'ttp_price_change' => $value->sales_price,
+								'ttp_percentage_price_change' => $commi_margin,
+								'ttp_price_effective_date' => date('Y-m-d', strtotime((string)$value->sales_price_effective_date)),
+								'updated_at' => date('Y-m-d H:i:s')
+							];
+
+							$trs_datas = [
+								// 'cost_price' => $value->supplier_cost, 
+								'ttp' => $value->sales_price,
+								'updated_at' => date('Y-m-d H:i:s')
+							];
+							
+							ItemMaster::where('tasteless_code', '=', (string)$value->tasteless_code)->update($excel_datas);
+
+							DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value->tasteless_code)->update($trs_datas);
+						}
+					
+						CRUDBooster::redirect(CRUDBooster::mainpath(),"Success ! Costing import successful!","success");
+					
+					}else{
+						return back()->with('error_import', implode("<br>", $errors));
+					}
+				}
+				else{
+					CRUDBooster::redirect(CRUDBooster::mainpath(),"Error ! Costing import unsuccessful!","danger");
+				}
+			}
+		}
+		//end-2022-07-04
+		public function downloadPriceTemplate() 
+		{
+			Excel::create('costing-format'.date("Ymd").'-'.date("h.i.sa"), function ($excel) {
+				$excel->sheet('sales', function ($sheet) {
+
+					$segmentation_array = [
+						"TASTELESS CODE","SALES PRICE","SALES PRICE EFFECTIVE DATE"
+					];
+					$segmentation_value_array = [
+						"1000000001","0.00","2022-01-01"
+					];
+						
+					$sheet->row(1, $segmentation_array);
+					$sheet->row(2, $segmentation_value_array);
+				});
+			})->download('csv');
+		}
+
+		//2022-07-04
+		public function getUploadModule(){
+			$this->cbLoader();
+			$data['page_title'] = 'Upload Module';
+			$this->cbView("upload.upload", $data);
+		}
+
+		//end-2022-07-04
 	}

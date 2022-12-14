@@ -30,11 +30,9 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     //subcategory master
     Route::get('admin/subcategories/getCategoryCode/{id}','AdminSubcategoriesController@getCategoryCode');
     //item export
-	Route::get('admin/item_masters/bartender','AdminItemMastersController@exportBartender')->name('bartender');
-	Route::get('admin/item_masters/posformat','AdminItemMastersController@exportPOSFormat')->name('posformat');
-	//---edited by cris
-	Route::get('admin/item_masters/qbformat','AdminItemMastersController@exportQBFormat')->name('qbformat');
-	//-----------------------------------
+	Route::post('admin/item_masters/bartender','AdminItemMastersController@exportBartender')->name('bartender');
+	Route::post('admin/item_masters/posformat','AdminItemMastersController@exportPOSFormat')->name('posformat');
+	Route::post('admin/item_masters/qbformat','AdminItemMastersController@exportQBFormat')->name('qbformat');
 	Route::get('admin/item_masters/export-excel','AdminItemMastersController@customExportExcel')->name('export-excel');
 	
 	//----added by cris 20201006----
