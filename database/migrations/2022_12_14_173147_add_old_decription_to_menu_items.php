@@ -14,7 +14,7 @@ class AddOldDecriptionToMenuItems extends Migration
     public function up()
     {
         Schema::table('menu_items', function (Blueprint $table) {
-            //
+            $table->string('pos_old_item_description',100)->nullable()->after('menu_item_description');
         });
     }
 
@@ -26,7 +26,7 @@ class AddOldDecriptionToMenuItems extends Migration
     public function down()
     {
         Schema::table('menu_items', function (Blueprint $table) {
-            //
+            $table->dropColumn('pos_old_item_description');
         });
     }
 }
