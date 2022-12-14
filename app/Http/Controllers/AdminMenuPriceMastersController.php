@@ -4,15 +4,21 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use Illuminate\Support\Facades\Schema;
+	use Illuminate\Database\Schema\Blueprint;
 
 	class AdminMenuPriceMastersController extends \crocodicstudio\crudbooster\controllers\CBController {
+
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
 
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "menu_price_column_name";
 			$this->limit = "20";
-			$this->orderby = "id,desc";
+			$this->orderby = "menu_price_column_description,asc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
@@ -24,7 +30,7 @@
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
-			$this->button_export = false;
+			$this->button_export = true;
 			$this->table = "menu_price_masters";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
@@ -33,27 +39,30 @@
 			$this->col[] = ["label"=>"Menu Price Column Name","name"=>"menu_price_column_name"];
 			$this->col[] = ["label"=>"Menu Price Column Description","name"=>"menu_price_column_description"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
-			$this->col[] = ["label"=>"Updated By","name"=>"updated_by"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Menu Price Column Name','name'=>'menu_price_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Menu Price Column Description','name'=>'menu_price_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+						
+			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
+			    $this->form[] = ['label'=>'Menu Price Column Name','name'=>'menu_price_column_name','type'=>'text','validation'=>'required|min:1|max:15','width'=>'col-sm-4'];
+				$this->form[] = ['label'=>'Menu Price Column Description','name'=>'menu_price_column_description','type'=>'text','validation'=>'required|min:1|max:30','width'=>'col-sm-4'];
+				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
+			}else{
+			    $this->form[] = ['label'=>'Menu Price Column Name','name'=>'menu_price_column_name','type'=>'text','validation'=>'required|min:1|max:15','width'=>'col-sm-4'];
+				$this->form[] = ['label'=>'Menu Price Column Description','name'=>'menu_price_column_description','type'=>'text','validation'=>'required|min:1|max:30','width'=>'col-sm-4'];
+			}
+			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
+				$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
+				$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
+				$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
+				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
+			}
 			# END FORM DO NOT REMOVE THIS LINE
-
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Menu Price Column Name","name"=>"menu_price_column_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Menu Price Column Description","name"=>"menu_price_column_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -95,7 +104,11 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-
+			if(CRUDBooster::isUpdate())
+	        {
+	            $this->button_selected[] = ['label'=>'Set Status ACTIVE ','icon'=>'fa fa-check-circle','name'=>'set_status_ACTIVE'];
+				$this->button_selected[] = ['label'=>'Set Status INACTIVE','icon'=>'fa fa-times','name'=>'set_status_INACTIVE'];
+	        }
 	                
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -105,7 +118,7 @@
 	        | @type    = warning,success,danger,info        
 	        | 
 	        */
-	        $this->alert        = array();
+	        $this->alert = array();
 	                
 
 	        
@@ -227,7 +240,20 @@
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
 	        //Your code here
-	            
+	        if($button_name == 'set_status_ACTIVE') {
+				DB::table('menu_price_masters')->whereIn('id',$id_selected)->update([
+					'status'=>'ACTIVE', 
+					'updated_at' => date('Y-m-d H:i:s'), 
+					'updated_by' => CRUDBooster::myId()
+				]);
+			}
+			elseif($button_name == 'set_status_INACTIVE') {
+				DB::table('menu_price_masters')->whereIn('id',$id_selected)->update([
+					'status'=>'INACTIVE', 
+					'updated_at' => date('Y-m-d H:i:s'), 
+					'updated_by' => CRUDBooster::myId()
+				]);
+			}      
 	    }
 
 
@@ -262,7 +288,8 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-
+			$postdata["created_by"]=CRUDBooster::myId();
+			self::createMenuPriceColumn($postdata["menu_price_column_name"]);
 	    }
 
 	    /* 
@@ -287,7 +314,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-
+			$postdata["updated_by"]=CRUDBooster::myId();
 	    }
 
 	    /* 
@@ -324,11 +351,17 @@
 	    public function hook_after_delete($id) {
 	        //Your code here
 
-	    }
+	    } 
 
+		public static function createMenuPriceColumn($column_name) {
+			Schema::table('menu_items', function (Blueprint $table) use ($column_name) {
+				$table->decimal($column_name, 16,2)->nullable()->after('menu_selling_price');
+			});
 
-
-	    //By the way, you can still create your own method in here... :) 
+			Schema::table('menu_item_approvals', function (Blueprint $table) use ($column_name) {
+				$table->decimal($column_name, 16,2)->nullable()->after('menu_selling_price');
+			});
+		}
 
 
 	}
