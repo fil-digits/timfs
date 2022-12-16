@@ -2,9 +2,14 @@
 
 use Illuminate\Support\Facades\Excel;
 use Illuminate\Support\Facades\PDF;
+use DB;
 
 class LogsController extends CBController
 {
+    public function __construct() {
+        DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+    }
+
     public function cbInit()
     {
         $this->table = 'cms_logs';
