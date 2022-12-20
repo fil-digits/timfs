@@ -20,9 +20,15 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     //menu items
     Route::get('/admin/menu_items/upload-view','AdminMenuItemsController@uploadView')->name('menu-items.view');
+    Route::get('/admin/menu_items/upload-update-view','AdminMenuItemsController@uploadUpdateView')->name('menu-items.update-view');
     Route::get('/admin/menu_items/upload-template','AdminMenuItemsController@uploadTemplate')->name('menu-items.template');
+    Route::get('/admin/menu_items/upload-update-template','AdminMenuItemsController@uploadUpdateTemplate')->name('menu-items.update-template');
     Route::post('/admin/menu_items/upload','AdminMenuItemsController@uploadItems')->name('menu-items.upload');
     Route::post('/admin/menu_items/export','AdminMenuItemsController@exportItems')->name('menu-items.export');
+
+    Route::get('admin/menu_items/test/{id}', function(){
+        dd('test');
+    });
     
     //item master
     Route::get('admin/item_masters/getBrandData/{id}','AdminItemMastersController@getBrandData')->name('getBrandData');

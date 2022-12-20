@@ -86,14 +86,14 @@
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])){
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'ACTIVE;INACTIVE'];
 			}
-			if(in_array(CRUDBooster::getCurrentMethod(),['getDetail'])){
-			    foreach($segmentation_data as $datas){
-					$this->form[] = ['label'=>'Segmentation'." ".$datas->menu_segment_column_description,'name'=>$datas->menu_segment_column_name,'type'=>'checkbox-custom','width'=>'col-sm-4'];
-				}
-			}else{
-				$this->form[] = ['label'=>'Segmentation','name'=>'segmentation','type'=>'checkbox-menu','width'=>'col-sm-6',
-					'datatable'=>'menu_segmentations,menu_segment_column_description,menu_segment_column_name','datatable_where'=>"status='ACTIVE'"];
-			}
+			// if(in_array(CRUDBooster::getCurrentMethod(),['getDetail'])){
+			//     foreach($segmentation_data as $datas){
+			// 		$this->form[] = ['label'=>'Segmentation'." ".$datas->menu_segment_column_description,'name'=>$datas->menu_segment_column_name,'type'=>'checkbox-custom','width'=>'col-sm-4'];
+			// 	}
+			// }else{
+			// 	$this->form[] = ['label'=>'Segmentation','name'=>'segmentation','type'=>'checkbox-menu','width'=>'col-sm-6',
+			// 		'datatable'=>'menu_segmentations,menu_segment_column_description,menu_segment_column_name','datatable_where'=>"status='ACTIVE'"];
+			// }
 			# END FORM DO NOT REMOVE THIS LINE
 			
 			/* 
@@ -122,8 +122,7 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array();
-
+	        $this->addaction = array(); 
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -136,8 +135,7 @@
 	        | 
 	        */
 	        $this->button_selected = array();
-
-	                
+			       
 	        /* 
 	        | ---------------------------------------------------------------------- 
 	        | Add alert message to this module at overheader
@@ -163,11 +161,19 @@
             if(CRUDBooster::getCurrentMethod() == 'getIndex') {
                 if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing"])){
                     $this->index_button[] = [
-                        "title"=>"Upload Menu Items",
-                        "label"=>"Upload Menu Items",
+                        "title"=>"Upload New Menu Items",
+                        "label"=>"Upload New Menu Items",
                         "icon"=>"fa fa-upload",
                         "color"=>"success",
                         "url"=>route('menu-items.view')];
+                }
+				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing"])){
+                    $this->index_button[] = [
+                        "title"=>"Update Menu Items",
+                        "label"=>"Update Menu Items",
+                        "icon"=>"fa fa-upload",
+                        "color"=>"success",
+                        "url"=>route('menu-items.update-view')];
                 }
 				$this->index_button[] = ['label'=>'Export Menu Items','url'=>"javascript:showMenuItemExport()",'icon'=>'fa fa-download'];
             }
@@ -437,72 +443,25 @@
 	        //Your code here 
 	        $item_info = MenuItem::where('id',$id)->first();
 	        
-            MenuItemApproval::where('id',$item_info['id'])->update([
-					'tasteless_menu_code' 			=> $item_info['tasteless_menu_code'],
-					'menu_item_description' 		=> $item_info['menu_item_description'],
-					//'card_id' 					=> $item_info['card_id'],
-					'menu_categories_id' 			=> $item_info['menu_categories_id'],
-					'menu_subcategories_id' 		=> $item_info['menu_subcategories_id'],
-					'tax_codes_id' 				    => $item_info['tax_codes_id'],
-					'status' 				        => $item_info['status'],
-					'menu_cost_price' 				=> $item_info['menu_cost_price'],
-					'menu_selling_price' 			=> $item_info['menu_selling_price'],
-					'segmentation' 					=> $item_info['segmentation'],
-					'segmentation_any' 				=> $item_info['segmentation_any'],
-					'segmentation_bbd'				=> $item_info['segmentation_bbd'],
-					'segmentation_eyb'				=> $item_info['segmentation_eyb'],
-					'segmentation_cbl'				=> $item_info['segmentation_cbl'],
-					'segmentation_com'				=> $item_info['segmentation_com'],
-					'segmentation_fmr'				=> $item_info['segmentation_fmr'],
-					'segmentation_fwb'				=> $item_info['segmentation_fwb'],
-					'segmentation_fzb'				=> $item_info['segmentation_fzb'],
-					'segmentation_hmk' 			    => $item_info['segmentation_hmk'],
-					'segmentation_htw' 		        => $item_info['segmentation_htw'],
-					'segmentation_kkd' 				=> $item_info['segmentation_kkd'],
-					'segmentation_lps' 				=> $item_info['segmentation_lps'],
-					'segmentation_lbs' 		        => $item_info['segmentation_lbs'],
-					'segmentation_mtd' 				=> $item_info['segmentation_mtd'],
-					'segmentation_ppd' 		        => $item_info['segmentation_ppd'],
-					'segmentation_pze' 				=> $item_info['segmentation_pze'],
-					'segmentation_psn' 				=> $item_info['segmentation_psn'],
-					'segmentation_ppr' 				=> $item_info['segmentation_ppr'],
-					'segmentation_rcf' 				=> $item_info['segmentation_rcf'],
-					'segmentation_scb' 				=> $item_info['segmentation_scb'],
-					'segmentation_sch' 				=> $item_info['segmentation_sch'],
-					'segmentation_sdh' 				=> $item_info['segmentation_sdh'],
-					'segmentation_smk' 				=> $item_info['segmentation_smk'],
-					'segmentation_twu' 				=> $item_info['segmentation_twu'],
-					'segmentation_tbf' 				=> $item_info['segmentation_tbf'],
-					'segmentation_tgd' 				=> $item_info['segmentation_tgd'],
-					'segmentation_wkd' 				=> $item_info['segmentation_wkd'],
-					'segmentation_wks' 				=> $item_info['segmentation_wks'],
-					'segmentation_wmn' 				=> $item_info['segmentation_wmn'],
-					'segmentation_1' 				=> $item_info['segmentation_1'],
-					'segmentation_2' 				=> $item_info['segmentation_2'],
-					'segmentation_3' 				=> $item_info['segmentation_3'],
-					'segmentation_4' 				=> $item_info['segmentation_4'],
-					'segmentation_5' 				=> $item_info['segmentation_5'],
-					'segmentation_6' 				=> $item_info['segmentation_6'],
-					'segmentation_7' 				=> $item_info['segmentation_7'],
-					'segmentation_8' 				=> $item_info['segmentation_8'],
-					'segmentation_9' 				=> $item_info['segmentation_9'],
-					'segmentation_10' 				=> $item_info['segmentation_10'],
-					'segmentation_11' 				=> $item_info['segmentation_11'],
-					'segmentation_12' 				=> $item_info['segmentation_12'],
-					'segmentation_13' 				=> $item_info['segmentation_13'],
-					'segmentation_14' 				=> $item_info['segmentation_14'],
-					'segmentation_15' 				=> $item_info['segmentation_15'],
-					'segmentation_16' 				=> $item_info['segmentation_16'],
-					'segmentation_17' 				=> $item_info['segmentation_17'],
-					'segmentation_18' 				=> $item_info['segmentation_18'],
-					'segmentation_19' 				=> $item_info['segmentation_19'],
-					'segmentation_20' 				=> $item_info['segmentation_20'],
-					'segmentation_21' 				=> $item_info['segmentation_21'],
-					'approval_status'				=> $item_info['approval_status'],
-					'action_type'				    => $item_info['action_type'],
-					'updated_by' 					=> $item_info['updated_by'],
-					'updated_at' 					=> $item_info['updated_at']
-			]);
+			$data_menu = [
+				'tasteless_menu_code' 			=> $item_info['tasteless_menu_code'],
+				'menu_item_description' 		=> $item_info['menu_item_description'],
+				'menu_categories_id' 			=> $item_info['menu_categories_id'],
+				'menu_subcategories_id' 		=> $item_info['menu_subcategories_id'],
+				'tax_codes_id' 				    => $item_info['tax_codes_id'],
+				'status' 				        => $item_info['status'],
+				'menu_cost_price' 				=> $item_info['menu_cost_price'],
+				'menu_selling_price' 			=> $item_info['menu_selling_price'],
+				'segmentation' 					=> $item_info['segmentation'],
+				'approval_status'				=> $item_info['approval_status'],
+				'action_type'				    => $item_info['action_type'],
+				'updated_by' 					=> $item_info['updated_by'],
+				'updated_at' 					=> $item_info['updated_at']
+			];
+
+			$data_segment = [];
+
+            MenuItemApproval::where('id',$item_info['id'])->update(array_merge($data_menu,$data_menu));
 			
 			CRUDBooster::redirect(CRUDBooster::mainpath(),"Your item has been edited and pending for approval.","info");
 	    }
@@ -554,10 +513,65 @@
             $data['page_title'] = 'Upload Menu Items';
             $data['uploadRoute'] = route('menu-items.upload');
             $data['uploadTemplate'] = route('menu-items.template');
+			$data['uploadAction'] = 'create';
+            return view('menu-items.upload-items',$data);
+	    }
+
+		public function uploadUpdateView(){
+	        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+            
+            $data = [];
+            $data['page_title'] = 'Update Menu Items';
+            $data['uploadRoute'] = route('menu-items.upload');
+            $data['uploadTemplate'] = route('menu-items.update-template');
+			$data['uploadAction'] = 'update';
             return view('menu-items.upload-items',$data);
 	    }
 	    
 	    public function uploadTemplate(){
+
+			$header = array();
+			$segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
+			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
+			$prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
+			$group_choices = MenuChoiceGroup::where('status','ACTIVE')->orderBy('menu_choice_group_column_description','ASC')->get();
+
+			
+			foreach($old_item_codes as $old_codes){
+				array_push($header,$old_codes->menu_old_code_column_description);
+			}
+
+			array_push($header,'POS OLD DESCRIPTION');
+			array_push($header,'MENU DESCRIPTION');
+			array_push($header,'PRODUCT TYPE');
+
+			foreach($group_choices as $choice){
+				array_push($header,$choice->menu_choice_group_column_description);
+				array_push($header,$choice->menu_choice_group_column_description.' SKU');
+			}
+			
+			array_push($header,'MENU TYPE');
+			array_push($header,'MAIN CATEGORY');
+			array_push($header,'SUB CATEGORY');
+
+			foreach($prices as $price){
+				array_push($header,$price->menu_price_column_description);
+			}
+			
+			array_push($header,'ORIGINAL CONCEPT');
+			array_push($header,'STATUS');
+
+			foreach($segmentations as $segment){
+				array_push($header,$segment->menu_segment_column_description);
+			}
+			
+			$export = new ExcelTemplate([$header]);
+            return Excel::download($export, 'menu-items-'.date("Ymd").'-'.date("h.i.sa").'.csv');
+	    }
+
+		public function uploadUpdateTemplate(){
 
 			$header = array('MENU CODE');
 			$segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
@@ -606,8 +620,16 @@
 			$path = storage_path('app').'/'.$path_excel;
             HeadingRowFormatter::default('none');
             $headings = (new HeadingRowImport)->toArray($path);
+			$excelData = Excel::toArray(new MenuItemsImport, $path);
+
+			if($request->upload_action == 'create'){
+				$header = array();
+			}
+			else{
+				$header = array('MENU CODE');
+			}
             //check headings
-            $header = array('MENU CODE');
+            
 			$segmentations =  MenuSegmentation::where('status','ACTIVE')->orderBy('menu_segment_column_description','ASC')->get();
 			$old_item_codes = MenuOldCodeMaster::where('status','ACTIVE')->orderBy('menu_old_code_column_description','ASC')->get();
 			$prices = MenuPriceMaster::where('status','ACTIVE')->orderBy('menu_price_column_description','ASC')->get();
@@ -651,6 +673,29 @@
 			if(!empty($unMatch)) {
                 return redirect()->back()->with(['message_type' => 'danger', 'message' => 'Failed ! Please check template headers, mismatched detected.']);
 			}
+
+			if($request->upload_action == 'uddate'){
+
+				$items = array_unique(array_column($excelData[0], "menu_code"));
+				$uploaded_items = array_column($excelData[0], "menu_code");
+
+				if(count((array)$uploaded_items) != count((array)$items)){
+					array_push($errors, 'duplicate item found!');
+				}
+
+				foreach ($items as $key => $value) {
+					$itemExist = MenuItem::where('menu_code',$value)->first();
+
+					if(!is_null($itemExist)){
+						array_push($errors, 'no item found!');
+					}
+				}
+			}
+
+			if(!empty($errors)){
+				return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'Failed ! Please check '.implode(", ",$errors)]);
+			}
+
             HeadingRowFormatter::default('slug');
 			Excel::import(new MenuItemsImport, $path);
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Upload complete!']);

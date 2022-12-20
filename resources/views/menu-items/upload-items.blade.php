@@ -16,6 +16,7 @@
 
           <form method='post' id='form' enctype='multipart/form-data' action='{{$uploadRoute}}'>
               <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="upload_action" value="{{$uploadAction}}">
               <div class="box-body">
                   <div class='callout callout-success'>
                       <h4>Welcome to Data Importer Tool</h4>
