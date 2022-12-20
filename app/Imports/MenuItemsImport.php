@@ -48,11 +48,12 @@ class MenuItemsImport implements ToModel, WithHeadingRow, WithChunkReading
 
         if(is_null($row["menu_code"])){
             $next_id = MenuItem::select('id')->orderBy('id','DESC')->first();
+            $next_code = intval($next_id->id) + 1;
             if($row["main_category"] == "PROMO"){
-                $code = '5'.str_pad($next_id->id, 6, "0", STR_PAD_LEFT);
+                $code = '5'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
             }
             else{
-                $code = '6'.str_pad($next_id->id, 6, "0", STR_PAD_LEFT);
+                $code = '6'.str_pad($next_code, 6, "0", STR_PAD_LEFT);
             }
         }
 
