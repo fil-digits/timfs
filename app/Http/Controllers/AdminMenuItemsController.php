@@ -159,7 +159,7 @@
 	        */
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex') {
-                if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing"])){
+                if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing","Encoder (Menu Item)"])){
                     $this->index_button[] = [
                         "title"=>"Upload New Menu Items",
                         "label"=>"Upload New Menu Items",
@@ -167,7 +167,7 @@
                         "color"=>"success",
                         "url"=>route('menu-items.view')];
                 }
-				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing"])){
+				if(CRUDBooster::isSuperadmin() || in_array(CRUDBooster::myPrivilegeName(),["Purchasing","Encoder (Menu Item)"])){
                     $this->index_button[] = [
                         "title"=>"Update Menu Items",
                         "label"=>"Update Menu Items",
