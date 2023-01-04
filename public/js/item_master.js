@@ -9,9 +9,6 @@ $(document).ready(function() {
 
     $('#quantity_on_hand').val('0.00');
 
-    //edit approval validation condition
-    var tasteless_code = $('#tasteless_code').val();
-
     $("#supplier_item_code, #myob_item_description, #full_item_description, #actual_color, #flavor, #size, #dimension").keyup(function() {
         this.value = this.value.toLocaleUpperCase();
     });
