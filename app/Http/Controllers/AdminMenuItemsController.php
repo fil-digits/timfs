@@ -674,7 +674,7 @@
                 return redirect()->back()->with(['message_type' => 'danger', 'message' => 'Failed ! Please check template headers, mismatched detected.']);
 			}
 
-			if($request->upload_action == 'uddate'){
+			if($request->upload_action == 'update'){
 
 				$items = array_unique(array_column($excelData[0], "menu_code"));
 				$uploaded_items = array_column($excelData[0], "menu_code");
