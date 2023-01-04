@@ -2349,7 +2349,7 @@ use App\Group;
 		public function getUploadModule(){
 			$this->cbLoader();
 			$data['page_title'] = 'Upload Module';
-			$this->cbView("upload.upload", $data);
+			return view("upload.upload", $data);
 		}
 
 		//end-2022-07-04
