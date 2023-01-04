@@ -25,10 +25,6 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/menu_items/upload-update-template','AdminMenuItemsController@uploadUpdateTemplate')->name('menu-items.update-template');
     Route::post('/admin/menu_items/upload','AdminMenuItemsController@uploadItems')->name('menu-items.upload');
     Route::post('/admin/menu_items/export','AdminMenuItemsController@exportItems')->name('menu-items.export');
-
-    Route::get('admin/menu_items/test/{id}', function(){
-        dd('test');
-    });
     
     //item master
     Route::get('admin/item_masters/getBrandData/{id}','AdminItemMastersController@getBrandData')->name('getBrandData');
@@ -59,15 +55,19 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     
     Route::get('/admin/history_item_masterfile/export-ttp-history','AdminHistoryItemMasterfileController@exportSalePrice')->name('exportSalePrice');
     Route::get('/admin/history_item_masterfile/export-purchase-price-history','AdminHistoryItemMasterfileController@exportPurchasePrice')->name('exportPurchasePrice');
-     Route::get('/admin/item_masters/update-items','AdminItemMastersController@getUpdateItems')->name('getUpdateItems');
-    Route::post('/admin/item_masters/update-items-upload','AdminItemMastersController@imfsUpdate')->name('update.imfs');
-
-    Route::post('/admin/item_masters/upload_sku_legend','AdminItemMastersController@uploadSKULegend')->name('uploadSKULegend');
-    Route::get('/admin/item_masters/upload-items-sku-legend','AdminItemMastersController@getUpdateItemsSkuLegend')->name('getUpdateItemsSkuLegend');
-    Route::get('/admin/item_masters/download-sku-template','AdminItemMastersController@downloadSKULegendTemplate')->name('downloadSKULegendTemplate');
     
-    // Upload Supplier Cost and Sales Price
-    Route::post('/admin/item_masters/upload-items-costing','AdminItemMastersController@uploadCostPrice')->name('uploadCostPrice');
-    Route::get('/admin/item_masters/update-items-price','AdminItemMastersController@getUpdateItemsPrice')->name('getUpdateItemsPrice');
-    Route::get('/admin/item_masters/download-price-template','AdminItemMastersController@downloadPriceTemplate')->name('downloadPriceTemplate');
+    //bulk upload fulfillment type
+    Route::post('/admin/item_masters/update-items-upload','ItemUploadController@store')->name('update.imfs');
+    Route::get('/admin/item_masters/update-items','ItemUploadController@create')->name('getUpdateItems');
+    Route::get('/admin/item_masters/download-item-template','ItemUploadController@downloadItemTemplate')->name('downloadItemTemplate');
+    
+    //bulk upload segmentation
+    Route::post('/admin/item_masters/upload_sku_legend','ItemSegmentationUploadController@store')->name('uploadSKULegend');
+    Route::get('/admin/item_masters/upload-items-sku-legend','ItemSegmentationUploadController@create')->name('getUpdateItemsSkuLegend');
+    Route::get('/admin/item_masters/download-sku-template','ItemSegmentationUploadController@downloadSKULegendTemplate')->name('downloadSKULegendTemplate');
+    
+    //bulk upload cost
+    Route::post('/admin/item_masters/upload-items-costing','ItemPriceUploadController@store')->name('uploadCostPrice');
+    Route::get('/admin/item_masters/update-items-price','ItemPriceUploadController@create')->name('getUpdateItemsPrice');
+    Route::get('/admin/item_masters/download-price-template','ItemPriceUploadController@downloadPriceTemplate')->name('downloadPriceTemplate');
 });

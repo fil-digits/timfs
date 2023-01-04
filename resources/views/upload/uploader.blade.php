@@ -20,27 +20,25 @@
         <li>
             {!! Session::get('error_import') !!}
         </li>
+        
     </div>
     @endif
 
-    <form method='post' id="form" enctype="multipart/form-data" action="{{ route('uploadCostPrice') }}">
+    <form method='post' id="form" enctype="multipart/form-data" action="{{ $uploadRoute }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="box-body">
 
             <div class='callout callout-success'>
                 <h4>Welcome to Data Importer Tool</h4>
                 Before uploading a file, please read below instructions : <br/>
-                1. Download specific template before uploading.<br/>
-                2. Duplicate record is not allowed.<br/>
-                3. Date format should be "<b>YYYY-MM-DD</b>"<br/>
-                4. Prices must be in decimal format<br/>
-                5. System will not accept blank row<br/>
-                6. File format should be : CSV file format<br/>
+                1. System will not accept wrong Item Code<br/>
+                2. System will not accept blank<br/>
+                3. File format should be : CSV file format<br/>
             </div>
 
             <label class='col-sm-2 control-label'>Import Template File: </label>
             <div class='col-sm-4'>
-                <a href="{{ route('downloadPriceTemplate') }}" class="btn btn-primary" role="button">Download Template</a>
+                <a href="{{ $uploadTemplate }}" class="btn btn-primary" role="button">Download Template</a>
             </div>
             <br/>
             <br/>
@@ -54,9 +52,9 @@
         </div><!-- /.box-body -->
 
         <div class="box-footer">
-            <a href="{{ CRUDBooster::mainpath('import-view') }}" class='btn btn-default pull-left'>Cancel</a>
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> Upload</button>
             
+            <a href="{{ route('getUploadModule') }}" class='btn btn-default pull-left'>Cancel</a>
+            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> Upload</button>
         </div><!-- /.box-footer-->
     </form>
 </div><!-- /.box -->
