@@ -156,7 +156,7 @@ class ItemPriceUploadController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ];
 
-            // DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value['tasteless_code'])->update($trs_datas);
+            DB::connection('mysql_trs')->table('items')->where('tasteless_code', '=', (string)$value['tasteless_code'])->update($trs_datas);
         }
 
         Excel::import(new ItemPriceImport, $path);
