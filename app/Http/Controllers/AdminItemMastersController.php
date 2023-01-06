@@ -70,7 +70,7 @@
     		$this->col[] = ["label"=>"Brand Description","name"=>"brands_id","join"=>"brands,brand_description","visible" => CRUDBooster::myColumnView()->brand_description ? true : false];
     		$this->col[] = ["label" => "Category Description", "name" => "categories_id", "join" => "categories,category_description", "visible" => CRUDBooster::myColumnView()->category_description ? true : false];
     		$this->col[] = ["label" => "Subcategory Description", "name" => "subcategories_id", "join" => "subcategories,subcategory_description", "visible" => CRUDBooster::myColumnView()->subcategory ? true : false];
-            $this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_types_id", "join" => "fulfillment_types,fulfillment_type"];
+            $this->col[] = ["label" => "Fulfillment Type", "name" => "fulfillment_type_id", "join" => "fulfillment_methods,fulfillment_method"];
             $this->col[] = ["label" => "Packaging Size", "name" => "packaging_size", "visible" => CRUDBooster::myColumnView()->packaging_size ? true : false];
     		$this->col[] = ["label" => "Packaging UOM", "name" => "packagings_id", "join" => "packagings,packaging_code", "visible" => CRUDBooster::myColumnView()->packaging ? true : false];
     		$this->col[] = ["label"=>"Currency","name"=>"currencies_id","join"=>"currencies,currency_code","visible" => CRUDBooster::myColumnView()->currency ? true : false];
@@ -131,9 +131,9 @@
                 ];
               
                 $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_types_id', 'type' => 'select2',
+    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
     				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-    				'datatable' => 'fulfillment_types,fulfillment_type', 'datatable_where' => "status='ACTIVE'"
+    				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
     			];
     
                 $this->form[] = [
@@ -305,9 +305,9 @@
                 ];
 				
                 $this->form[] = [
-    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_types_id', 'type' => 'select2',
+    				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
     				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-    				'datatable' => 'fulfillment_types,fulfillment_type', 'datatable_where' => "status='ACTIVE'"
+    				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
     			];
 
                 $this->form[] = [
@@ -497,9 +497,9 @@
                     ];
 					
                     $this->form[] = [
-        				'label' => 'Fulfillment Type', 'name' => 'fulfillment_types_id', 'type' => 'select2',
+        				'label' => 'Fulfillment Type', 'name' => 'fulfillment_type_id', 'type' => 'select2',
         				'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-        				'datatable' => 'fulfillment_types,fulfillment_type', 'datatable_where' => "status='ACTIVE'"
+        				'datatable' => 'fulfillment_methods,fulfillment_method', 'datatable_where' => "status='ACTIVE'"
         			];
         
                     $this->form[] = [
@@ -1082,7 +1082,7 @@
 							full_item_description,  
 							brand_id, 
 							group_id, 
-							fulfillment_types_id, 
+							fulfillment_type_id, 
 							category_id, 
 							subcategory_id, 
 							uom_id, 
@@ -1095,7 +1095,7 @@
 							moq_store,
 							myob_item_description,
 							created_by, 
-							updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_types_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
+							updated_by) values (?,?,?,?,?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [$new_items['tasteless_code'], $new_items['supplier_itemcode'], $new_items['full_item_description'],  $new_items['brands_id'],$new_items['groups_id'],$new_items['fulfillment_type_id'],$new_items['categories_id'], $new_items['subcategories_id'], $new_items['uoms_id'], $new_items['uoms_set_id'], $new_items['sku_statuses_id'], $new_items['currencies_id'], $new_items['purchase_price'], $new_items['ttp'], $new_items['landed_cost'], $new_items['moq_store'], $new_items['full_item_description'], $new_items['created_by'], $new_items['updated_by']]);
                         //-------------------------                         
 			            
 						foreach($this->segments as $segment)
@@ -1289,7 +1289,7 @@
 					'myob_item_description' => $postdata['full_item_description'],
 					'brand_id' 				=> $postdata['brands_id'],
 					'group_id' 				=> $postdata['groups_id'],
-                    'fulfillment_types_id'   => $postdata['fulfillment_types_id'],
+                    'fulfillment_type_id'   => $postdata['fulfillment_type_id'],
 					'category_id' 			=> $postdata['categories_id'],
 					'subcategory_id' 		=> $postdata['subcategories_id'],
 					'uom_id' 				=> $postdata['uoms_id'],
@@ -1333,16 +1333,16 @@
 			}else{
 			    
                 // Fullfillment Type
-			    if(!empty($postdata['fulfillment_types_id']))
+			    if(!empty($postdata['fulfillment_type_id']))
 			    {
 			        // TIMFS item_masters table
 			        DB::table('item_masters')->where('tasteless_code',$postdata["tasteless_code"])->update([
-					    'fulfillment_types_id'   =>  $postdata['fulfillment_types_id']
+					    'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
 				    ]);
 				    
 				    // TRS items table
 				    DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-                        'fulfillment_types_id'   =>  $postdata['fulfillment_types_id']
+                        'fulfillment_type_id'   =>  $postdata['fulfillment_type_id']
                     ]);
 			    }
 
