@@ -1269,16 +1269,13 @@
 			    
                 $postdata["encoder_privilege_id"] =	CRUDBooster::myPrivilegeId();
 			    $postdata["action_type"] = "Update";
-			    $postdata["updated_by"] = CRUDBooster::myId();
-			    
-	            $sku_legend = Input::all();
-	            
+			    $postdata["updated_by"] = CRUDBooster::myId();	            
 	            //-----added by cris 20201009--------
-                $postdata["packagings_id"] = $sku_legend['uoms_set_id'];
+                $postdata["packagings_id"] = $postdata['uoms_set_id'];
                 //-----------------------------------
                 
 	            //-----added by cris 20200707-------------------
-                $postdata["tax_status"] = $sku_legend['tax_codes_id'];
+                $postdata["tax_status"] = $postdata['tax_codes_id'];
                 //----------------------------------------------
                 
 				
@@ -1287,30 +1284,30 @@
                 //----------------------------------------------
 				
 				DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
-					'supplier_item_code' 	=> $sku_legend['supplier_item_code'],
-					'full_item_description' => $sku_legend['full_item_description'],
-					'myob_item_description' => $sku_legend['full_item_description'],
-					'brand_id' 				=> $sku_legend['brands_id'],
-					'group_id' 				=> $sku_legend['groups_id'],
-                    'fulfillment_types_id'   => $sku_legend['fulfillment_types_id'],
-					'category_id' 			=> $sku_legend['categories_id'],
-					'subcategory_id' 		=> $sku_legend['subcategories_id'],
-					'uom_id' 				=> $sku_legend['uoms_id'],
-					'packaging_id' 			=> $sku_legend['uoms_set_id'],
-					'skustatus_id' 			=> $sku_legend['sku_statuses_id'],
-					'currency_id' 			=> $sku_legend['currencies_id'],
-					'cost_price' 			=> $sku_legend['purchase_price'],
-					'ttp' 					=> $sku_legend['ttp'],
-					'landed_cost' 			=> $sku_legend['landed_cost'],
+					'supplier_item_code' 	=> $postdata['supplier_item_code'],
+					'full_item_description' => $postdata['full_item_description'],
+					'myob_item_description' => $postdata['full_item_description'],
+					'brand_id' 				=> $postdata['brands_id'],
+					'group_id' 				=> $postdata['groups_id'],
+                    'fulfillment_types_id'   => $postdata['fulfillment_types_id'],
+					'category_id' 			=> $postdata['categories_id'],
+					'subcategory_id' 		=> $postdata['subcategories_id'],
+					'uom_id' 				=> $postdata['uoms_id'],
+					'packaging_id' 			=> $postdata['uoms_set_id'],
+					'skustatus_id' 			=> $postdata['sku_statuses_id'],
+					'currency_id' 			=> $postdata['currencies_id'],
+					'cost_price' 			=> $postdata['purchase_price'],
+					'ttp' 					=> $postdata['ttp'],
+					'landed_cost' 			=> $postdata['landed_cost'],
 					'moq_supplier' 			=> $postdata['moq_supplier'],
-					'moq_store' 			=> $sku_legend['moq_store'],
+					'moq_store' 			=> $postdata['moq_store'],
 					'updated_by' 			=> CRUDBooster::myId(),
 					'updated_at' 			=> date('Y-m-d H:i:s'),
 				]);
 
 				foreach($this->segments as $segment)
 				{
-					$segment_search = $sku_legend[$segment->segment_column_name];
+					$segment_search = $postdata[$segment->segment_column_name];
 				
 					ItemMasterApproval::where('id',$id)->update([
 						$segment->segment_column_name => $segment_search
@@ -1324,15 +1321,11 @@
                         $segment->segment_column_name => $segment_search
                     ]);
 					
-					//->statement('update items set '.$segment->segment_column_name.' = '.$var.' where tasteless_code = '.$postdata["tasteless_code"].'');
-				
-					//-----added by cris 20200707-------------------
 					if ($segment_search == "X" || $segment_search == null) {
 					}else{
 						$this->counter = 1;
 						array_push($this->segmentation_editForm, $segment->segment_column_name);
 					}
-					//----------------------------------------------
 				}
 			    
 			    DB::disconnect('mysql_trs');
