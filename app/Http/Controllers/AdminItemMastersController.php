@@ -633,7 +633,8 @@
         
                     foreach ($this->segments as $segment) {
         
-                        $this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom', 'width' => 'col-sm-4'];
+                        $this->form[] = ['label' => '+' . " " . $segment->segment_column_description, 'name' => $segment->segment_column_name, 'type' => 'checkbox-custom',
+						'datatable' => 'segmentations,segment_column_description,segment_column_name', 'datatable_where' => "status='ACTIVE'", 'width' => 'col-sm-4'];
                     }
 					
 			}
@@ -1258,30 +1259,19 @@
 			//Your code here
 			if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeId() == 8 || CRUDBooster::myPrivilegeId() == 13) // 	Manager (Purchaser) //View III (TTP and Purchase Price) 	
             {
-			    //---added by cris 20200623------
                 $crnt_ttp_price = DB::table('item_masters')->where('id', $id)->first();
     
                 $this->counter = 0;
                 $this->pre_ttp_price = 0;
                 $this->pre_ttp_price = $crnt_ttp_price->ttp;
                 unset($this->segmentation_editForm);
-                //-------------------------------
 			    
                 $postdata["encoder_privilege_id"] =	CRUDBooster::myPrivilegeId();
 			    $postdata["action_type"] = "Update";
-			    $postdata["updated_by"] = CRUDBooster::myId();	            
-	            //-----added by cris 20201009--------
+			    $postdata["updated_by"] = CRUDBooster::myId();	 
                 $postdata["packagings_id"] = $postdata['uoms_set_id'];
-                //-----------------------------------
-                
-	            //-----added by cris 20200707-------------------
                 $postdata["tax_status"] = $postdata['tax_codes_id'];
-                //----------------------------------------------
-                
-				
-				 //-----added by cris 20200707-------------------
                 $this->segmentation_editForm = [];
-                //----------------------------------------------
 				
 				DB::connection('mysql_trs')->table('items')->where('tasteless_code',$postdata["tasteless_code"])->update([
 					'supplier_item_code' 	=> $postdata['supplier_item_code'],
