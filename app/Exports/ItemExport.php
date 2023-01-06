@@ -145,7 +145,7 @@ class ItemExport implements FromQuery, WithHeadings, WithMapping
         ->leftJoin('sku_statuses','item_masters.sku_statuses_id','=','sku_statuses.id')
         ->leftJoin('vendor_types','item_masters.vendor_types_id','=','vendor_types.id')
         ->leftJoin('packagings','item_masters.packagings_id','=','packagings.id')
-        ->leftJoin('fulfillment_methods','item_masters.fulfillment_methods_id','=','fulfillment_methods.id')
+        ->leftJoin('fulfillment_methods','item_masters.fulfillment_type_id','=','fulfillment_methods.id')
         ->leftJoin('uoms','item_masters.uoms_id','=','uoms.id')
         ->leftJoin('inventory_types','item_masters.inventory_types_id','=','inventory_types.id')
         ->leftJoin('tax_codes','item_masters.tax_codes_id','=','tax_codes.id')
