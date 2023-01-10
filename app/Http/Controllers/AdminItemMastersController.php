@@ -982,6 +982,7 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 			//Your code here
+			$inputs = \Input::all();
 			if(CRUDBooster::isSuperadmin())
             {
 			    $postdata["myob_item_description"] = $postdata['full_item_description'];
@@ -992,7 +993,7 @@
     			$postdata["sku_statuses_id"] = 1;
 
 			    foreach($this->segments as $segment){
-				    $segment_search = $postdata[$segment->segment_column_name];
+				    $segment_search = $inputs[$segment->segment_column_name];
 				    $postdata[$segment->segment_column_name] = $segment_search;
 			    }
 			    
@@ -1045,7 +1046,7 @@
 			    
 			}else{
 			    foreach($this->segments as $segment){
-				    $segment_search = $postdata[$segment->segment_column_name];
+				    $segment_search = $inputs[$segment->segment_column_name];
 				    $postdata[$segment->segment_column_name] = $segment_search;
 			    }
 
@@ -1206,6 +1207,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) 
         {
+			$inputs = \Input::all();
 			$ItemValue = DB::table('item_masters')->where('id', $id)->first();
 			$CheckTableColumn = Schema::getColumnListing('item_masters');
 			
@@ -1297,7 +1299,7 @@
 
 				foreach($this->segments as $segment)
 				{
-					$segment_search = $postdata[$segment->segment_column_name];
+					$segment_search = $inputs[$segment->segment_column_name];
 				
 					ItemMasterApproval::where('id',$id)->update([
 						$segment->segment_column_name => $segment_search
@@ -1359,7 +1361,7 @@
 				
 					foreach($this->segments as $segment){					
 						ItemMasterApproval::where('id',$id)->update([
-                            $segment->segment_column_name => $postdata[$segment->segment_column_name]
+                            $segment->segment_column_name => $inputs[$segment->segment_column_name]
 						]);
 					}
 
@@ -1411,7 +1413,7 @@
             if(CRUDBooster::myPrivilegeId() == 4){ //Supervisor (Purchaser)
 			    foreach($this->segments as $segment)
 				{
-					$segment_search = $postdata[$segment->segment_column_name];
+					$segment_search = $inputs[$segment->segment_column_name];
 					
 				    if(ItemMasterApproval::where('id',$id)->get()){
 				        ItemMasterApproval::where('id',$id)->update([
