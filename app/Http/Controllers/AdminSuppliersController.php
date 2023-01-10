@@ -14,6 +14,10 @@
 
 	class AdminSuppliersController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -37,203 +41,38 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-// 			$this->col[] = ["label"=>"Last Name","name"=>"last_name"];
-// 			$this->col[] = ["label"=>"First Name","name"=>"first_name"];
-// 			$this->col[] = ["label"=>"Card ID","name"=>"card_id"];
-// 			$this->col[] = ["label"=>"Card Status","name"=>"card_status"];
-// 			$this->col[] = ["label"=>"Currency Code","name"=>"currencies_id","join"=>"currencies,currency_code"];
-// 			$this->col[] = ["label"=>"Address1 Line1","name"=>"address1_line1"];
-// 			$this->col[] = ["label"=>"Address1 Line2","name"=>"address1_line2"];
-// 			$this->col[] = ["label"=>"City","name"=>"cities_id","join"=>"cities,city_name"];
-// 			$this->col[] = ["label"=>"State","name"=>"states_id","join"=>"states,state_name"];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code"];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries_id","join"=>"countries,country_code"];
-// 			$this->col[] = ["label"=>"Terms Payment Is Due","name"=>"terms_payment_is_due"];
-// 			$this->col[] = ["label"=>"Terms Balance Due Days","name"=>"terms_balance_due_days"];
-// 			$this->col[] = ["label"=>"Tax Code","name"=>"tax_codes_id","join"=>"tax_codes,tax_code"];
-// 			$this->col[] = ["label"=>"Tax ID No.","name"=>"tax_id_no"];
-// 			$this->col[] = ["label"=>"Sales Purchase Layout","name"=>"sales_purchase_layout"];
-// 			$this->col[] = ["label"=>"Payment Memo","name"=>"payment_memo"];
-// 			$this->col[] = ["label"=>"Freight Tax Code","name"=>"freight_tax_code"];
-// 			$this->col[] = ["label"=>"Use Supplier Tax Code","name"=>"use_supplier_tax_code"];
-// 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
-// 			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
-// 			$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-// 			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
+			$this->col[] = ["label"=>"Card ID","name"=>"card_id"];
+			$this->col[] = ["label"=>"Card Status","name"=>"card_status"];
+			$this->col[] = ["label"=>"Vendor","name"=>"last_name","visible"=>true];
+			$this->col[] = ["label"=>"Currency","name"=>"currencies_id", "join"=>"currencies,currency_code"];
 
+			$this->col[] = ["label"=>"First Name","name"=>"first_name1"];
+			$this->col[] = ["label"=>"Last Name","name"=>"last_name1"];
+			$this->col[] = ["label"=>"Main Phone","name"=>"phone_number1"];
 
-//          hided by cris
-//              $this->col[] = ["label"=>"Co./Last Name","name"=>"last_name"];
-// 			$this->col[] = ["label"=>"First Name","name"=>"first_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Card ID","name"=>"card_id"];
-// 			$this->col[] = ["label"=>"Card Status","name"=>"card_status"];
-// 			$this->col[] = ["label"=>"Currency Code","name"=>"currencies_id","join"=>"currencies,currency_code"];
-// 			//1ST
-// 			$this->col[] = ["label"=>"Address1 Line1","name"=>"address1_line1","visible"=>false];
-// 			$this->col[] = ["label"=>"Address1 Line2","name"=>"address1_line2","visible"=>false];
-// 			$this->col[] = ["label"=>"Address1 Line3","name"=>"address1_line3","visible"=>false];
-// 			$this->col[] = ["label"=>"Address1 Line4","name"=>"address1_line4","visible"=>false];
-// 			$this->col[] = ["label"=>"City","name"=>"cities_id","join"=>"cities,city_name","visible"=>false];
-// 			$this->col[] = ["label"=>"State","name"=>"states_id","join"=>"states,state_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code","visible"=>false];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries_id","join"=>"countries,country_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #1","name"=>"phone_number1","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #2","name"=>"phone_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #3","name"=>"phone_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Fax #","name"=>"fax_number","visible"=>false];
-// 			$this->col[] = ["label"=>"Email","name"=>"email","visible"=>false];
-// 			$this->col[] = ["label"=>"WWW","name"=>"www","visible"=>false];
-// 			$this->col[] = ["label"=>"Contact Name","name"=>"contact_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Salutation","name"=>"salutation","visible"=>false];
-// 			//2ND
-// 			$this->col[] = ["label"=>"Address2 Line1","name"=>"address2_line1","visible"=>false];
-// 			$this->col[] = ["label"=>"Address2 Line2","name"=>"address2_line2","visible"=>false];
-// 			$this->col[] = ["label"=>"Address2 Line3","name"=>"address2_line3","visible"=>false];
-// 			$this->col[] = ["label"=>"Address2 Line4","name"=>"address2_line4","visible"=>false];
-// 			$this->col[] = ["label"=>"City","name"=>"cities2_id","join"=>"cities,city_name","visible"=>false];
-// 			$this->col[] = ["label"=>"State","name"=>"states2_id","join"=>"states,state_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code2","visible"=>false];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries2_id","join"=>"countries,country_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #1","name"=>"phone2_number1","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #2","name"=>"phone2_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #3","name"=>"phone2_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Fax #","name"=>"fax_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Email","name"=>"email2","visible"=>false];
-// 			$this->col[] = ["label"=>"WWW","name"=>"www2","visible"=>false];
-// 			$this->col[] = ["label"=>"Contact Name","name"=>"contact_name2","visible"=>false];
-// 			$this->col[] = ["label"=>"Salutation","name"=>"salutation2","visible"=>false];
-// 			//3RD
-// 			$this->col[] = ["label"=>"Address3 Line1","name"=>"address3_line1","visible"=>false];
-// 			$this->col[] = ["label"=>"Address3 Line2","name"=>"address3_line2","visible"=>false];
-// 			$this->col[] = ["label"=>"Address3 Line3","name"=>"address3_line3","visible"=>false];
-// 			$this->col[] = ["label"=>"Address3 Line4","name"=>"address3_line4","visible"=>false];
-// 			$this->col[] = ["label"=>"City","name"=>"cities3_id","join"=>"cities,city_name","visible"=>false];
-// 			$this->col[] = ["label"=>"State","name"=>"states3_id","join"=>"states,state_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code3","visible"=>false];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries3_id","join"=>"countries,country_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #1","name"=>"phone3_number1","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #2","name"=>"phone3_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #3","name"=>"phone3_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Fax #","name"=>"fax_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Email","name"=>"email3","visible"=>false];
-// 			$this->col[] = ["label"=>"WWW","name"=>"www3","visible"=>false];
-// 			$this->col[] = ["label"=>"Contact Name","name"=>"contact_name3","visible"=>false];
-// 			$this->col[] = ["label"=>"Salutation","name"=>"salutation3","visible"=>false];
-// 			//4TH
-// 			$this->col[] = ["label"=>"Address4 Line1","name"=>"address4_line1","visible"=>false];
-// 			$this->col[] = ["label"=>"Address4 Line2","name"=>"address4_line2","visible"=>false];
-// 			$this->col[] = ["label"=>"Address4 Line3","name"=>"address4_line3","visible"=>false];
-// 			$this->col[] = ["label"=>"Address4 Line4","name"=>"address4_line4","visible"=>false];
-// 			$this->col[] = ["label"=>"City","name"=>"cities4_id","join"=>"cities,city_name","visible"=>false];
-// 			$this->col[] = ["label"=>"State","name"=>"states4_id","join"=>"states,state_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code4","visible"=>false];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries4_id","join"=>"countries,country_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #1","name"=>"phone4_number1","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #2","name"=>"phone4_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #3","name"=>"phone4_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Fax #","name"=>"fax_number4","visible"=>false];
-// 			$this->col[] = ["label"=>"Email","name"=>"email4","visible"=>false];
-// 			$this->col[] = ["label"=>"WWW","name"=>"www4","visible"=>false];
-// 			$this->col[] = ["label"=>"Contact Name","name"=>"contact_name4","visible"=>false];
-// 			$this->col[] = ["label"=>"Salutation","name"=>"salutation4","visible"=>false];
-// 			//5TH
-// 			$this->col[] = ["label"=>"Address5 Line1","name"=>"address5_line1","visible"=>false];
-// 			$this->col[] = ["label"=>"Address5 Line2","name"=>"address5_line2","visible"=>false];
-// 			$this->col[] = ["label"=>"Address5 Line3","name"=>"address5_line3","visible"=>false];
-// 			$this->col[] = ["label"=>"Address5 Line4","name"=>"address5_line4","visible"=>false];
-// 			$this->col[] = ["label"=>"City","name"=>"cities5_id","join"=>"cities,city_name","visible"=>false];
-// 			$this->col[] = ["label"=>"State","name"=>"states5_id","join"=>"states,state_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Post Code","name"=>"post_code5","visible"=>false];
-// 			$this->col[] = ["label"=>"Country","name"=>"countries5_id","join"=>"countries,country_name","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #1","name"=>"phone5_number1","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #2","name"=>"phone5_number2","visible"=>false];
-// 			$this->col[] = ["label"=>"Phone #3","name"=>"phone5_number3","visible"=>false];
-// 			$this->col[] = ["label"=>"Fax #","name"=>"fax_number5","visible"=>false];
-// 			$this->col[] = ["label"=>"Email","name"=>"email5","visible"=>false];
-// 			$this->col[] = ["label"=>"WWW","name"=>"www5","visible"=>false];
-// 			$this->col[] = ["label"=>"Contact Name","name"=>"contact_name5","visible"=>false];
-// 			$this->col[] = ["label"=>"Salutation","name"=>"salutation5","visible"=>false];
-
-// 			$this->col[] = ["label"=>"Picture","name"=>"picture","visible"=>false];
-// 			$this->col[] = ["label"=>"Notes","name"=>"notes","visible"=>false];
-// 			$this->col[] = ["label"=>"Identifiers","name"=>"identifiers","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom List 1","name"=>"custom_list1","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom List 2","name"=>"custom_list2","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom List 3","name"=>"custom_list3","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom Field 1","name"=>"custom_field1","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom Field 2","name"=>"custom_field2","visible"=>false];
-// 			$this->col[] = ["label"=>"Custom Field 3","name"=>"custom_field3","visible"=>false];
-// 			$this->col[] = ["label"=>"Billing Rate","name"=>"billing_rate","visible"=>false];
-// 			$this->col[] = ["label"=>"Cost Per Hour","name"=>"cost_per_hour","visible"=>false];
-// 			$this->col[] = ["label"=>"Terms-Payment is Due","name"=>"terms_payment_is_due","visible"=>false];
-// 			$this->col[] = ["label"=>"Discount Days","name"=>"terms_discount_days","visible"=>false];
-// 			$this->col[] = ["label"=>"Balance Due Days","name"=>"terms_balance_due_days","visible"=>false];
-// 			$this->col[] = ["label"=>"Discount","name"=>"terms_discount","visible"=>false];
-// 			$this->col[] = ["label"=>"Tax Code","name"=>"tax_codes_id","join"=>"tax_codes,tax_code"];
-// 			$this->col[] = ["label"=>"Credit Limit","name"=>"credit_limit","visible"=>false];
-// 			$this->col[] = ["label"=>"Tax ID No.","name"=>"tax_id_no"];
-// 			$this->col[] = ["label"=>"Volume Discount","name"=>"volume_discount","visible"=>false];
-// 			$this->col[] = ["label"=>"Sales/Purchase Layout","name"=>"sales_purchase_layout"];
-// 			$this->col[] = ["label"=>"Account","name"=>"account","visible"=>false];
-// 			$this->col[] = ["label"=>"Comment","name"=>"comment","visible"=>false];
-// 			$this->col[] = ["label"=>"Shipping Method","name"=>"shipping_method","visible"=>false];
-// 			$this->col[] = ["label"=>"Printed Form","name"=>"printed_form","visible"=>false];
-// 			$this->col[] = ["label"=>"Freight Tax Code","name"=>"freight_tax_code","join"=>"tax_codes,tax_code"];
-// 			$this->col[] = ["label"=>"Use Suppliers Tax Code","name"=>"use_supplier_tax_code"];
-// 			$this->col[] = ["label"=>"Payment Memo","name"=>"payment_memo","visible"=>false];
-// 			$this->col[] = ["label"=>"Invoice/Purchase Order Delivery","name"=>"invoice_purchase_order_delivery","visible"=>false];
-// 			$this->col[] = ["label"=>"Record ID","name"=>"record_id","visible"=>false];
-// 			if(CRUDBooster::isSuperadmin()) {
-// 				$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
-// 				$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
-// 				$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-// 				$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
-// 				# END COLUMNS DO NOT REMOVE THIS LINE
-// 			}
-                //---added by cris 20200707----
-                $this->col[] = ["label"=>"Card ID","name"=>"card_id"];
-        			$this->col[] = ["label"=>"Card Status","name"=>"card_status"];
-        			$this->col[] = ["label"=>"Vendor","name"=>"last_name","visible"=>true];
-        			$this->col[] = ["label"=>"Currency","name"=>"currencies_id", "join"=>"currencies,currency_code"];
-        			
-        			$this->col[] = ["label"=>"First Name","name"=>"first_name1"];
-        			$this->col[] = ["label"=>"Last Name","name"=>"last_name1"];
-        			$this->col[] = ["label"=>"Main Phone","name"=>"phone_number1"];
+			$this->col[] = ["label"=>"Balance","name"=>"balance","visible"=>false];
+			$this->col[] = ["label"=>"Balance Total","name"=>"balance_total","visible"=>false];
+			$this->col[] = ["label"=>"Balance (PHP)","name"=>"balance_php","visible"=>false];
+			$this->col[] = ["label"=>"Balance Total (PHP)","name"=>"balance_total_php","visible"=>false];
+			$this->col[] = ["label"=>"Terms","name"=>"terms_id","join"=>"terms,terms_description","visible"=>false];
         
-        			$this->col[] = ["label"=>"Balance","name"=>"balance","visible"=>false];
-        			$this->col[] = ["label"=>"Balance Total","name"=>"balance_total","visible"=>false];
-        			$this->col[] = ["label"=>"Balance (PHP)","name"=>"balance_php","visible"=>false];
-        			$this->col[] = ["label"=>"Balance Total (PHP)","name"=>"balance_total_php","visible"=>false];
-        			$this->col[] = ["label"=>"Terms","name"=>"terms_id","join"=>"terms,terms_description","visible"=>false];
-        
-                if (CRUDBooster::isSuperadmin()) {
-                    $this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
-                    $this->col[] = ["label" => "Created Date", "name" => "created_at"];
-                    $this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name"];
-                    $this->col[] = ["label" => "Updated Date", "name" => "updated_at"];
-                    # END COLUMNS DO NOT REMOVE THIS LINE
-                }
-                //-------------------------------------
-
-           
+			if (CRUDBooster::isSuperadmin()) {
+				$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
+				$this->col[] = ["label" => "Created Date", "name" => "created_at"];
+				$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name"];
+				$this->col[] = ["label" => "Updated Date", "name" => "updated_at"];
+			}
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			
-			
-			//---added by cris 20200707
             $this->form[] = ['label' => 'Card Status', 'name' => 'card_status', 'type' => 'select', 'validation' => 'required', 'width' => 'col-sm-4', 'dataenum' => 'ACTIVE;NON-ACTIVE'];//, 'help' => 'If Active = N, If Inactive = Y'
             $this->form[] = ['label' => 'Vendor', 'name' => 'last_name', 'type' => 'text', 'validation' => 'required|min:2|max:100', 'width' => 'col-sm-4'];
             if (CRUDBooster::getCurrentMethod() == 'getDetail') {
                 $this->form[] = ['label' => 'Card ID', 'name' => 'card_id', 'type' => 'text', 'validation' => 'required|min:6|max:9', 'width' => 'col-sm-4'];
             }
             $this->form[] = ['label' => 'Currency', 'name' => 'currencies_id', 'type' => 'select2', 'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'datatable' => 'currencies,currency_code', 'datatable_where' => "status = 'ACTIVE'"];
-            // $this->form[] = ['label' => 'Balance', 'name' => 'balance', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
-            // $this->form[] = ['label' => 'Balance Total', 'name' => 'balance_total', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
-            // $this->form[] = ['label' => 'Balance (PHP)', 'name' => 'balance_php', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
-            // $this->form[] = ['label' => 'Balance Total (PHP)', 'name' => 'balance_total_php', 'type' => 'number', 'validation' => 'integer|min:0', 'width' => 'col-sm-4'];
-    		$this->form[] = ['label'=>'Company','name'=>'company','type'=>'text','validation'=>'required|min:2|max:100','width'=>'col-sm-4', 'readonly'=>true];
+            $this->form[] = ['label'=>'Company','name'=>'company','type'=>'text','validation'=>'required|min:2|max:100','width'=>'col-sm-4', 'readonly'=>true];
             $this->form[] = ['label'=>'Mr./Ms./...','name'=>'mr_ms','type'=>'select','width'=>'col-sm-4', 'dataenum'=>'MR;MS;MRS'];
             $this->form[] = ['label' => 'First Name', 'name' => 'first_name1', 'type' => 'text', 'validation' => 'required', 'width' => 'col-sm-4'];
             $this->form[] = ['label' => 'M.I.', 'name' => 'middle_name1', 'type' => 'text', 'width' => 'col-sm-4'];
@@ -255,42 +94,8 @@
             $this->form[] = ['label' => 'Fax', 'name' => 'fax_number', 'type' => 'text', 'validation' => 'min:7|max:20', 'width' => 'col-sm-4'];
             $this->form[] = ['label'=>'Alt Phone','name'=>'phone2_number1','type'=>'number','width'=>'col-sm-4'];
             $this->form[] = ['label' => 'Secondary Contact', 'name' => 'phone_number3', 'type' => 'text', 'width' => 'col-sm-4'];
-                //-----added by cris 20200826---
-    			$this->form[] = ['label'=>'Minimum Order Value','name'=>'minimum_order_value','type'=>'number','validation'=>'required|min:0.00','width'=>'col-sm-5'];
-                //-----------------------------
-            //---------------------------
-			
-			//   hided by cris
-// 			$this->form[] = ['label'=>'Last Name','name'=>'last_name','type'=>'text','validation'=>'required|min:2|max:100','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'First Name','name'=>'first_name','type'=>'text','validation'=>'max:100','width'=>'col-sm-4'];
-// 			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
-// 				$this->form[] = ['label'=>'Card ID','name'=>'card_id','type'=>'text','validation'=>'required|min:6|max:9','width'=>'col-sm-4'];
-// 			}
-// 			$this->form[] = ['label'=>'Card Status','name'=>'card_status','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'N;Y','help'=>'If Active = N, If Inactive = Y'];
-// 			$this->form[] = ['label'=>'Currency','name'=>'currencies_id','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-4','datatable'=>'currencies,currency_code','datatable_where'=>"status = 'ACTIVE'"];
-// 			$this->form[] = ['label'=>'Address1 Line1','name'=>'address1_line1','type'=>'text','validation'=>'max:100','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Address1 Line2','name'=>'address1_line2','type'=>'text','validation'=>'max:50','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'City','name'=>'cities_id','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-4','datatable'=>'cities,city_name','datatable_where'=>"status = 'ACTIVE'"];
-// 			$this->form[] = ['label'=>'States','name'=>'states_id','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-4','datatable'=>'states,state_name','datatable_where'=>"status = 'ACTIVE'"];
-// 			$this->form[] = ['label'=>'Post Code','name'=>'post_code','type'=>'text','validation'=>'min:4|max:20','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Country','name'=>'countries_id','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-4','datatable'=>'countries,country_name','datatable_where'=>"status = 'ACTIVE'"];
-// 			$this->form[] = ['label'=>'Phone #1','name'=>'phone_number1','type'=>'text','validation'=>'min:4|max:20','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Phone #2','name'=>'phone_number2','type'=>'text','validation'=>'min:4|max:20','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Phone #3','name'=>'phone_number3','type'=>'text','validation'=>'min:4|max:20','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Contact Fax #','name'=>'fax_number','type'=>'text','validation'=>'min:7|max:20','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Contact Email','name'=>'email','type'=>'email','validation'=>'email|unique:suppliers,email','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Contact Name','name'=>'contact_name','type'=>'text','validation'=>'min:2|max:30','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Contact Salutation','name'=>'salutation','type'=>'text','validation'=>'min:2|max:5','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Terms Payment Is Due','name'=>'terms_payment_is_due','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-4','help'=>'If MYOB Format for COD = 1, If MYOB Format on a Day of the Month = 3','dataenum'=>'1;3'];
-// 			$this->form[] = ['label'=>'Terms Balance Due Days','name'=>'terms_balance_due_days','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Tax Code','name'=>'tax_codes_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status = 'ACTIVE' and tax_code != 'FRE'"];
-// 			$this->form[] = ['label'=>'Tax ID No.','name'=>'tax_id_no','type'=>'text','validation'=>'min:15|max:16','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Sales Purchase Layout','name'=>'sales_purchase_layout','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'I;S','help'=>'If Item = I, If Service = S'];
-// 			$this->form[] = ['label'=>'Freight Tax Code','name'=>'freight_tax_code','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-4','datatable'=>'tax_codes,tax_code','datatable_where'=>"status = 'ACTIVE'"];
-// 			$this->form[] = ['label'=>'Use Supplier Tax Code','name'=>'use_supplier_tax_code','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'N;Y','help'=>'If Active = N, If Inactive = Y'];
-// 			$this->form[] = ['label'=>'Payment Memo','name'=>'payment_memo','type'=>'text','validation'=>'max:50','width'=>'col-sm-4'];
-// 			$this->form[] = ['label'=>'Invoice Purchase Order Delivery','name'=>'invoice_purchase_order_delivery','type'=>'select','validation'=>'required','width'=>'col-sm-4','dataenum'=>'P'];
-			# END FORM DO NOT REMOVE THIS LINE
+            
+    		$this->form[] = ['label'=>'Minimum Order Value','name'=>'minimum_order_value','type'=>'number','validation'=>'required|min:0.00','width'=>'col-sm-4'];
 
 			/* 
 	        | ---------------------------------------------------------------------- 
