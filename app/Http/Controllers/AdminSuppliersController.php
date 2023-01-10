@@ -1,11 +1,8 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	//----added by cris 20201006----
     use Illuminate\Http\Request;
-    // use Request;
     use Excel;
-    //------------------------------
 	use DB;
 	use CRUDBooster;
 	use App\Supplier;
@@ -161,19 +158,17 @@
 	        | 
 	        */
 	        $this->index_button = array();
-            //---added by cris 20201006----
-            if (CRUDBooster::getCurrentMethod() == 'getIndex') {
-                if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeName() == "Manager (Purchaser)")
-                {
-                    $this->index_button[] = [
-                    "title" => "Update Vendor",
-                    "label" => "Update Vendor",
-                    "color" => "success",
-                    "icon" => "fa fa-upload", "url" => CRUDBooster::mainpath('update-vendor')
-                ];
-                }
-            }
-            //-----------------------------
+            // if (CRUDBooster::getCurrentMethod() == 'getIndex') {
+            //     if(CRUDBooster::isSuperadmin() || CRUDBooster::myPrivilegeName() == "Manager (Purchaser)")
+            //     {
+            //         $this->index_button[] = [
+            //         "title" => "Update Vendor",
+            //         "label" => "Update Vendor",
+            //         "color" => "success",
+            //         "icon" => "fa fa-upload", "url" => CRUDBooster::mainpath('update-vendor')
+            //     ];
+            //     }
+            // }
 
 
 	        /* 
@@ -497,11 +492,8 @@
 	
         public function updateVendor() {
             $this->cbLoader();
-           
             $data['page_title'] = 'Update Vendor';
-    
-            // send to front-end view
-            $this->cbView("upload.update_vendor", $data);
+            return view("upload.update_vendor", $data);
         }
     
         public function vendorUpdate(Request $request) {
