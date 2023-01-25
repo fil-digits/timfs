@@ -6,6 +6,7 @@
         margin-bottom: 10px;
         padding: 15px;
         border: 1px solid #ddd;
+        position: relative;
     }
 
     .ingredient-entry > * {
@@ -236,12 +237,68 @@
 
         $(document).on('click', '.move-up', function() {
             const entry = $(this).parents('.ingredient-entry');
-            entry.insertBefore($(entry).prev());
+            const sibling = entry.prev()[0];
+            if (!sibling) return;
+            $(sibling).animate(
+                {
+                    top: `+=${$(sibling).outerHeight()}`,
+                },
+                {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        $(sibling).css('top', '0');
+                    }
+                }
+            );
+
+            entry.animate(
+                {
+                    top: `-=${entry.outerHeight()}`
+                },
+                {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        entry.css('top', '0');
+                        entry.insertBefore($(entry).prev());
+                    }
+                }
+            );
         });
 
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-entry');
-            entry.insertAfter($(entry).next());
+            const sibling = entry.next()[0];
+            if (!sibling) return;
+
+            $(sibling).animate(
+                {
+                    top: `-=${$(sibling).outerHeight()}`,
+                },
+                {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        $(sibling).css('top', '0');
+                    }
+                }
+            );
+
+            entry.animate(
+                {
+                    top: `+=${entry.outerHeight()}`
+                },
+                {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        entry.css('top', '0');
+                        entry.insertAfter($(entry).next());
+                    }
+                }
+            );
+            
         });
 
         $(document).on('click', '.delete', function(event) {
