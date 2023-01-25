@@ -224,8 +224,8 @@
         });
 
         $(document).on('click', '.delete', function(event) {
-            const index = $('.delete').index(this);
-            const itemMastersId = $('.ingredient').eq(index).val();
+            const entry = $(this).parents('.ingredient-entry');
+            const itemMastersId = entry.find('.ingredient').val();
             const menuItemsId = {{$item->id}};
             Swal.fire({
                 title: 'Are you sure?',
@@ -259,7 +259,7 @@
                     },
                     success: function(response) {
                         if (response || !itemMastersId) {
-                            $('.ingredient-entry').eq(index).remove();
+                            entry.remove();
                             $('.item-list').html('');  
                             $('.item-list').fadeOut();
                         }
