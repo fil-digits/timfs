@@ -121,10 +121,12 @@
                         <select name="uom[]" class="select2 form-control uom" required>
                             <option value="">Please select UOM</option>
                             @if($current_uom)
-                            <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
+                                <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
                             @endif
                             @foreach($uoms as $uom)
-                            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                                @if($current_uom->id != $uom->id)
+                                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                                @endif
                             @endforeach
                         </select>
                     </label>
