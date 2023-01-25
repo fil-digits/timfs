@@ -1,5 +1,4 @@
 @push('head')
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script> --}}
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <style type="text/css">
@@ -42,6 +41,7 @@
 
 {{-- 
     A COPY OF INGREDIENT ENTRY!!! FOR CLONING!!
+    THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
 
 <div class="ingredient-entry" style=" margin-bottom: 10px; padding: 15px; border: 1px solid #ddd; display: none">
@@ -175,13 +175,11 @@
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
-                // console.log(current_ingredients);
                 current_ingredients.forEach((item, item_index) => {
                     // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
                     // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
                     if (item_index != index) arrayOfIngredients.push(item.value);
                 });
-                console.log(arrayOfIngredients);
 
                 if (query == '') {
                     $('.item-list').html = '';
@@ -198,8 +196,8 @@
                     },
                     success:function(response) { 
                         $('.item-list').html('');
-                        $('.item-list').eq(index).fadeIn(); 
-                        $('.item-list').eq(index).html(response);                        
+                        entry.find('.item-list').fadeIn(); 
+                        entry.find('.item-list').html(response);                        
                     }
                 });
             });
@@ -207,7 +205,6 @@
 
         $(document).on('click', '.list-item', function(event) { 
             const entry = $(this).parents('.ingredient-entry');
-            // console.log(this);
             entry.find('.ingredient').val($(this).attr('item_id'));
             entry.find('.display-ingredient').val($(this).text());
 
@@ -217,13 +214,11 @@
 
         $(document).on('click', '.move-up', function() {
             const entry = $(this).parents('.ingredient-entry');
-            // console.log(entry);
             entry.insertBefore($(entry).prev());
         });
 
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-entry');
-            // console.log(entry);
             entry.insertAfter($(entry).next());
         });
 
