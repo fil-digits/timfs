@@ -46,33 +46,33 @@
 
 <div class="ingredient-entry" style=" margin-bottom: 10px; padding: 15px; border: 1px solid #ddd; display: none">
     <div class="ingredient-inputs">
-    <label style="margin-bottom: 10px;">
-        <span class="required-star">*</span> Ingredient
-        <div>
-            <input value="" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
-            <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-            <div class="item-list" style="position: absolute;">
+        <label style="margin-bottom: 10px;">
+            <span class="required-star">*</span> Ingredient
+            <div>
+                <input value="" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
+                <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                <div class="item-list" style="position: absolute;">
+                </div>
             </div>
-        </div>
-    </label>
-    <label for="" style="margin-bottom: 10px;">
-        <span class="required-star">*</span> Ingredient Quantity
-        <input value="" name="quantity[]" class="form-control" type="number" min="0" required/>
-    </label>
-    <label for="" style="margin-bottom: 10px;">
-        <span class="required-star">*</span> Ingredient UOM
-        <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
-        <select name="uom[]" class="select2 form-control uom" required>
-            <option value="">Please select UOM</option>
-            @foreach($uoms as $uom)
-            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
-            @endforeach
-        </select>
-    </label>
-    <label for="" style="margin-bottom: 10px;">
-        <span class="required-star">*</span> Ingredient SRP
-        <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
-    </label>
+        </label>
+        <label for="" style="margin-bottom: 10px;">
+            <span class="required-star">*</span> Ingredient Quantity
+            <input value="" name="quantity[]" class="form-control" type="number" min="0" required/>
+        </label>
+        <label for="" style="margin-bottom: 10px;">
+            <span class="required-star">*</span> Ingredient UOM
+            <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
+            <select name="uom[]" class="select2 form-control uom" required>
+                <option value="">Please select UOM</option>
+                @foreach($uoms as $uom)
+                <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                @endforeach
+            </select>
+        </label>
+        <label for="" style="margin-bottom: 10px;">
+            <span class="required-star">*</span> Ingredient SRP
+            <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
+        </label>
     </div>
     <div class="actions">
         <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
@@ -85,7 +85,8 @@
  --}}
  <a title="Return" href="{{ CRUDBooster::mainpath() }}">
     <i class="fa fa-chevron-circle-left "></i>
-    Back To List Data Menu Item Masterfile</a>
+    Back To List Data Menu Item Masterfile
+</a>
 <div class="panel panel-default">
     <div class="panel-heading">
         <strong><p>Edit Menu Item</p></strong>
@@ -109,38 +110,38 @@
                 @foreach($current_ingredients as $current_ingredient)
                 <div class="ingredient-entry" style=" margin-bottom: 10px; padding: 15px; border: 1px solid #ddd;">
                     <div class="ingredient-inputs">
-                    <label style="margin-bottom: 10px;">
-                        <span class="required-star">*</span> Ingredient
-                        <div>
-                            <input value="{{$current_ingredient->id}}" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
-                            <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-                            <div class="item-list" style="position: absolute;">
+                        <label style="margin-bottom: 10px;">
+                            <span class="required-star">*</span> Ingredient
+                            <div>
+                                <input value="{{$current_ingredient->id}}" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
+                                <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                                <div class="item-list" style="position: absolute;">
+                                </div>
                             </div>
-                        </div>
-                    </label>
-                    <label for="" style="margin-bottom: 10px;">
-                        <span class="required-star">*</span> Ingredient Quantity
-                        <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" required />
-                    </label>
-                    <label for="" style="margin-bottom: 10px;">
-                        <span class="required-star">*</span> Ingredient UOM
-                        <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
-                        <select name="uom[]" class="select2 form-control uom" required>
-                            <option value="">Please select UOM</option>
-                            @if($current_uom)
-                                <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
-                            @endif
-                            @foreach($uoms as $uom)
-                                @if($current_uom->id != $uom->id)
-                                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                        </label>
+                        <label for="" style="margin-bottom: 10px;">
+                            <span class="required-star">*</span> Ingredient Quantity
+                            <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" required />
+                        </label>
+                        <label for="" style="margin-bottom: 10px;">
+                            <span class="required-star">*</span> Ingredient UOM
+                            <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
+                            <select name="uom[]" class="select2 form-control uom" required>
+                                <option value="">Please select UOM</option>
+                                @if($current_uom)
+                                    <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
                                 @endif
-                            @endforeach
-                        </select>
-                    </label>
-                    <label for="" style="margin-bottom: 10px;">
-                        <span class="required-star">*</span> Ingredient SRP
-                        <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
-                    </label>
+                                @foreach($uoms as $uom)
+                                    @if($current_uom->id != $uom->id)
+                                        <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </label>
+                        <label for="" style="margin-bottom: 10px;">
+                            <span class="required-star">*</span> Ingredient SRP
+                            <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
+                        </label>
                     </div>
                     <div class="actions">
                         <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
