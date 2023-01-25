@@ -2,6 +2,11 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <style type="text/css">
+    .ingredient-entry {
+        margin-bottom: 10px;
+        padding: 15px;
+        border: 1px solid #ddd;
+    }
 
     .ingredient-entry > * {
         display:inline-block;
@@ -32,6 +37,22 @@
         font-size: 1.6rem !important;
     }
 
+    .ingredient {
+        display: none;
+    }
+
+    .item-list {
+        position: absolute;
+    }
+
+    label {
+        margin-bottom: 10px;
+    }
+
+    .menu-item-label {
+        display: block;
+    }
+
     
 </style>
 @endpush
@@ -44,22 +65,22 @@
     THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
 
-<div class="ingredient-entry" style=" margin-bottom: 10px; padding: 15px; border: 1px solid #ddd; display: none">
+<div class="ingredient-entry" style="display: none;">
     <div class="ingredient-inputs">
-        <label style="margin-bottom: 10px;">
+        <label>
             <span class="required-star">*</span> Ingredient
             <div>
-                <input value="" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
+                <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
                 <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-                <div class="item-list" style="position: absolute;">
+                <div class="item-list">
                 </div>
             </div>
         </label>
-        <label for="" style="margin-bottom: 10px;">
+        <label>
             <span class="required-star">*</span> Ingredient Quantity
             <input value="" name="quantity[]" class="form-control" type="number" min="0" required/>
         </label>
-        <label for="" style="margin-bottom: 10px;">
+        <label>
             <span class="required-star">*</span> Ingredient UOM
             <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
             <select name="uom[]" class="select2 form-control uom" required>
@@ -69,7 +90,7 @@
                 @endforeach
             </select>
         </label>
-        <label for="" style="margin-bottom: 10px;">
+        <label>
             <span class="required-star">*</span> Ingredient SRP
             <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
         </label>
@@ -95,11 +116,11 @@
         <form class='form-horizontal' action="{{ route('edit_menu_item') }}" id="form" method="POST" autocomplete="off">
             @csrf
             <input type="text" name="menu_items_id" value="{{$item->id}}" style="display: none;">
-            <label for="" style="display: block; margin-bottom: 10px;">
+            <label class="menu-item-label">
                 Menu Item Code
                 <input class="form-control" type="text" value="{{$item->tasteless_menu_code}}" disabled>
             </label>
-            <label for="" style="display: block; margin-bottom: 10px;">
+            <label class="menu-item-label">
                 Menu Item Description
                 <input class="form-control" type="text" value="{{$item->menu_item_description}}" disabled>
             </label>
@@ -108,22 +129,22 @@
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
                 @foreach($current_ingredients as $current_ingredient)
-                <div class="ingredient-entry" style=" margin-bottom: 10px; padding: 15px; border: 1px solid #ddd;">
+                <div class="ingredient-entry">
                     <div class="ingredient-inputs">
-                        <label style="margin-bottom: 10px;">
+                        <label>
                             <span class="required-star">*</span> Ingredient
                             <div>
-                                <input value="{{$current_ingredient->id}}" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
+                                <input value="{{$current_ingredient->id}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
                                 <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-                                <div class="item-list" style="position: absolute;">
+                                <div class="item-list">
                                 </div>
                             </div>
                         </label>
-                        <label for="" style="margin-bottom: 10px;">
+                        <label>
                             <span class="required-star">*</span> Ingredient Quantity
                             <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" required />
                         </label>
-                        <label for="" style="margin-bottom: 10px;">
+                        <label>
                             <span class="required-star">*</span> Ingredient UOM
                             <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
                             <select name="uom[]" class="select2 form-control uom" required>
@@ -138,7 +159,7 @@
                                 @endforeach
                             </select>
                         </label>
-                        <label for="" style="margin-bottom: 10px;">
+                        <label>
                             <span class="required-star">*</span> Ingredient SRP
                             <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
                         </label>
