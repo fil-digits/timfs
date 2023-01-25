@@ -22,7 +22,7 @@
     }
 
     .display-ingredient {
-        min-width: 30vw;
+        min-width: 27vw;
     }
 
     .uom {
@@ -74,7 +74,11 @@
         <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
     </label>
     </div>
-    <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i> Delete</button>
+    <div class="actions">
+        <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+        <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+        <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
+    </div>
 </div>
 {{-- 
     END OF COPY
@@ -138,7 +142,11 @@
                         <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
                     </label>
                     </div>
-                    <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i> Delete</button>
+                    <div class="actions">
+                        <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+                        <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+                        <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
+                    </div>
                 </div>
                 
                 @endforeach
@@ -161,34 +169,38 @@
     $(document).ready(function() {
 
         $.fn.reload = function() {
-            $('.ingredient-entry').map(function(id) {
-                $('.display-ingredient').eq(id).keyup(function() {
-                    const query = ($('.display-ingredient').eq(id)).val();
-                    const current_ingredients = $(".ingredient").serializeArray();
-                    const arrayOfIngredients = [];
-                    current_ingredients.forEach((item, item_index) => {
-                        if (item_index != id) arrayOfIngredients.push(item.value);
-                    });
+            $('.display-ingredient').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry');
+                const query = ($(this).val());
+                const current_ingredients = $(".ingredient").serializeArray();
+                const arrayOfIngredients = [];
+                const index = $('.display-ingredient').index(this);
+                // console.log(current_ingredients);
+                current_ingredients.forEach((item, item_index) => {
+                    // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
+                    // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
+                    if (item_index != index) arrayOfIngredients.push(item.value);
+                });
+                console.log(arrayOfIngredients);
 
-                    if (query == '') {
-                        $('.item-list').html = '';
+                if (query == '') {
+                    $('.item-list').html = '';
+                }
+                const _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('type_search') }}",
+                    method:"POST",
+                    data: {
+                        query: query,
+                        _token: _token,
+                        entry_id: index,
+                        current_ingredients: arrayOfIngredients.join(','),
+                    },
+                    success:function(response) { 
+                        $('.item-list').html('');
+                        $('.item-list').eq(index).fadeIn(); 
+                        $('.item-list').eq(index).html(response);                        
                     }
-                    var _token = $('input[name="_token"]').val();
-                    $.ajax({
-                        url:"{{ route('type_search') }}",
-                        method:"POST",
-                        data: {
-                            query: query,
-                            _token: _token,
-                            entry_id: id,
-                            current_ingredients: arrayOfIngredients.join(','),
-                        },
-                        success:function(response) { 
-                            $('.item-list').html('');
-                            $('.item-list').eq(id).fadeIn(); 
-                            $('.item-list').eq(id).html(response);                        
-                        }
-                    });
                 });
             });
         }
@@ -201,7 +213,19 @@
 
             $('.item-list').html('');  
             $('.item-list').fadeOut();
-        }); 
+        });
+
+        $(document).on('click', '.move-up', function() {
+            const entry = $(this).parents('.ingredient-entry');
+            // console.log(entry);
+            entry.insertBefore($(entry).prev());
+        });
+
+        $(document).on('click', '.move-down', function() {
+            const entry = $(this).parents('.ingredient-entry');
+            // console.log(entry);
+            entry.insertAfter($(entry).next());
+        });
 
         $(document).on('click', '.delete', function(event) {
             const index = $('.delete').index(this);
