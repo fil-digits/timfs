@@ -750,6 +750,8 @@
 					}
 					$element['status'] = 'ACTIVE';
 					$element['row_id'] = $index;
+					$element['deleted_at'] = null;
+					$element['deleted_by'] = null;
 					
 					DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
 				}
