@@ -29,6 +29,10 @@
         width: 199.6px;
     }
 
+    .swal2-popup, .swal2-modal, .swal2-icon-warning .swal2-show {
+        font-size: 1.6rem !important;
+    }
+
     
 </style>
 @endpush
