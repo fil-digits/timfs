@@ -265,7 +265,7 @@
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
 			$postdata["created_by"]=CRUDBooster::myId();
-			self::createMenuItemMasterColumn($postdata["menu_ingredient_description"]);
+			// self::createMenuItemMasterColumn($postdata["menu_ingredient_description"]);
 	    }
 
 	    /* 
