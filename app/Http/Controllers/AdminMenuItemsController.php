@@ -713,7 +713,11 @@
 			$data = [];
 			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
 
-			$data['current_ingredients'] = DB::table('menu_ingredients_details')->where('menu_items_id', $id)->where('status', 'ACTIVE')->orderby('row_id')->get();
+			$data['current_ingredients'] = DB::table('menu_ingredients_details')
+											->where('menu_items_id', $id)
+											->where('status', 'ACTIVE')
+											->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+											->get();
 			$data['all_items'] = DB::table('item_masters')->get();
 			$data['uoms'] = DB::table('uoms')->orderby('uom_description')->get();
 			return $this->view('menu-items/edit-item', $data);

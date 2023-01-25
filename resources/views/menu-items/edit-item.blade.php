@@ -108,9 +108,8 @@
                     <label style="margin-bottom: 10px;">
                         <span class="required-star">*</span> Ingredient
                         <div>
-                            <?php $current_item = $all_items->where('id', $current_ingredient->item_masters_id)->first(); ?>
-                            <input value="{{$current_item->id}}" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
-                            <input value="{{$current_item->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                            <input value="{{$current_ingredient->id}}" type="text" style="display: none;" name="ingredient[]" class="ingredient form-control" required/>
+                            <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
                             <div class="item-list" style="position: absolute;">
                             </div>
                         </div>
