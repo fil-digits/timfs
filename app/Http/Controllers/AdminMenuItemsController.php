@@ -717,8 +717,8 @@
 											->where('menu_items_id', $id)
 											->where('status', 'ACTIVE')
 											->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+											->orderby('row_id')
 											->get();
-			$data['all_items'] = DB::table('item_masters')->get();
 			$data['uoms'] = DB::table('uoms')->orderby('uom_description')->get();
 			return $this->view('menu-items/edit-item', $data);
 		}
