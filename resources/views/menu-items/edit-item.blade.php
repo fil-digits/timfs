@@ -56,11 +56,11 @@
         </div>
     </label>
     <label for="" style="margin-bottom: 10px;">
-        Ingredient Quantity
+        <span class="required-star">*</span> Ingredient Quantity
         <input value="" name="quantity[]" class="form-control" type="number" min="0" required/>
     </label>
     <label for="" style="margin-bottom: 10px;">
-        Ingredient UOM
+        <span class="required-star">*</span> Ingredient UOM
         <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
         <select name="uom[]" class="select2 form-control uom" required>
             <option value="">Please select UOM</option>
@@ -70,7 +70,7 @@
         </select>
     </label>
     <label for="" style="margin-bottom: 10px;">
-        Ingredient SRP
+        <span class="required-star">*</span> Ingredient SRP
         <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
     </label>
     </div>
@@ -115,11 +115,11 @@
                         </div>
                     </label>
                     <label for="" style="margin-bottom: 10px;">
-                        Ingredient Quantity
+                        <span class="required-star">*</span> Ingredient Quantity
                         <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" required />
                     </label>
                     <label for="" style="margin-bottom: 10px;">
-                        Ingredient UOM
+                        <span class="required-star">*</span> Ingredient UOM
                         <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
                         <select name="uom[]" class="select2 form-control uom" required>
                             <option value="">Please select UOM</option>
@@ -134,7 +134,7 @@
                         </select>
                     </label>
                     <label for="" style="margin-bottom: 10px;">
-                        Ingredient SRP
+                        <span class="required-star">*</span> Ingredient SRP
                         <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
                     </label>
                     </div>
