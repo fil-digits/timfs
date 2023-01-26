@@ -12,7 +12,8 @@ class AddOldDecriptionToMenuItems extends Migration
      * @return void
      */
     public function up()
-    {
+    {   
+        if (!Schema::hasColumn('menu_items', 'pos_old_item_description'))
         Schema::table('menu_items', function (Blueprint $table) {
             $table->string('pos_old_item_description',100)->nullable()->after('menu_item_description');
         });
