@@ -779,6 +779,7 @@
 				$current_ingredients = explode(',', $request->get('current_ingredients'));
 				$data = DB::table('item_masters')
 					->where('full_item_description', 'LIKE', "{$query}%")
+					->orWhere('tasteless_code', 'LIKE', "{$query}%")
 					->orderby('full_item_description')
 					->get();
 				$output = '<ul class="dropdown-menu" style="display:block; position: absolute">';
@@ -787,9 +788,7 @@
 					if (in_array($row->id, $current_ingredients)) {
 						continue;
 					}
-					$output .= "
-					<li item_id='$row->id' class='list-item dropdown-item'><a href='javascript:void(0)'>".$row->full_item_description.'</a></li>
-					';
+					$output .= "<li item_id='$row->id' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
 				}
 				$output .= '</ul>';
 				echo $output;
