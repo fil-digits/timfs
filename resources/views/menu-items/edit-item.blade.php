@@ -120,7 +120,7 @@
 </a>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <strong><p>Edit Menu Item</p></strong>
+        <i class="fa fa-pencil"></i><strong> Edit Menu Item</strong>
     </div>
     <div class="panel-body">
         <form class='form-horizontal' action="{{ route('edit_menu_item') }}" id="form" method="POST" autocomplete="off">
