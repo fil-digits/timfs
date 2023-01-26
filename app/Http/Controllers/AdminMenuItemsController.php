@@ -781,10 +781,10 @@
 					->where('full_item_description', 'LIKE', "{$query}%")
 					->orWhere('tasteless_code', 'LIKE', "{$query}%")
 					->orderby('full_item_description')
+					->take(10)
 					->get();
 				$output = '<ul class="dropdown-menu" style="display:block; position: absolute">';
-				for($i = 0; $i<10; $i++) {
-					$row = $data[$i];
+				foreach ($data as $row) {
 					if (in_array($row->id, $current_ingredients)) {
 						continue;
 					}
