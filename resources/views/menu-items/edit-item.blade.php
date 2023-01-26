@@ -54,6 +54,15 @@
         display: block;
     }
 
+    .list-item a {
+        color: #555 !important;
+    }
+
+    .list-item a:hover {
+        background: #1E90FF !important;
+        color: #eee !important;
+    }
+
     
 </style>
 @endpush
