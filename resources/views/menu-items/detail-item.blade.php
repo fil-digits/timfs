@@ -32,32 +32,37 @@
                 </tr>
             </tbody>
         </table>
-        <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
-        <div class="box-body table-responsive no-padding">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th scoped="col">Tasteless Code</th>
-                        <th scoped="col">Ingredient</th>
-                        <th scoped="col">Quantity</th>
-                        <th scoped="col">UOM</th>
-                        <th scoped="col">SRP</th>
-                    </tr>
-                </thead>
-    
-                <tbody>
-                    @foreach ($ingredients as $ingredient)
-                    <tr>
-                        <td>{{$ingredient->tasteless_code}}</td>
-                        <td>{{$ingredient->full_item_description}}</td>
-                        <td>{{$ingredient->qty}}</td>
-                        <td>{{$ingredient->uom_description}}</td>   
-                        <td>₱ {{$ingredient->srp}}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+
+        @if(!count($ingredients))
+            <h4 style="color: gray; text-align: center; font-style: italic;">No ingredients to show...</h4>
+        @else
+            <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
+            <div class="box-body table-responsive no-padding">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th scoped="col">Tasteless Code</th>
+                            <th scoped="col">Ingredient</th>
+                            <th scoped="col">Quantity</th>
+                            <th scoped="col">UOM</th>
+                            <th scoped="col">SRP</th>
+                        </tr>
+                    </thead>
+        
+                    <tbody>
+                        @foreach ($ingredients as $ingredient)
+                            <tr>
+                                <td>{{$ingredient->tasteless_code}}</td>
+                                <td>{{$ingredient->full_item_description}}</td>
+                                <td>{{$ingredient->qty}}</td>
+                                <td>{{$ingredient->uom_description}}</td>   
+                                <td>₱ {{$ingredient->srp}}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
     </div>
 </div>
 
