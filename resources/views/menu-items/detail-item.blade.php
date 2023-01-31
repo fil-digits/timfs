@@ -1,3 +1,11 @@
+@push('head')
+<style>
+    th, td {
+        text-align: center;
+    }
+</style>
+@endpush
+
 @extends('crudbooster::admin_template')
 @section('content')
 
@@ -24,9 +32,8 @@
                 </tr>
             </tbody>
         </table>
-        <h4 style="font-weight: 600">Ingredients List</h4>
-        <div class="box-boy table-responsive no-padding">
-
+        <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
+        <div class="box-body table-responsive no-padding">
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
