@@ -773,6 +773,26 @@
 
 		}
 
+		public function getDetail($id) {
+			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			$data = [];
+			$data['item'] = DB::table('menu_items')
+				->where('id', $id)
+				->get()
+				->first();
+
+			$data['ingredients'] = DB::table('menu_ingredients_details')
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_details.status', 'ACTIVE')
+				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->join('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->orderby('row_id')
+				->get();
+			return $this->view('menu-items/detail-item', $data);
+		}
+
+
+
 		public function autocompleteSearch(Request $request) {
 			if($request->get('query')) {
 				$query = $request->get('query');
