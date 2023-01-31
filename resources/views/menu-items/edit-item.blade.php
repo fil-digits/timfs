@@ -186,7 +186,7 @@
             <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
             <div class='panel-footer'>
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <button class="btn btn-primary pull-right" name="submit" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> Save</button>
+                <button class="btn btn-primary pull-right" type="button" id="save-edit"> <i class="fa fa-save" ></i> Save</button>
             </div>
         </form>
     </div>
@@ -241,6 +241,23 @@
                 }
             });
         }
+
+        $(document).on('click', '#save-edit', function(event) {
+            Swal.fire({
+                title: 'Do you want to save the changes?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Save'
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    $(this).prop("disabled", true);
+                    $('form').submit();
+                }
+            });
+        }); 
 
         $(document).on('click', '.list-item', function(event) { 
             const entry = $(this).parents('.ingredient-entry');
