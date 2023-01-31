@@ -252,21 +252,7 @@
 
         $(document).on('click', '#save-edit', function(event) {
             const formValues = $('#form input, #form select');
-            let isValid = true;
-            formValues.each(index => {
-                if (!$(formValues[index]).val()) {
-                    isValid = false;
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please enter appropriate data!',
-                    }).then(() => {
-                        $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
-                        $('#form .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
-                    });
-                }
-            });
-
+            const isValid = jQuery.makeArray(formValues).every(e => !!$(e).val());
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
@@ -280,6 +266,15 @@
                         $(this).prop("disabled", true);
                         $('form').submit();
                     }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please enter appropriate data!',
+                }).then(() => {
+                    $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
+                    $('#form .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
                 });
             }
         }); 
