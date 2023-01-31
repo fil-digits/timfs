@@ -243,20 +243,37 @@
         }
 
         $(document).on('click', '#save-edit', function(event) {
-            Swal.fire({
-                title: 'Do you want to save the changes?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Save'
-            })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    $(this).prop("disabled", true);
-                    $('form').submit();
+            const formValues = $('#form input, #form select');
+            let isValid = true;
+            formValues.each(index => {
+                if (!$(formValues[index]).val()) {
+                    isValid = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please fill out all the required fields!',
+                    }).then(() => {
+                        $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
+                    })
                 }
-            });
+            })
+            if (isValid) {
+
+                Swal.fire({
+                    title: 'Do you want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Save'
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        $(this).prop("disabled", true);
+                        $('form').submit();
+                    }
+                });
+            }
         }); 
 
         $(document).on('click', '.list-item', function(event) { 
