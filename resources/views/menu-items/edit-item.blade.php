@@ -240,6 +240,14 @@
                 return false;
                 }
             });
+
+            $('#form input:invalid, #form select:invalid').keyup(function() {
+                $('#form input:valid, #form select:valid').css('outline', 'none');
+            });
+
+            $('.uom').on('change', function() {
+                $('#form input:valid, #form select:valid').css('outline', 'none');
+            });
         }
 
         $(document).on('click', '#save-edit', function(event) {
@@ -251,14 +259,15 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Please fill out all the required fields!',
+                        text: 'Please enter appropriate data!',
                     }).then(() => {
                         $('#form input:invalid, #form select:invalid').css('outline', '2px solid red');
-                    })
+                        $('#form .ingredient:invalid').parents('.ingredient-entry').find('.display-ingredient').css('outline', '2px solid red');
+                    });
                 }
-            })
-            if (isValid) {
+            });
 
+            if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
                     icon: 'warning',
@@ -266,8 +275,7 @@
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Save'
-                })
-                .then((result) => {
+                }).then((result) => {
                     if (result.isConfirmed) {
                         $(this).prop("disabled", true);
                         $('form').submit();
