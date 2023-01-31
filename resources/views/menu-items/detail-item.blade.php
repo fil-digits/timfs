@@ -10,7 +10,7 @@
         <i class="fa fa-eye"></i><strong> Detail Menu Item</strong>
     </div>
     <div class="panel-body">
-        <table class="table table-striped">
+        <table class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th scope="col">Menu Item Code</th>
@@ -25,29 +25,32 @@
             </tbody>
         </table>
         <h4 style="font-weight: 600">Ingredients List</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scoped="col">Tasteless Code</th>
-                    <th scoped="col">Ingredient</th>
-                    <th scoped="col">Quantity</th>
-                    <th scoped="col">UOM</th>
-                    <th scoped="col">SRP</th>
-                </tr>
-            </thead>
+        <div class="box-boy table-responsive no-padding">
 
-            <tbody>
-                @foreach ($ingredients as $ingredient)
-                <tr>
-                    <td>{{$ingredient->tasteless_code}}</td>
-                    <td>{{$ingredient->full_item_description}}</td>
-                    <td>{{$ingredient->qty}}</td>
-                    <td>{{$ingredient->uom_description}}</td>   
-                    <td>₱ {{$ingredient->srp}}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th scoped="col">Tasteless Code</th>
+                        <th scoped="col">Ingredient</th>
+                        <th scoped="col">Quantity</th>
+                        <th scoped="col">UOM</th>
+                        <th scoped="col">SRP</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    @foreach ($ingredients as $ingredient)
+                    <tr>
+                        <td>{{$ingredient->tasteless_code}}</td>
+                        <td>{{$ingredient->full_item_description}}</td>
+                        <td>{{$ingredient->qty}}</td>
+                        <td>{{$ingredient->uom_description}}</td>   
+                        <td>₱ {{$ingredient->srp}}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
