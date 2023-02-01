@@ -6,4 +6,5 @@
 [ ] Change 'Ingredient SRP' to 'Ingredient Cost'
 [ ] AutoFill the Ingredient UOM and Ingredient Cost
 [ ] Implement the conversion
+[ ] Implement cost vs. srp percentage
 [ ] Add 'Theoretical Ingredient' and 'Theoretical Cost'

@@ -63,6 +63,24 @@
         color: #eee !important;
     }
 
+    .recipe-text {
+        font-weight: 700;
+        letter-spacing: 5px;
+        text-align: center;
+        margin: 20px 0;
+        color: #367fa9;
+    }
+
+    .no-ingredient-warning {
+        color: grey;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    #add-row {
+        width: 100%;
+    }
     
 </style>
 @endpush
@@ -138,8 +156,10 @@
                 Menu Item SRP
                 <input class="form-control" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-
-
+            <h4 class="recipe-text"">RECIPE</h4>
+            @if(!(count($current_ingredients)))
+                <h5 class="no-ingredient-warning">No Ingredients currently saved.</h5>
+            @endif
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
                 @foreach($current_ingredients as $current_ingredient)
@@ -423,6 +443,7 @@
         section.css('display', '');
         $('.ingredient-section').append(section);
         $('.item-list').fadeOut();
+        $('.no-ingredient-warning').hide();
         $.fn.reload();
     }
 
