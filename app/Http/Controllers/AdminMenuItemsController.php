@@ -737,7 +737,7 @@
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
 					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
-					$data[$i]['srp'] = $request->input('srp')[$i];
+					$data[$i]['cost'] = $request->input('cost')[$i];
 				}
 				
 				foreach($data as $index => $element) {

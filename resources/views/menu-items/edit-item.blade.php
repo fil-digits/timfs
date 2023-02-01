@@ -119,8 +119,8 @@
             </select>
         </label>
         <label>
-            <span class="required-star">*</span> Ingredient SRP
-            <input value="" name="srp[]" class="form-control" type="number" min="0" step="0.01" required>
+            <span class="required-star">*</span> Ingredient Cost
+            <input value="" name="cost[]" class="form-control cost" type="number" min="0" step="0.01" required>
         </label>
     </div>
     <div class="actions">
@@ -194,8 +194,8 @@
                             </select>
                         </label>
                         <label>
-                            <span class="required-star">*</span> Ingredient SRP
-                            <input value="{{$current_ingredient->srp}}" name="srp[]" class="form-control srp" type="number" min="0" step="0.01" required />
+                            <span class="required-star">*</span> Ingredient Cost
+                            <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="number" min="0" step="0.01" required />
                         </label>
                     </div>
                     <div class="actions">
@@ -439,7 +439,7 @@
         section.find('.ingredient').val('');
         section.find('.quantity').val('');
         section.find('.uom').val('');
-        section.find('.srp').val('');
+        section.find('.cost').val('');
         section.css('display', '');
         $('.ingredient-section').append(section);
         $('.item-list').fadeOut();

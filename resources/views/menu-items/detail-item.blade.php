@@ -56,7 +56,7 @@
                                 <td>{{$ingredient->full_item_description}}</td>
                                 <td>{{$ingredient->qty}}</td>
                                 <td>{{$ingredient->uom_description}}</td>   
-                                <td>₱ {{$ingredient->srp}}</td>
+                                <td>₱ {{$ingredient->cost}}</td>
                             </tr>
                         @endforeach
                     </tbody>
