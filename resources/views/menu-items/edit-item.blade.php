@@ -134,6 +134,10 @@
                 Menu Item Description
                 <input class="form-control" type="text" value="{{$item->menu_item_description}}" disabled>
             </label>
+            <label class="menu-item-label">
+                Menu Item SRP
+                <input class="form-control" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
+            </label>
 
 
             <section class="ingredient-section">
