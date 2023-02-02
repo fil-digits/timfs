@@ -175,9 +175,7 @@
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
             <h4 class="recipe-text""><i class="fa fa-spoon"></i> RECIPE <i class="fa fa-spoon"></i></h4>
-            @if(!(count($current_ingredients)))
-                <h5 class="no-ingredient-warning">No ingredients currently saved.</h5>
-            @endif
+            <h5 class="no-ingredient-warning" style="display: none;">No ingredients currently saved.</h5>
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
                 @foreach($current_ingredients as $current_ingredient)
@@ -227,7 +225,7 @@
             <section class="section-footer">
                 <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
                 <label class="label-total">
-                    Total Ingredients Cost (<span class="percentage">0%</span>)
+                    Total Ingredients Cost (<span class="percentage"></span>)
                     <input class="form-control total-cost" type="text" readonly>
                 </label>
             </section>
@@ -248,6 +246,10 @@
     $(document).ready(function() {
 
         $.fn.reload = function() {
+            if($('.ingredient-entry').length == 1) {
+                $('.no-ingredient-warning').css('display', '')
+            }
+
             $('.display-ingredient').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
                 const query = ($(this).val());
@@ -299,7 +301,7 @@
             $('.quantity').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
                 const ingredientCost = entry.find('.ingredient').attr('ttp');
-                entry.find('.cost').val(`₱ ${$(this).val() * ingredientCost}`);
+                entry.find('.cost').val(`₱ ${($(this).val() * ingredientCost).toLocaleString()}`);
                 $.fn.sumCost();
             });
         }
@@ -308,18 +310,18 @@
             let sum = 0;
             const menuItemSRP = Number($('.menu-item-srp').val().split(' ')[1]);
             $('.cost').each(function() {
-                sum += Number($(this).val().replace(/[^0-9.,]/g, ''));
+                sum += Number($(this).val().replace(/[^0-9.]/g, ''));
             });
-            $('.total-cost').val(`₱ ${sum}`);
+            $('.total-cost').val(`₱ ${sum.toLocaleString()}`);
             const percentage = Math.round(sum / menuItemSRP * 100);
             const percentageText = $('.percentage');
-            $(percentageText).text(`${percentage}%`);
+            $(percentageText).text(`${percentage}% of SRP`);
             if (percentage > 30) {
                 $(percentageText).css('color', 'red');
                 $('.total-cost').css({'color': 'red', 'outline': '2px solid red',});
             } else {
                 $(percentageText).css('color', '');
-                $('.total-cost').css({'color': '', 'outline': '',});
+                $('.total-cost').css({'color': '', 'outline': '',});    
             }
         }
 
@@ -357,7 +359,7 @@
             entry.find('.ingredient').val($(this).attr('item_id'));
             entry.find('.ingredient').attr('ttp', $(this).attr('ttp'));
             entry.find('.display-ingredient').val($(this).text());
-            entry.find('.cost').val(`₱ ${$(this).attr('ttp')}`);
+            entry.find('.cost').val(`₱ ${Number($(this).attr('ttp')).toLocaleString()}`);
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
             $('.item-list').html('');  
@@ -468,6 +470,9 @@
                     success: function(response) {
                         if (response || !itemMastersId) {
                             entry.remove();
+                            if($('.ingredient-entry').length == 1) {
+                                $('.no-ingredient-warning').css('display', '')
+                            }
                             $('.item-list').html('');  
                             $('.item-list').fadeOut();
                             $.fn.sumCost();

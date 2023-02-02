@@ -737,7 +737,7 @@
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
 					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
-					$cost = preg_replace("/[^0-9.,]/", "", $request->input('cost')[$i]);
+					$cost = preg_replace("/[^0-9.]/", "", $request->input('cost')[$i]);
 					$data[$i]['cost'] = $cost;
 				}
 				
