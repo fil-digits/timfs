@@ -78,13 +78,15 @@
         margin-bottom: 20px;
     }
 
-    #add-row {
-        width: 100%;
+    .section-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .label-total {
         display: inline-table;
-        float: right;
+        position: relative;
     }
 
     input::-webkit-outer-spin-button,
@@ -122,7 +124,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Quantity
-            <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" readonly required/>
+            <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" readonly required/>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
@@ -130,7 +132,7 @@
             <select name="uom[]" class="select2 form-control uom" required>
                 <option value="">Please select UOM</option>
                 @foreach($uoms as $uom)
-                <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
                 @endforeach
             </select>
         </label>
@@ -179,55 +181,56 @@
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
                 @foreach($current_ingredients as $current_ingredient)
-                <div class="ingredient-entry">
-                    <div class="ingredient-inputs">
-                        <label>
-                            <span class="required-star">*</span> Ingredient
-                            <div>
-                                <input value="{{$current_ingredient->id}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                                <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-                                <div class="item-list">
+                    <div class="ingredient-entry">
+                        <div class="ingredient-inputs">
+                            <label>
+                                <span class="required-star">*</span> Ingredient
+                                <div>
+                                    <input value="{{$current_ingredient->id}}" ttp="{{$current_ingredient->ttp}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
+                                    <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                                    <div class="item-list">
+                                    </div>
                                 </div>
-                            </div>
-                        </label>
-                        <label>
-                            <span class="required-star">*</span> Ingredient Quantity
-                            <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" required />
-                        </label>
-                        <label>
-                            <span class="required-star">*</span> Ingredient UOM
-                            <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
-                            <select name="uom[]" class="select2 form-control uom" required>
-                                <option value="">Please select UOM</option>
-                                @if($current_uom)
-                                    <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
-                                @endif
-                                @foreach($uoms as $uom)
-                                    @if($current_uom->id != $uom->id)
-                                        <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                            </label>
+                            <label>
+                                <span class="required-star">*</span> Ingredient Quantity
+                                <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" required />
+                            </label>
+                            <label>
+                                <span class="required-star">*</span> Ingredient UOM
+                                <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
+                                <select name="uom[]" class="select2 form-control uom" required>
+                                    <option value="">Please select UOM</option>
+                                    @if($current_uom)
+                                        <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
                                     @endif
-                                @endforeach
-                            </select>
-                        </label>
-                        <label>
-                            <span class="required-star">*</span> Ingredient Cost
-                            <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
-                        </label>
+                                    @foreach($uoms as $uom)
+                                        @if($current_uom->id != $uom->id)
+                                            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </label>
+                            <label>
+                                <span class="required-star">*</span> Ingredient Cost
+                                <input value="₱ {{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
+                            </label>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+                            <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+                            <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
+                        </div>
                     </div>
-                    <div class="actions">
-                        <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-                        <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-                        <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
-                    </div>
-                </div>
-                
                 @endforeach
             </section>
-            <label class="label-total">
-                Total Ingredients Cost (<span class="percentage">0%</span>)
-                <input class="form-control total-cost" type="text" readonly>
-            </label>
-            <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
+            <section class="section-footer">
+                <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
+                <label class="label-total">
+                    Total Ingredients Cost (<span class="percentage">0%</span>)
+                    <input class="form-control total-cost" type="text" readonly>
+                </label>
+            </section>
             <div class="panel-footer">
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
                 <button class="btn btn-primary pull-right" type="button" id="save-edit"> <i class="fa fa-save" ></i> Save</button>
@@ -296,7 +299,7 @@
             $('.quantity').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
                 const ingredientCost = entry.find('.ingredient').attr('ttp');
-                entry.find('.cost').val($(this).val() * ingredientCost);
+                entry.find('.cost').val(`₱ ${$(this).val() * ingredientCost}`);
                 $.fn.sumCost();
             });
         }
@@ -305,16 +308,18 @@
             let sum = 0;
             const menuItemSRP = Number($('.menu-item-srp').val().split(' ')[1]);
             $('.cost').each(function() {
-                sum += Number($(this).val());
+                sum += Number($(this).val().replace(/[^0-9.,]/g, ''));
             });
-            $('.total-cost').val(sum);
+            $('.total-cost').val(`₱ ${sum}`);
             const percentage = Math.round(sum / menuItemSRP * 100);
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}%`);
             if (percentage > 30) {
                 $(percentageText).css('color', 'red');
+                $('.total-cost').css({'color': 'red', 'outline': '2px solid red',});
             } else {
                 $(percentageText).css('color', '');
+                $('.total-cost').css({'color': '', 'outline': '',});
             }
         }
 
@@ -352,7 +357,7 @@
             entry.find('.ingredient').val($(this).attr('item_id'));
             entry.find('.ingredient').attr('ttp', $(this).attr('ttp'));
             entry.find('.display-ingredient').val($(this).text());
-            entry.find('.cost').val($(this).attr('ttp'));
+            entry.find('.cost').val(`₱ ${$(this).attr('ttp')}`);
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
             $('.item-list').html('');  

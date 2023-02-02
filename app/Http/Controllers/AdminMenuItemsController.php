@@ -737,7 +737,8 @@
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
 					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
-					$data[$i]['cost'] = $request->input('cost')[$i];
+					$cost = preg_replace("/[^0-9.,]/", "", $request->input('cost')[$i]);
+					$data[$i]['cost'] = $cost;
 				}
 				
 				foreach($data as $index => $element) {
@@ -798,7 +799,7 @@
 				$query = $request->get('query');
 				$current_ingredients = explode(',', $request->get('current_ingredients'));
 				$data = DB::table('item_masters')
-					->where('full_item_description', 'LIKE', "{$query}%")
+					->where('full_item_description', 'LIKE', "%{$query}%")
 					->orWhere('tasteless_code', 'LIKE', "{$query}%")
 					->orderby('full_item_description')
 					->take(10)
