@@ -808,7 +808,7 @@
 					if (in_array($row->id, $current_ingredients)) {
 						continue;
 					}
-					$output .= "<li item_id='$row->id' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
+					$output .= "<li item_id='$row->id' ttp='$row->ttp' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
 				}
 				$output .= '</ul>';
 				echo $output;

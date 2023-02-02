@@ -81,6 +81,22 @@
     #add-row {
         width: 100%;
     }
+
+    .label-total {
+        display: inline-table;
+        float: right;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    input[type=number] {
+        -moz-appearance:textfield; /* Firefox */
+    }
     
 </style>
 @endpush
@@ -106,7 +122,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Quantity
-            <input value="" name="quantity[]" class="form-control" type="number" min="0" required/>
+            <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" readonly required/>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
@@ -120,7 +136,7 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Cost
-            <input value="" name="cost[]" class="form-control cost" type="number" min="0" step="0.01" required>
+            <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
         </label>
     </div>
     <div class="actions">
@@ -154,11 +170,11 @@
             </label>
             <label class="menu-item-label">
                 Menu Item SRP
-                <input class="form-control" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
+                <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-            <h4 class="recipe-text"">RECIPE</h4>
+            <h4 class="recipe-text""><i class="fa fa-spoon"></i> RECIPE <i class="fa fa-spoon"></i></h4>
             @if(!(count($current_ingredients)))
-                <h5 class="no-ingredient-warning">No Ingredients currently saved.</h5>
+                <h5 class="no-ingredient-warning">No ingredients currently saved.</h5>
             @endif
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
@@ -195,7 +211,7 @@
                         </label>
                         <label>
                             <span class="required-star">*</span> Ingredient Cost
-                            <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="number" min="0" step="0.01" required />
+                            <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
                         </label>
                     </div>
                     <div class="actions">
@@ -207,8 +223,12 @@
                 
                 @endforeach
             </section>
+            <label class="label-total">
+                Total Ingredients Cost (<span class="percentage">0%</span>)
+                <input class="form-control total-cost" type="text" readonly>
+            </label>
             <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
-            <div class='panel-footer'>
+            <div class="panel-footer">
                 <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
                 <button class="btn btn-primary pull-right" type="button" id="save-edit"> <i class="fa fa-save" ></i> Save</button>
             </div>
@@ -272,6 +292,30 @@
             $('.uom').on('change', function() {
                 $('#form input:valid, #form select:valid').css('outline', 'none');
             });
+
+            $('.quantity').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry');
+                const ingredientCost = entry.find('.ingredient').attr('ttp');
+                entry.find('.cost').val($(this).val() * ingredientCost);
+                $.fn.sumCost();
+            });
+        }
+
+        $.fn.sumCost = function() {
+            let sum = 0;
+            const menuItemSRP = Number($('.menu-item-srp').val().split(' ')[1]);
+            $('.cost').each(function() {
+                sum += Number($(this).val());
+            });
+            $('.total-cost').val(sum);
+            const percentage = Math.round(sum / menuItemSRP * 100);
+            const percentageText = $('.percentage');
+            $(percentageText).text(`${percentage}%`);
+            if (percentage > 30) {
+                $(percentageText).css('color', 'red');
+            } else {
+                $(percentageText).css('color', '');
+            }
         }
 
         $(document).on('click', '#save-edit', function(event) {
@@ -306,10 +350,14 @@
         $(document).on('click', '.list-item', function(event) { 
             const entry = $(this).parents('.ingredient-entry');
             entry.find('.ingredient').val($(this).attr('item_id'));
+            entry.find('.ingredient').attr('ttp', $(this).attr('ttp'));
             entry.find('.display-ingredient').val($(this).text());
-
+            entry.find('.cost').val($(this).attr('ttp'));
+            entry.find('.quantity').val('1');
+            entry.find('.quantity').attr('readonly', false);
             $('.item-list').html('');  
             $('.item-list').fadeOut();
+            $.fn.sumCost();
         });
 
         $(document).on('click', '.move-up', function() {
@@ -417,6 +465,7 @@
                             entry.remove();
                             $('.item-list').html('');  
                             $('.item-list').fadeOut();
+                            $.fn.sumCost();
                         }
                     }
                 });
@@ -424,6 +473,7 @@
         }); 
         
         $.fn.reload();
+        $.fn.sumCost();
     });
 
 </script>
