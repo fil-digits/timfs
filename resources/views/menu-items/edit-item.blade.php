@@ -279,18 +279,14 @@
                 }
             });
 
-            $('#form input:invalid, #form select:invalid').keyup(function() {
-                $('#form input:valid, #form select:valid').css('outline', 'none');
-            });
-
-            $('.uom').on('change', function() {
+            $('#form input, #form select').keyup(function() {
                 $('#form input:valid, #form select:valid').css('outline', 'none');
             });
 
             $('.quantity').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
                 const ingredientCost = entry.find('.ingredient').attr('ttp');
-                entry.find('.cost').val(`₱ ${($(this).val() * ingredientCost).toLocaleString()}`);
+                entry.find('.cost').val(`₱ ${($(this).val() * ingredientCost).toLocaleString(undefined, { maximumFractionDigits: 8})}`);
                 $.fn.sumCost();
             });
         }
@@ -301,7 +297,7 @@
             $('.cost').each(function() {
                 sum += Number($(this).val().replace(/[^0-9.]/g, ''));
             });
-            $('.total-cost').val(`₱ ${sum.toLocaleString()}`);
+            $('.total-cost').val(`₱ ${sum.toLocaleString(undefined, { maximumFractionDigits: 4})}`);
             const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}% of SRP`);
@@ -352,9 +348,10 @@
             entry.find('.display-ingredient').val($(this).text());
             entry.find('.uom').val($(this).attr('uom'));
             entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.cost').val(`₱ ${Number($(this).attr('ttp')).toLocaleString()}`);
+            entry.find('.cost').val(`₱ ${Number($(this).attr('ttp')).toLocaleString(undefined, { maximumFractionDigits: 8})}`);
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
+            $('#form input:valid, #form select:valid').css('outline', 'none');
             $('.item-list').html('');  
             $('.item-list').fadeOut();
             $.fn.sumCost();

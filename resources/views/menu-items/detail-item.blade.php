@@ -1,7 +1,17 @@
 @push('head')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <style>
     th, td {
         text-align: center;
+    }
+
+    .total-cost-label {
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .total-cost {
+        font-weight: bold
     }
 </style>
 @endpush
@@ -23,12 +33,14 @@
                 <tr>
                     <th scope="col">Menu Item Code</th>
                     <th scope="col">Menu Item Description</th>
+                    <th scope="col">Menu Item SRP</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
+                    <td>₱ {{$item->menu_price_dine}}</td>
                 </tr>
             </tbody>
         </table>
@@ -45,7 +57,7 @@
                             <th scoped="col">Ingredient</th>
                             <th scoped="col">Quantity</th>
                             <th scoped="col">UOM</th>
-                            <th scoped="col">SRP</th>
+                            <th scoped="col">Cost</th>
                         </tr>
                     </thead>
         
@@ -56,15 +68,30 @@
                                 <td>{{$ingredient->full_item_description}}</td>
                                 <td>{{$ingredient->qty}}</td>
                                 <td>{{$ingredient->uom_description}}</td>   
-                                <td>₱ {{$ingredient->cost}}</td>
+                                <td class="cost">₱ {{$ingredient->cost}}</td>
                             </tr>
                         @endforeach
+                            <tr>
+                                <td colspan="4" class="total-cost-label">Total Ingredients Cost</td>
+                                <td class="total-cost"></td>
+                            </tr>
                     </tbody>
                 </table>
             </div>
         @endif
     </div>
 </div>
-
-
 @endsection
+
+@push('bottom')
+<script>
+     $(document).ready(function() {
+        const costsElems = jQuery.makeArray($('.cost'))
+        const totalCostElem = $('.total-cost');
+        costsElems.forEach(cost => console.log($(cost).text()));
+        const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
+        $(totalCostElem).text(`₱ ${totalCost}`);
+    });
+    
+</script>
+@endpush
