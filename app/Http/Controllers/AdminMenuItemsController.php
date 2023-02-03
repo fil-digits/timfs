@@ -815,7 +815,7 @@
 					if (in_array($row->id, $current_ingredients)) {
 						continue;
 					}
-					$output .= "<li item_id='$row->item_masters_id' ttp='$row->ttp' uom='$row->packagings_id'  uom_desc='$row->uom_description' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
+					$output .= "<li item_id='$row->item_masters_id' cost='$row->ingredient_cost' uom='$row->packagings_id'  uom_desc='$row->uom_description' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
 				}
 				$output .= '</ul>';
 				echo $output;

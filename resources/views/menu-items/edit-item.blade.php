@@ -1,6 +1,7 @@
 @push('head')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
     .ingredient-entry {
         margin-bottom: 10px;
@@ -171,7 +172,7 @@
                 Menu Item SRP
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-            <h4 class="recipe-text""><i class="fa fa-spoon"></i> RECIPE <i class="fa fa-spoon"></i></h4>
+            <h4 class="recipe-text""><i class="fa fa-burger"></i> RECIPE <i class="fa fa-utensils"></i></h4>
             <h5 class="no-ingredient-warning" style="display: none;">No ingredients currently saved.</h5>
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
@@ -181,7 +182,7 @@
                             <label>
                                 <span class="required-star">*</span> Ingredient
                                 <div>
-                                    <input value="{{$current_ingredient->item_masters_id}}" ttp="{{$current_ingredient->ttp}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
+                                    <input value="{{$current_ingredient->item_masters_id}}" cost="{{$current_ingredient->cost}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
                                     <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
                                     <div class="item-list">
                                     </div>
@@ -285,7 +286,7 @@
 
             $('.quantity').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
-                const ingredientCost = entry.find('.ingredient').attr('ttp');
+                const ingredientCost = entry.find('.ingredient').attr('cost');
                 entry.find('.cost').val($(this).val() * ingredientCost);
                 $.fn.sumCost();
             });
@@ -352,12 +353,12 @@
             const entry = $(this).parents('.ingredient-entry');
             const ingredient = entry.find('.ingredient');
             ingredient.val($(this).attr('item_id'));
-            ingredient.attr('ttp', $(this).attr('ttp'));
+            ingredient.attr('cost', $(this).attr('cost'));
             ingredient.attr('uom', $(this).attr('uom'));
             entry.find('.display-ingredient').val($(this).text());
             entry.find('.uom').val($(this).attr('uom'));
             entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.cost').val($(this).attr('ttp'));
+            entry.find('.cost').val($(this).attr('cost'));
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
             $('#form input:valid, #form select:valid').css('outline', 'none');
