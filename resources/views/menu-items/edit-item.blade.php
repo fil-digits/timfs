@@ -176,8 +176,8 @@
                 Menu Item SRP
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-            <h4 class="recipe-text""><i class="fa fa-burger"></i> RECIPE <i class="fa fa-utensils"></i></h4>
-            <h5 class="no-ingredient-warning" style="display: none;">No ingredients currently saved.</h5>
+            <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
+            <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
             <section class="ingredient-section">
                 {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
                 @foreach($current_ingredients as $current_ingredient)

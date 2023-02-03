@@ -46,7 +46,7 @@
         </table>
 
         @if(!count($ingredients))
-            <h4 style="color: gray; text-align: center; font-style: italic;">No ingredients to show...</h4>
+            <h4 style="color: gray; text-align: center; font-style: italic;"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         @else
             <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
             <div class="box-body table-responsive no-padding">
@@ -94,10 +94,6 @@
         function formatNumbers() {
             const elems = jQuery.makeArray($('.peso'));
             elems.forEach(elem => $(elem).text('₱ ' + Number($(elem).text()).toLocaleString(undefined, {maximumFractionDigits: 4})))
-            // elems.forEach(elem => {
-            //     const value = $(elem).text();
-            //     console.log(elem);
-            // })
         }
 
         formatNumbers();
