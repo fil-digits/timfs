@@ -220,7 +220,7 @@
                 <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
                 <label class="label-total">
                     Total Ingredients Cost (<span class="percentage"></span>)
-                    <input class="form-control total-cost" type="text" readonly>
+                    <input class="form-control total-cost" name="total_cost" type="text" readonly>
                 </label>
             </section>
             <div class="panel-footer">
@@ -319,7 +319,7 @@
         $.fn.formatNumbers = function() {
             const costs = jQuery.makeArray($('.cost, .total-cost'));
             costs.forEach(cost => {
-                const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString();
+                const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString(undefined, {maximumFractionDigits: 4});
                 $(cost).val(`₱ ${val}`);
             })
         }

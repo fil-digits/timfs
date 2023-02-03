@@ -732,7 +732,6 @@
 				->where('menu_items_id', $request->input('menu_items_id'))
 				->update(['status' => 'INACTIVE', 'row_id' => null]);
 
-
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
 					$data[$i]['item_masters_id'] = $request->input('ingredient')[$i];
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
@@ -750,6 +749,7 @@
 					} else {
 						$element['created_by'] = CRUDBooster::myId();
 					}
+					$element['total_cost'] = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
 					$element['status'] = 'ACTIVE';
 					$element['row_id'] = $index;
 					$element['deleted_at'] = null;
@@ -772,7 +772,7 @@
 				$response = DB::table('menu_ingredients_details')
 					->where('menu_items_id', $menu_items_id)
 					->where('item_masters_id', $item_masters_id)
-					->update(['status' => 'INACTIVE', 'row_id' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
+					->update(['status' => 'INACTIVE', 'row_id' => null, 'total_cost' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
 				return $response;
 			}
 
