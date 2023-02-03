@@ -90,6 +90,10 @@
         position: relative;
     }
 
+    input {
+        font-weight: normal;
+    }
+
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
         /* display: none; <- Crashes Chrome on hover */
@@ -304,10 +308,10 @@
             $(percentageText).text(`${percentage}% of SRP`);
             if (percentage > 30) {
                 $(percentageText).css('color', 'red');
-                $('.total-cost').css({'color': 'red', 'outline': '2px solid red',});
+                $('.total-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
             } else {
                 $(percentageText).css('color', '');
-                $('.total-cost').css({'color': '', 'outline': '',});    
+                $('.total-cost').css({'color': '', 'outline': '', 'font-weight': 'normal'});    
             }
             $.fn.formatNumbers();
         }
