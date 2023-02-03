@@ -40,7 +40,7 @@
                 <tr>
                     <td>{{$item->tasteless_menu_code}}</td>
                     <td>{{$item->menu_item_description}}</td>
-                    <td>₱ {{$item->menu_price_dine}}</td>
+                    <td class="peso">{{$item->menu_price_dine}}</td>
                 </tr>
             </tbody>
         </table>
@@ -68,12 +68,12 @@
                                 <td>{{$ingredient->full_item_description}}</td>
                                 <td>{{$ingredient->qty}}</td>
                                 <td>{{$ingredient->uom_description}}</td>   
-                                <td class="cost">₱ {{$ingredient->cost}}</td>
+                                <td class="cost peso">{{$ingredient->cost}}</td>
                             </tr>
                         @endforeach
                             <tr>
                                 <td colspan="4" class="total-cost-label">Total Ingredients Cost</td>
-                                <td class="total-cost"></td>
+                                <td class="total-cost peso"></td>
                             </tr>
                     </tbody>
                 </table>
@@ -88,9 +88,19 @@
      $(document).ready(function() {
         const costsElems = jQuery.makeArray($('.cost'))
         const totalCostElem = $('.total-cost');
-        costsElems.forEach(cost => console.log($(cost).text()));
         const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
-        $(totalCostElem).text(`₱ ${totalCost}`);
+        $(totalCostElem).text(totalCost);
+
+        function formatNumbers() {
+            const elems = jQuery.makeArray($('.peso'));
+            elems.forEach(elem => $(elem).text('₱ ' + Number($(elem).text()).toLocaleString(undefined, {maximumFractionDigits: 4})))
+            // elems.forEach(elem => {
+            //     const value = $(elem).text();
+            //     console.log(elem);
+            // })
+        }
+
+        formatNumbers();
     });
     
 </script>
