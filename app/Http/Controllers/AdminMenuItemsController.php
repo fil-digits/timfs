@@ -715,16 +715,17 @@
 
 			$data['current_ingredients'] = DB::table('menu_ingredients_details')
 											->where('menu_items_id', $id)
-											->where('status', 'ACTIVE')
+											->where('menu_ingredients_details.status', 'ACTIVE')
 											->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+											->select('*', \DB::raw('item_masters.id as item_masters_id'))
+											->join('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 											->orderby('row_id')
 											->get();
-			$data['uoms'] = DB::table('uoms')->orderby('uom_description')->get();
 			return $this->view('menu-items/edit-item', $data);
 		}
 
 		public function submitEdit(Request $request) {
-			$data = [];			
+			$data = [];
 			if($request->input('ingredient')) {
 
 				DB::table('menu_ingredients_details')
@@ -754,7 +755,10 @@
 					$element['deleted_at'] = null;
 					$element['deleted_by'] = null;
 					
-					DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
+					DB::table('menu_ingredients_details')
+						->where('menu_items_id', $element['menu_items_id'])
+						->where('item_masters_id', $element['item_masters_id'])
+						->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
 				}
 			}
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
@@ -799,8 +803,10 @@
 				$query = $request->get('query');
 				$current_ingredients = explode(',', $request->get('current_ingredients'));
 				$data = DB::table('item_masters')
+					->select('*', \DB::raw('item_masters.id as item_masters_id'))
 					->where('full_item_description', 'LIKE', "%{$query}%")
 					->orWhere('tasteless_code', 'LIKE', "{$query}%")
+					->join('uoms', 'item_masters.packagings_id', '=', 'uoms.id')
 					->orderby('full_item_description')
 					->take(10)
 					->get();
@@ -809,7 +815,7 @@
 					if (in_array($row->id, $current_ingredients)) {
 						continue;
 					}
-					$output .= "<li item_id='$row->id' ttp='$row->ttp' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
+					$output .= "<li item_id='$row->item_masters_id' ttp='$row->ttp' uom='$row->packagings_id'  uom_desc='$row->uom_description' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
 				}
 				$output .= '</ul>';
 				echo $output;

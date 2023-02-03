@@ -128,13 +128,10 @@
         </label>
         <label>
             <span class="required-star">*</span> Ingredient UOM
-            <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
-            <select name="uom[]" class="select2 form-control uom" required>
-                <option value="">Please select UOM</option>
-                @foreach($uoms as $uom)
-                    <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
-                @endforeach
-            </select>
+            <div>
+                <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                <input type="text" class="form-control display-uom" value="" readonly>
+            </div>
         </label>
         <label>
             <span class="required-star">*</span> Ingredient Cost
@@ -184,7 +181,7 @@
                             <label>
                                 <span class="required-star">*</span> Ingredient
                                 <div>
-                                    <input value="{{$current_ingredient->id}}" ttp="{{$current_ingredient->ttp}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
+                                    <input value="{{$current_ingredient->item_masters_id}}" ttp="{{$current_ingredient->ttp}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
                                     <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
                                     <div class="item-list">
                                     </div>
@@ -196,18 +193,10 @@
                             </label>
                             <label>
                                 <span class="required-star">*</span> Ingredient UOM
-                                <?php $current_uom = $uoms->where('id', $current_ingredient->uom_id)->first(); ?>
-                                <select name="uom[]" class="select2 form-control uom" required>
-                                    <option value="">Please select UOM</option>
-                                    @if($current_uom)
-                                        <option value="{{$current_uom->id}}" selected>{{$current_uom->uom_description}}</option>
-                                    @endif
-                                    @foreach($uoms as $uom)
-                                        @if($current_uom->id != $uom->id)
-                                            <option value="{{$uom->id}}">{{$uom->uom_description}}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
+                                <div>
+                                    <input type="text" class="form-control uom" value="{{$current_ingredient->id}}" name="uom[]" style="display: none;"/>
+                                    <input type="text" class="form-control display_uom" value="{{$current_ingredient->uom_description}}" readonly>
+                                </div>
                             </label>
                             <label>
                                 <span class="required-star">*</span> Ingredient Cost
@@ -313,7 +302,7 @@
                 sum += Number($(this).val().replace(/[^0-9.]/g, ''));
             });
             $('.total-cost').val(`₱ ${sum.toLocaleString()}`);
-            const percentage = Math.round(sum / menuItemSRP * 100);
+            const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}% of SRP`);
             if (percentage > 30) {
@@ -356,9 +345,13 @@
 
         $(document).on('click', '.list-item', function(event) { 
             const entry = $(this).parents('.ingredient-entry');
-            entry.find('.ingredient').val($(this).attr('item_id'));
-            entry.find('.ingredient').attr('ttp', $(this).attr('ttp'));
+            const ingredient = entry.find('.ingredient');
+            ingredient.val($(this).attr('item_id'));
+            ingredient.attr('ttp', $(this).attr('ttp'));
+            ingredient.attr('uom', $(this).attr('uom'));
             entry.find('.display-ingredient').val($(this).text());
+            entry.find('.uom').val($(this).attr('uom'));
+            entry.find('.display-uom').val($(this).attr('uom_desc'));
             entry.find('.cost').val(`₱ ${Number($(this).attr('ttp')).toLocaleString()}`);
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
@@ -471,7 +464,7 @@
                         if (response || !itemMastersId) {
                             entry.remove();
                             if($('.ingredient-entry').length == 1) {
-                                $('.no-ingredient-warning').css('display', '')
+                                $('.no-ingredient-warning').css('display', '');
                             }
                             $('.item-list').html('');  
                             $('.item-list').fadeOut();
