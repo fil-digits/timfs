@@ -200,7 +200,7 @@
                             </label>
                             <label>
                                 <span class="required-star">*</span> Ingredient Cost
-                                <input value="₱ {{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
+                                <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
                             </label>
                         </div>
                         <div class="actions">
@@ -286,7 +286,7 @@
             $('.quantity').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry');
                 const ingredientCost = entry.find('.ingredient').attr('ttp');
-                entry.find('.cost').val(`₱ ${($(this).val() * ingredientCost).toLocaleString(undefined, { maximumFractionDigits: 8})}`);
+                entry.find('.cost').val($(this).val() * ingredientCost);
                 $.fn.sumCost();
             });
         }
@@ -297,7 +297,7 @@
             $('.cost').each(function() {
                 sum += Number($(this).val().replace(/[^0-9.]/g, ''));
             });
-            $('.total-cost').val(`₱ ${sum.toLocaleString(undefined, { maximumFractionDigits: 4})}`);
+            $('.total-cost').val(sum);
             const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}% of SRP`);
@@ -308,6 +308,15 @@
                 $(percentageText).css('color', '');
                 $('.total-cost').css({'color': '', 'outline': '',});    
             }
+            $.fn.formatNumbers();
+        }
+
+        $.fn.formatNumbers = function() {
+            const costs = jQuery.makeArray($('.cost, .total-cost'));
+            costs.forEach(cost => {
+                const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString();
+                $(cost).val(`₱ ${val}`);
+            })
         }
 
         $(document).on('click', '#save-edit', function(event) {
@@ -348,7 +357,7 @@
             entry.find('.display-ingredient').val($(this).text());
             entry.find('.uom').val($(this).attr('uom'));
             entry.find('.display-uom').val($(this).attr('uom_desc'));
-            entry.find('.cost').val(`₱ ${Number($(this).attr('ttp')).toLocaleString(undefined, { maximumFractionDigits: 8})}`);
+            entry.find('.cost').val($(this).attr('ttp'));
             entry.find('.quantity').val('1');
             entry.find('.quantity').attr('readonly', false);
             $('#form input:valid, #form select:valid').css('outline', 'none');
