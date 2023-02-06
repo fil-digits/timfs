@@ -186,7 +186,7 @@
                             <label>
                                 <span class="required-star">*</span> Ingredient
                                 <div>
-                                    <input value="{{$current_ingredient->item_masters_id}}" cost="{{$current_ingredient->cost}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
+                                    <input value="{{$current_ingredient->item_masters_id}}" cost="{{$current_ingredient->ingredient_cost}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
                                     <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
                                     <div class="item-list">
                                     </div>
@@ -440,6 +440,7 @@
         $(document).on('click', '.delete', function(event) {
             const entry = $(this).parents('.ingredient-entry');
             const itemMastersId = entry.find('.ingredient').val();
+            console.log($(this));
             const menuItemsId = {{$item->id}};
             Swal.fire({
                 title: 'Are you sure?',

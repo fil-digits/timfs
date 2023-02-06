@@ -1,5 +1,6 @@
 @push('head')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style>
     th, td {
         text-align: center;
