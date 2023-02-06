@@ -3,14 +3,26 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
-    .ingredient-entry {
+    .ingredient-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ingredient-wrapper {
+        position: relative;
         margin-bottom: 10px;
+        border: 2px solid grey;
+        border-radius: 5px;
+        padding: 20px;
+    }
+
+    .ingredient-entry {
         padding: 15px;
-        border: 1px solid #ddd;
         position: relative;
     }
 
-    .ingredient-entry > * {
+    .ingredient-entry > *, .substitute > * {
         display:inline-block;
     }
 
@@ -105,6 +117,43 @@
         -moz-appearance:textfield; /* Firefox */
     }
     
+    .substitute {
+        border: 1px dashed grey;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-left: 50px;
+        margin-bottom: 10px;
+    }
+    .substitute .actions > * {
+        margin: 1px;
+    }
+
+    .add-sub-btn {
+        background-color: #1E90FF;
+        font-size: 14;
+        height: 30px;
+        width: 30px;
+        text-align: center;
+        border-radius: 50%;
+        color: white;
+        position: absolute;
+        bottom: -15px;
+        left: 10px;
+        cursor: pointer;
+        rotate: -90deg;
+        transition: 200ms;
+        display: grid;
+        place-items: center;
+    }
+
+    .add-sub-btn:hover {
+        transform: scale(1.2);
+        rotate: 90deg;
+        transition: 200ms;
+    }
+
 </style>
 @endpush
 
@@ -115,8 +164,49 @@
     A COPY OF INGREDIENT ENTRY!!! FOR CLONING!!
     THIS IS HIDDEN FROM THE DOM!!! --> {display: none}
 --}}
+<div class="ingredient-wrapper" style="display: none;">
+    <div class="ingredient-entry">
+        <div class="ingredient-inputs">
+            <label>
+                <span class="required-star">*</span> Ingredient
+                <div>
+                    <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
+                    <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Quantity
+                <input value="" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" readonly required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient UOM
+                <div>
+                    <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Cost
+                <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Substitue Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+{{-- 
+    END OF COPY
+ --}}
 
-<div class="ingredient-entry" style="display: none;">
+ <div class="substitute" style="display: none;">
     <div class="ingredient-inputs">
         <label>
             <span class="required-star">*</span> Ingredient
@@ -144,14 +234,13 @@
         </label>
     </div>
     <div class="actions">
-        <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-        <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-        <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
+        <button class="btn btn-info set-primary" title="Set Primary Ingredient" type="button"> <i class="fa fa-star" ></i></button>
+        <button class="btn btn-danger delete-sub" title="Delete Ingredient" type="button"> <i class="fa fa-minus" ></i></button>
     </div>
-</div>
-{{-- 
-    END OF COPY
- --}}
+ </div> 
+
+ {{-- DOM STARTS HERE !!!! --}}
+
  <a title="Return" href="{{ CRUDBooster::mainpath() }}">
     <i class="fa fa-chevron-circle-left "></i>
     Back To List Data Menu Item Masterfile
@@ -245,7 +334,8 @@
             }
 
             $('.display-ingredient').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry');
+                let entry = $(this).parents('.substitute');
+                if (!entry[0]) entry = $(this).parents('.ingredient-entry');
                 const query = ($(this).val());
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
@@ -255,6 +345,7 @@
                     // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
                     if (item_index != index) arrayOfIngredients.push(item.value);
                 });
+                console.log(entry, index);
 
                 if (query == '') {
                     $('.item-list').html = '';
@@ -354,7 +445,8 @@
         }); 
 
         $(document).on('click', '.list-item', function(event) { 
-            const entry = $(this).parents('.ingredient-entry');
+            let entry = $(this).parents('.substitute');
+            if (!entry[0]) entry = $(this).parents('.ingredient-entry');
             const ingredient = entry.find('.ingredient');
             ingredient.val($(this).attr('item_id'));
             ingredient.attr('cost', $(this).attr('cost'));
@@ -372,15 +464,15 @@
         });
 
         $(document).on('click', '.move-up', function() {
-            const entry = $(this).parents('.ingredient-entry');
+            const entry = $(this).parents('.ingredient-wrapper');
             const sibling = entry.prev()[0];
             if (!sibling) return;
             $(sibling).animate(
                 {
-                    top: `+=${$(sibling).outerHeight()}`,
+                    top: `+=${$(entry).outerHeight()}`,
                 },
                 {
-                    duration: 200,
+                    duration: 300,
                     queue: false,
                     done: function() {
                         $(sibling).css('top', '0');
@@ -390,10 +482,10 @@
 
             entry.animate(
                 {
-                    top: `-=${entry.outerHeight()}`
+                    top: `-=${$(sibling).outerHeight()}`
                 },
                 {
-                    duration: 200,
+                    duration: 300,
                     queue: false,
                     done: function() {
                         entry.css('top', '0');
@@ -404,16 +496,16 @@
         });
 
         $(document).on('click', '.move-down', function() {
-            const entry = $(this).parents('.ingredient-entry');
+            const entry = $(this).parents('.ingredient-wrapper');
             const sibling = entry.next()[0];
             if (!sibling) return;
 
             $(sibling).animate(
                 {
-                    top: `-=${$(sibling).outerHeight()}`,
+                    top: `-=${$(entry).outerHeight()}`,
                 },
                 {
-                    duration: 200,
+                    duration: 300,
                     queue: false,
                     done: function() {
                         $(sibling).css('top', '0');
@@ -423,10 +515,10 @@
 
             entry.animate(
                 {
-                    top: `+=${entry.outerHeight()}`
+                    top: `+=${$(sibling).outerHeight()}`
                 },
                 {
-                    duration: 200,
+                    duration: 300,
                     queue: false,
                     done: function() {
                         entry.css('top', '0');
@@ -438,10 +530,10 @@
         });
 
         $(document).on('click', '.delete', function(event) {
-            const entry = $(this).parents('.ingredient-entry');
+            const entry = $(this).parents('.ingredient-wrapper');
             const itemMastersId = entry.find('.ingredient').val();
-            console.log($(this));
             const menuItemsId = {{$item->id}};
+            console.log(menuItemsId);
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -486,6 +578,28 @@
                 });
             }
         }); 
+
+        $(document).on('click', '.add-sub-btn', function(event) {
+            const entry = $(this).parents('.ingredient-wrapper');
+            const substitute = $('.substitute').eq(0).clone();
+            substitute.css('display', '');
+            entry.append($(substitute));
+            $.fn.reload();
+        });
+
+        $(document).on('click', '.set-primary', function(event) {
+            const sub = $(this).parents('.substitute');
+            const ingredientWrapper = $(this).parents('.ingredient-wrapper');
+            ingredientWrapper.find('.substitute').css('background', '');
+            console.log(sub);
+            $(this).css('color', '#FAF2A1');
+            sub.css('background', '#FAF2A1');
+        })
+
+        $(document).on('click', '.delete-sub', function(event) {
+            const subEntry = $(this).parents('.substitute');
+            subEntry.hide('slow', 'linear');
+        })
         
         $.fn.reload();
         $.fn.sumCost();
@@ -497,7 +611,7 @@
 <script>
     const addButton = document.querySelector('#add-row');
     addButton.onclick = function(event) {
-        const section = $($('.ingredient-entry').eq(0).prop('outerHTML'));
+        const section = $($('.ingredient-wrapper').eq(0).prop('outerHTML'));
         section.find('input').val('');
         section.find('.ingredient').val('');
         section.find('.display-ingredient').val('');
