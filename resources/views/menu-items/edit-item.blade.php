@@ -611,7 +611,7 @@
 
         $(document).on('click', '.delete', function(event) {
             const entry = $(this).parents('.ingredient-wrapper');
-            const itemMastersId = entry.find('.ingredient').val();
+            const itemMastersId = jQuery.makeArray(entry.find('.ingredient')).map(e => $(e).val());
             const menuItemsId = {{$item->id}};
             Swal.fire({
                 title: 'Are you sure?',

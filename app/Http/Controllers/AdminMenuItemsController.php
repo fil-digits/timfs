@@ -774,7 +774,7 @@
 			if ($request->get('item_masters_id')) {
 				$response = DB::table('menu_ingredients_details')
 					->where('menu_items_id', $menu_items_id)
-					->where('item_masters_id', $item_masters_id)
+					->whereIn('item_masters_id', $item_masters_id)
 					->update(['status' => 'INACTIVE', 'row_id' => null, 'total_cost' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
 				return $response;
 			}
