@@ -268,51 +268,6 @@
             <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
             <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
             <section class="ingredient-section">
-                {{-- IF THE MENU ITEM DOES HAVE SOME SAVED INGREDIENTS //LOOP// --}}
-                {{-- @for($i = 0; $i<count($current_ingredients); $i++) --}}
-                {{-- <div class="ingredient-wrapper">
-                @foreach ($current_ingredients as $current_ingredient)
-                @if ($current_ingredient->row_id == $i)
-                    <div class="ingredient-entry">
-                        <div class="ingredient-inputs">
-                            <label>
-                                <span class="required-star">*</span> Ingredient
-                                <div>
-                                    <input value="{{$current_ingredient->item_masters_id}}" cost="{{$current_ingredient->ingredient_cost}}" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                                    <input value="{{$current_ingredient->full_item_description}}" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
-                                    <div class="item-list">
-                                    </div>
-                                </div>
-                            </label>
-                            <label>
-                                <span class="required-star">*</span> Ingredient Quantity
-                                <input value="{{$current_ingredient->qty}}" name="quantity[]" class="form-control quantity" type="number" min="0" step="any" required />
-                            </label>
-                            <label>
-                                <span class="required-star">*</span> Ingredient UOM
-                                <div>
-                                    <input type="text" class="form-control uom" value="{{$current_ingredient->id}}" name="uom[]" style="display: none;"/>
-                                    <input type="text" class="form-control display-uom" value="{{$current_ingredient->uom_description}}" readonly>
-                                </div>
-                            </label>
-                            <label>
-                                <span class="required-star">*</span> Ingredient Cost
-                                <input value="{{$current_ingredient->cost}}" name="cost[]" class="form-control cost" type="text" readonly required />
-                            </label>
-                        </div>
-                        <div class="actions">
-                            <button class="btn btn-info move-up" type="button"> <i class="fa fa-arrow-up" ></i></button>
-                            <button class="btn btn-info move-down" type="button"> <i class="fa fa-arrow-down" ></i></button>
-                            <button class="btn btn-danger delete" type="button"> <i class="fa fa-trash" ></i></button>
-                        </div>
-                    </div>
-                @endif
-                    <div class="add-sub-btn" title="Add Substitute Ingredient">
-                        <i class="fa fa-plus"></i>
-                    </div>
-                @endforeach
-                </div>
-                @endfor --}}
             </section>
             <section class="section-footer">
                 <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
@@ -340,10 +295,8 @@
         const savedIngredients = {!! json_encode($current_ingredients) !!}
         $.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
-            console.log(entryCount);
 
             const section = $('.ingredient-section');
-            console.log(savedIngredients);
 
             for (i of entryCount) {
                 const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
@@ -352,7 +305,6 @@
                 wrapperTemplate.append($('.add-sub-btn').eq(0).clone());
 
                 groupedIngredients.forEach(savedIngredient => {
-                    // console.log(savedIngredient.full_item_description, savedIngredient.ingredient_group == i);
                     let element = undefined;
                     if (savedIngredient.is_primary == 'TRUE') {
                         element = $('.ingredient-entry').eq(0).clone();
@@ -442,11 +394,23 @@
         }
 
         $.fn.sumCost = function() {
+            const wrappers = jQuery.makeArray($('.ingredient-wrapper')) ;
             let sum = 0;
-            const menuItemSRP = Number($('.menu-item-srp').val().split(' ')[1]);
-            $('.cost').each(function() {
-                sum += Number($(this).val().replace(/[^0-9.]/g, ''));
+            wrappers.forEach(wrapper => {
+                const primary = $(wrapper).find('.ingredient-entry');
+                const substitute = jQuery.makeArray($(wrapper).find('.substitute'));
+                const markedSub = substitute.filter(e => $(e).attr('primary') == 'true');
+                if (!!markedSub.length) {
+                    sum += Number($(markedSub[0]).find('.cost').val().replace(/[^0-9.]/g, ''));
+                } else {
+                    sum += Number(primary.find('.cost').val().replace(/[^0-9.]/g, ''));
+                }
+                
             });
+            const menuItemSRP = Number($('.menu-item-srp').val().replace(/[^0-9.]/g, ''));
+            // $('.cost').each(function() {
+            //     sum += Number($(this).val().replace(/[^0-9.]/g, ''));
+            // });
             $('.total-cost').val(sum);
             const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
@@ -497,7 +461,6 @@
                             const primaryIngredient = primary.find('.ingredient');
                             const primaryIngredientValue = primaryIngredient.val();
                             primaryIngredient.val(`${primaryIngredientValue},TRUE,${index},-1`);
-                            console.log(primaryIngredient.val());
                             const subs = jQuery.makeArray($(wrapper).find('.substitute'));
                             if (!subs.length) {
                                 return;
@@ -670,7 +633,6 @@
             const sub = $(this).parents('.substitute');
             const ingredientWrapper = $(this).parents('.ingredient-wrapper');
             const isPrimary = sub.attr('primary') == 'true';
-            console.log(isPrimary);
             ingredientWrapper.find('.substitute').css('background', '');
             ingredientWrapper.find('.set-primary').css('color', '');
             ingredientWrapper.find('.substitute').attr('primary', false);
@@ -679,6 +641,8 @@
                 sub.css('background', '#F4D35E');
                 sub.find('.set-primary').css('color', 'black');
             }
+            $.fn.reload();
+            $.fn.sumCost();
 
         });
 
@@ -686,6 +650,7 @@
             const subEntry = $(this).parents('.substitute');
             subEntry.hide('fast', function() {
                 $(this).remove();
+                $.fn.sumCost();
             });
         });
         $.firstLoad();
