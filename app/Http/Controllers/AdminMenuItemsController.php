@@ -738,6 +738,7 @@
 					$data[$i]['is_primary'] = $ingredient[1];
 					$data[$i]['ingredient_group'] = $ingredient[2];
 					$data[$i]['row_id'] = $ingredient[3];
+					$data[$i]['is_selected'] = $ingredient[4];
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
 					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];

@@ -340,8 +340,7 @@
             }
 
             $('.display-ingredient').keyup(function() {
-                let entry = $(this).parents('.substitute');
-                if (!entry[0]) entry = $(this).parents('.ingredient-entry');
+                const entry = $(this).parents('.ingredient-entry, .substitute');
                 const query = ($(this).val());
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
@@ -353,7 +352,7 @@
                 });
 
                 if (query == '') {
-                    $('.item-list').html = '';
+                    $('.item-list').html('');
                 }
                 const _token = $('input[name="_token"]').val();
                 $.ajax({
@@ -367,7 +366,7 @@
                     },
                     success:function(response) { 
                         $('.item-list').html('');
-                        entry.find('.item-list').fadeIn(); 
+                        entry.find('.item-list').fadeIn('fast'); 
                         entry.find('.item-list').html(response);                        
                     }
                 });
@@ -385,7 +384,7 @@
             });
 
             $('.quantity').keyup(function() {
-                const entry = $(this).parents('.ingredient-entry');
+                const entry = $(this).parents('.ingredient-entry, .substitute');
                 const ingredientCost = entry.find('.ingredient').attr('cost');
                 entry.find('.cost').val($(this).val() * ingredientCost);
                 $.fn.sumCost();
@@ -448,12 +447,13 @@
                         $(this).prop("disabled", true);
                         const form = $('form');
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));
-                        //TODO: implement the saving on the database
                         /*
-                            primayIngredientValue = item_masters_id,
+                            primaryIngredientValue / subIngredientValue = item_masters_id,
                             TRUE / FALSE = is_primary,
                             index = ingredient_group,
-                            -1 / i = row_id
+                            -1 / i = row_id,
+                            TRUE / FALSE = is_selected
+                            sample-code : (`${subIngredientValue},FALSE,${index},${i},${FALSE}`)
                         */
                         wrappers.forEach((wrapper, index) => {
                             const primary = $(wrapper).find('.ingredient-entry');
@@ -468,7 +468,8 @@
                                 const currentSub = subs[i];
                                 const subIngredient = $(currentSub).find('.ingredient');
                                 const subIngredientValue = subIngredient.val();
-                                subIngredient.val(`${subIngredientValue},FALSE,${index},${i}`);
+                                const isSelected = $(currentSub).attr('primary') == 'true';
+                                subIngredient.val(`${subIngredientValue},FALSE,${index},${i},${isSelected.toString().toUpperCase()}`);
                             }
                         });
                         form.submit();
