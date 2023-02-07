@@ -733,7 +733,11 @@
 				->update(['status' => 'INACTIVE', 'row_id' => null]);
 
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
-					$data[$i]['item_masters_id'] = $request->input('ingredient')[$i];
+					$ingredient = explode(',', $request->input('ingredient')[$i]);
+					$data[$i]['item_masters_id'] = $ingredient[0];
+					$data[$i]['is_primary'] = $ingredient[1];
+					$data[$i]['ingredient_group'] = $ingredient[2];
+					$data[$i]['row_id'] = $ingredient[3];
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
 					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
@@ -751,7 +755,6 @@
 					}
 					$element['total_cost'] = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
 					$element['status'] = 'ACTIVE';
-					$element['row_id'] = $index;
 					$element['deleted_at'] = null;
 					$element['deleted_by'] = null;
 					
