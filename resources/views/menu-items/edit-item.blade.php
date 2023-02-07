@@ -312,7 +312,7 @@
                         ingredientInput.val(savedIngredient.item_masters_id);
                         ingredientInput.attr('cost', savedIngredient.ingredient_cost);
                         element.find('.display-ingredient').val(savedIngredient.full_item_description);
-                        element.find('.quantity').val(savedIngredient.qty);
+                        element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
                         element.find('.uom').val(savedIngredient.uom_id);
                         element.find('.display-uom').val(savedIngredient.uom_description);
                         element.find('.cost').val(savedIngredient.cost);
@@ -322,7 +322,7 @@
                         ingredientInput.val(savedIngredient.item_masters_id);
                         ingredientInput.attr('cost', savedIngredient.ingredient_cost);
                         element.find('.display-ingredient').val(savedIngredient.full_item_description);
-                        element.find('.quantity').val(savedIngredient.qty);
+                        element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
                         element.find('.uom').val(savedIngredient.uom_id);
                         element.find('.display-uom').val(savedIngredient.uom_description);
                         element.find('.cost').val(savedIngredient.cost);
@@ -333,7 +333,6 @@
                 section.append(wrapperTemplate);
             }
         }
-
 
         $.fn.reload = function() {
             if($('.ingredient-entry').length == 1) {
