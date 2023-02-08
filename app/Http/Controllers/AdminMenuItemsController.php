@@ -716,12 +716,22 @@
 			$data['current_ingredients'] = DB::table('menu_ingredients_details')
 											->where('menu_items_id', $id)
 											->where('menu_ingredients_details.status', 'ACTIVE')
-											->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
-											->select('*', \DB::raw('item_masters.id as item_masters_id'))
-											->join('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+											->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+											->select(\DB::raw('item_masters.id as item_masters_id'),
+													'is_selected',
+													'is_primary',
+													'qty',
+													'cost',
+													'ingredient_group',
+													'uom_id',
+													'uoms.uom_description',
+													'item_masters.ingredient_cost',
+													'item_masters.full_item_description')
+											->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 											->orderBy('ingredient_group', 'ASC')
 											->orderBy('row_id', 'ASC')
 											->get();
+											
 			$data['item_masters'] = DB::table('item_masters')
 											->select(\DB::raw('item_masters.id as item_masters_id'),
 													'item_masters.packagings_id',
