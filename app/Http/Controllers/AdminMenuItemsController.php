@@ -719,7 +719,8 @@
 											->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 											->select('*', \DB::raw('item_masters.id as item_masters_id'))
 											->join('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
-											->orderby('row_id')
+											->orderBy('ingredient_group', 'ASC')
+											->orderBy('row_id', 'ASC')
 											->get();
 			return $this->view('menu-items/edit-item', $data);
 		}
@@ -807,7 +808,11 @@
 				$query = $request->get('query');
 				$current_ingredients = explode(',', $request->get('current_ingredients'));
 				$data = DB::table('item_masters')
-					->select('*', \DB::raw('item_masters.id as item_masters_id'))
+					->select('item_masters.packagings_id',
+						'item_masters.ingredient_cost',
+						'item_masters.full_item_description',
+						\DB::raw('item_masters.id as item_masters_id'),
+						'uoms.uom_description')
 					->where('full_item_description', 'LIKE', "%{$query}%")
 					->orWhere('tasteless_code', 'LIKE', "{$query}%")
 					->join('uoms', 'item_masters.packagings_id', '=', 'uoms.id')
