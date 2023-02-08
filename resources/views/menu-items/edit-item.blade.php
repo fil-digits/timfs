@@ -549,6 +549,22 @@
             );
         });
 
+        $(document).on('click', '#add-row', function() {
+            const section = $($('.ingredient-wrapper').eq(0).clone());
+            section.find('input').val('');
+            section.find('.ingredient').val('');
+            section.find('.display-ingredient').val('');
+            section.find('.ingredient').val('');
+            section.find('.quantity').val('');
+            section.find('.uom').val('');
+            section.find('.cost').val('');
+            section.css('display', '');
+            $('.ingredient-section').append(section);
+            $('.item-list').fadeOut();
+            $('.no-ingredient-warning').hide();
+            $.fn.reload();
+        });
+
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-wrapper');
             const sibling = entry.next()[0];
@@ -666,27 +682,6 @@
         $.fn.formatSelected();
         $.fn.sumCost();
     });
-
-</script>
-
-
-<script>
-    const addButton = document.querySelector('#add-row');
-    addButton.onclick = function(event) {
-        const section = $($('.ingredient-wrapper').eq(0).clone());
-        section.find('input').val('');
-        section.find('.ingredient').val('');
-        section.find('.display-ingredient').val('');
-        section.find('.ingredient').val('');
-        section.find('.quantity').val('');
-        section.find('.uom').val('');
-        section.find('.cost').val('');
-        section.css('display', '');
-        $('.ingredient-section').append(section);
-        $('.item-list').fadeOut();
-        $('.no-ingredient-warning').hide();
-        $.fn.reload();
-    }
 
 </script>
 @endpush
