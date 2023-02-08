@@ -295,7 +295,7 @@
         const savedIngredients = {!! json_encode($current_ingredients) !!}
         const item_masters = {!! json_encode($item_masters) !!}
 
-        $.firstLoad = function() {
+        $.fn.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
 
             const section = $('.ingredient-section');
@@ -698,7 +698,7 @@
                 $.fn.sumCost();
             });
         });
-        $.firstLoad();
+        $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
