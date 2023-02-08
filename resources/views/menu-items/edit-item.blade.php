@@ -293,6 +293,8 @@
     $(document).ready(function() {
 
         const savedIngredients = {!! json_encode($current_ingredients) !!}
+        const item_masters = {!! json_encode($item_masters) !!}
+
         $.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
 
@@ -346,31 +348,50 @@
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
+                const itemList = entry.find('.item-list');
                 current_ingredients.forEach((item, item_index) => {
                     // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
                     // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
                     if (item_index != index) arrayOfIngredients.push(item.value);
                 });
 
-                if (query == '') {
+                const result = [...item_masters]
+                    .filter(e => (e.full_item_description?.toLowerCase().includes(query.toLowerCase())
+                            || e.tasteless_code?.includes(query))
+                            && !arrayOfIngredients.includes(e.item_masters_id.toString()))
+                    .slice(0, 10)
+                    .sort((a, b) => a.full_item_description - b.full_item_description);
+
+                if (!result.length || query == '') {
                     $('.item-list').html('');
+                    return;
                 }
-                const _token = $('input[name="_token"]').val();
-                $.ajax({
-                    url:"{{ route('type_search') }}",
-                    method:"POST",
-                    data: {
-                        query: query,
-                        _token: _token,
-                        entry_id: index,
-                        current_ingredients: arrayOfIngredients.join(','),
-                    },
-                    success:function(response) { 
-                        $('.item-list').html('');
-                        entry.find('.item-list').fadeIn('fast'); 
-                        entry.find('.item-list').html(response);                        
-                    }
+
+                $('.item-list').html('');
+                
+               itemList.fadeIn('fast');
+
+                const ul = $(document.createElement('ul'));
+                ul.addClass('dropdown-menu');
+                ul.css({
+                    display: 'block',
+                    position: 'absolute',
                 });
+                result.forEach(e => {
+                    const li = $(document.createElement('li'));
+                    const a = $(document.createElement('a'));
+                    li.addClass('list-item dropdown-item');
+                    li.attr({
+                        item_id: e.item_masters_id,
+                        cost: e.ingredient_cost,
+                        uom: e.packagings_id,
+                        uom_desc: e.uom_description,
+                    });
+                    a.text(e.full_item_description);
+                    li.append(a);
+                    ul.append(li);
+                });
+                itemList.append(ul);
             });
 
             $(window).keydown(function(event){
