@@ -154,6 +154,10 @@
         transition: 200ms;
     }
 
+    .label-total {
+        font-size: 18px !important;
+    }
+
 </style>
 @endpush
 
@@ -272,7 +276,7 @@
             <section class="section-footer">
                 <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
                 <label class="label-total">
-                    Total Ingredients Cost (<span class="percentage"></span>)
+                    Food Cost (<span class="percentage"></span>)
                     <input class="form-control total-cost" name="total_cost" type="text" readonly>
                 </label>
             </section>
@@ -431,7 +435,7 @@
             $('.total-cost').val(sum);
             const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
-            $(percentageText).text(`${percentage}% of SRP`);
+            $(percentageText).text(`${percentage}%`);
             if (percentage > 30) {
                 $(percentageText).css('color', 'red');
                 $('.total-cost').css({'color': 'red', 'outline': '2px solid red', 'font-weight': 'bold',});
