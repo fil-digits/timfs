@@ -318,6 +318,7 @@
                         element.find('.cost').val(savedIngredient.cost);
                     } else {
                         element = $('.substitute').eq(0).clone();
+                        if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
                         const ingredientInput = element.find('.ingredient');
                         ingredientInput.val(savedIngredient.item_masters_id);
                         ingredientInput.attr('cost', savedIngredient.ingredient_cost);
@@ -406,9 +407,6 @@
                 
             });
             const menuItemSRP = Number($('.menu-item-srp').val().replace(/[^0-9.]/g, ''));
-            // $('.cost').each(function() {
-            //     sum += Number($(this).val().replace(/[^0-9.]/g, ''));
-            // });
             $('.total-cost').val(sum);
             const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
             const percentageText = $('.percentage');
@@ -429,6 +427,19 @@
                 const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString(undefined, {maximumFractionDigits: 4});
                 $(cost).val(`₱ ${val}`);
             })
+        }
+
+        $.fn.formatSelected = function() {
+            const substitutes = jQuery.makeArray($('.substitute'));
+            substitutes.forEach(sub => {
+                if ($(sub).attr('primary') == 'true') {
+                    $(sub).css('background', '#F4D35E');
+                    $(sub).find('.set-primary').css('color', 'black');
+                } else {
+                    $(sub).css('background', '');
+                    $(sub).find('.set-primary').css('color', '');
+                }
+            });
         }
 
         $(document).on('click', '#save-edit', function(event) {
@@ -633,15 +644,12 @@
             const sub = $(this).parents('.substitute');
             const ingredientWrapper = $(this).parents('.ingredient-wrapper');
             const isPrimary = sub.attr('primary') == 'true';
-            ingredientWrapper.find('.substitute').css('background', '');
-            ingredientWrapper.find('.set-primary').css('color', '');
             ingredientWrapper.find('.substitute').attr('primary', false);
             if (!isPrimary) {
                 sub.attr('primary', true);
                 sub.css('background', '#F4D35E');
-                sub.find('.set-primary').css('color', 'black');
             }
-            $.fn.reload();
+            $.fn.formatSelected();
             $.fn.sumCost();
 
         });
@@ -655,6 +663,7 @@
         });
         $.firstLoad();
         $.fn.reload();
+        $.fn.formatSelected();
         $.fn.sumCost();
     });
 
