@@ -280,11 +280,11 @@
                     <input class="form-control total-cost" name="total_cost" type="text" readonly>
                 </label>
             </section>
-            <div class="panel-footer">
-                <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
-                <button class="btn btn-primary pull-right" type="button" id="save-edit"> <i class="fa fa-save" ></i> Save</button>
-            </div>
         </form>
+    </div>
+    <div class="panel-footer">
+        <a href='{{ CRUDBooster::mainpath() }}' class='btn btn-default'>Cancel</a>
+        <button class="btn btn-primary pull-right" type="button" id="save-edit"> <i class="fa fa-save" ></i> Save</button>
     </div>
 </div>
   
