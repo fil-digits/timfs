@@ -626,51 +626,10 @@
 
         $(document).on('click', '.delete', function(event) {
             const entry = $(this).parents('.ingredient-wrapper');
-            const itemMastersId = jQuery.makeArray(entry.find('.ingredient')).map(e => $(e).val());
-            const menuItemsId = {{$item->id}};
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Deleting this will remove the whole ingredient group from the list!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    handleDelete(); 
-                    Swal.fire(
-                        'Deleted!',
-                        'Ingredient Deleted!',
-                        'success'
-                    );
-                }
+            entry.hide(300, function() {
+                $(this).remove();
+                $.fn.sumCost();
             });
-
-            function handleDelete() {
-                const _token = $('input[name="_token"]').val();
-                $.ajax({
-                    url: "{{ route('delete_ingredient') }}",
-                    method: 'POST',
-                    data: {
-                        _token: _token,
-                        item_masters_id: itemMastersId,
-                        menu_items_id: menuItemsId,
-                    },
-                    success: function(response) {
-                        if (response || !itemMastersId) {
-                            entry.remove();
-                            if($('.ingredient-entry').length == 1) {
-                                $('.no-ingredient-warning').css('display', '');
-                            }
-                            $('.item-list').html('');  
-                            $('.item-list').fadeOut();
-                            $.fn.sumCost();
-                        }
-                    }
-                });
-            }
         }); 
 
         $(document).on('click', '.add-sub-btn', function(event) {

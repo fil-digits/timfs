@@ -750,8 +750,13 @@
 			if($request->input('ingredient')) {
 
 				DB::table('menu_ingredients_details')
+				->where('status', 'ACTIVE')
 				->where('menu_items_id', $request->input('menu_items_id'))
-				->update(['status' => 'INACTIVE', 'row_id' => null]);
+				->update(['status' => 'INACTIVE',
+					'row_id' => null,
+					'total_cost' => null,
+					'deleted_by' => CRUDBooster::myID(),
+					'deleted_at' => date('Y-m-d H:i:s')]);
 
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
 					$ingredient = explode(',', $request->input('ingredient')[$i]);
@@ -789,19 +794,19 @@
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
-		public function deleteIngredient(Request $request) {
-			$data = [];
-			$item_masters_id = $request->get('item_masters_id');
-			$menu_items_id = $request->get('menu_items_id');
-			if ($request->get('item_masters_id')) {
-				$response = DB::table('menu_ingredients_details')
-					->where('menu_items_id', $menu_items_id)
-					->whereIn('item_masters_id', $item_masters_id)
-					->update(['status' => 'INACTIVE', 'row_id' => null, 'total_cost' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
-				return $response;
-			}
+		// public function deleteIngredient(Request $request) {
+		// 	$data = [];
+		// 	$item_masters_id = $request->get('item_masters_id');
+		// 	$menu_items_id = $request->get('menu_items_id');
+		// 	if ($request->get('item_masters_id')) {
+		// 		$response = DB::table('menu_ingredients_details')
+		// 			->where('menu_items_id', $menu_items_id)
+		// 			->whereIn('item_masters_id', $item_masters_id)
+		// 			->update(['status' => 'INACTIVE', 'row_id' => null, 'total_cost' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
+		// 		return $response;
+		// 	}
 
-		}
+		// }
 
 		public function getDetail($id) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
@@ -814,9 +819,19 @@
 			$data['ingredients'] = DB::table('menu_ingredients_details')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details.status', 'ACTIVE')
+				->select('tasteless_code',
+					'item_masters_id',
+					'ingredient_group',
+					'row_id',
+					'is_primary',
+					'is_selected',
+					'total_cost',
+					'full_item_description',
+					'qty', 'uom_description',
+					'cost')
 				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
-				->join('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
-				->orderby('row_id')
+				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+				->orderby('ingredient_group')
 				->get();
 			return $this->view('menu-items/detail-item', $data);
 		}
