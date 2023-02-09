@@ -59,21 +59,7 @@
                             <th scoped="col">Cost</th>
                         </tr>
                     </thead>
-        
                     <tbody class="ingredient-tbody">
-                        {{-- @foreach ($ingredients as $ingredient)
-                            <tr>
-                                <td>{{$ingredient->tasteless_code}}</td>
-                                <td>{{$ingredient->full_item_description}}</td>
-                                <td>{{$ingredient->qty}}</td>
-                                <td>{{$ingredient->uom_description}}</td>   
-                                <td class="cost peso">{{$ingredient->cost}}</td>
-                            </tr>
-                        @endforeach
-                            <tr>
-                                <td colspan="4" class="total-cost-label">Total Ingredients Cost</td>
-                                <td class="total-cost peso"></td>
-                            </tr> --}}
                     </tbody>
                 </table>
             </div>

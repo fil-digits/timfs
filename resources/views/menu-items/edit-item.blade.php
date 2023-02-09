@@ -348,7 +348,7 @@
 
             $('.display-ingredient').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
-                const query = ($(this).val());
+                const query = ($(this).val().toLowerCase().split(' '));
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
@@ -360,8 +360,8 @@
                 });
 
                 const result = [...item_masters]
-                    .filter(e => (e.full_item_description?.toLowerCase().includes(query.toLowerCase())
-                            || e.tasteless_code?.includes(query))
+                    .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
+                            || query.every(f => e.tasteless_code?.includes(f)))
                             && !arrayOfIngredients.includes(e.item_masters_id.toString()))
                     .slice(0, 10)
                     .sort((a, b) => a.full_item_description - b.full_item_description);
