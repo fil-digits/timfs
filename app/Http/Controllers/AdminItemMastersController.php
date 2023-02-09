@@ -255,8 +255,8 @@
 
 			    //----added by cris 20200630
                 $this->form[] = ['label' => 'Active Status', 'name' => 'sku_statuses_id', 'type' => 'select2', CRUDBooster::myEditForm()->sku_status ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->sku_status ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->sku_status ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                    'datatable' => 'sku_statuses,sku_status_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->sku_status ?: 'display:none;'
                 ];
                     
                 $this->form[] = [
@@ -266,37 +266,37 @@
 				
                 $this->form[] = [
                     'label' => 'Description', 'name' => 'full_item_description', 'type' => 'text', CRUDBooster::myEditForm()->full_item_description ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->full_item_description ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->full_item_description ? 'required|min:5|max:255' : '', 'width' => 'col-sm-4',
+                    'style' => CRUDBooster::myEditForm()->full_item_description ?: 'display:none;'
                 ];
                     
                 $this->form[] = ['label'=>'Brand Description','name'=>'brands_id','type'=>'select2', CRUDBooster::myEditForm()->brands_id ? : 'readonly' => true,
-                    'validation'=>CRUDBooster::myAddForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
-                    'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myAddForm()->brand_description ? : 'display:none;'];
+                    'validation'=>CRUDBooster::myEditForm()->brand_description ? 'required|integer|min:0' : '','width'=>'col-sm-4',
+                    'datatable'=>'brands,brand_description','datatable_where'=>"status='ACTIVE'",'style'=> CRUDBooster::myEditForm()->brand_description ? : 'display:none;'];
     
     
                 $this->form[] = [
                     'label' => 'Tax Code', 'name' => 'tax_codes_id', 'type' => 'select2', CRUDBooster::myEditForm()->tax_codes_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->tax_code ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->tax_code ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                    'datatable' => 'tax_codes,tax_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->tax_code ?: 'display:none;'
                 ];
     
                 $this->form[] = [
                     'label' => 'Account', 'name' => 'accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->accounts_id ? : 'readonly' => true,
                     'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+                    'datatable' => 'accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
                 ];
     
                 $this->form[] = [
                     'label' => 'COGS Account', 'name' => 'cogs_accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->cogs_accounts_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                    'datatable' => 'cogs_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
                 ];
     
                 $this->form[] = [
                     'label' => 'Asset Account', 'name' => 'asset_accounts_id', 'type' => 'select2', CRUDBooster::myEditForm()->asset_accounts_id ? : 'readonly' => true,
                     'validation' => 'required|integer|min:0', 'width' => 'col-sm-4',
-                    'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+                    'datatable' => 'asset_accounts,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
                 ];
 				
                 $this->form[] = [
@@ -312,8 +312,8 @@
 
                 $this->form[] = [
                     'label' => 'U/M', 'name' => 'uoms_id', 'type' => 'select2', CRUDBooster::myEditForm()->uoms_id ? : 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->uom ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->uom ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                    'datatable' => 'uoms,uom_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->uom ?: 'display:none;'
                 ];
     
                 $this->form[] = [
@@ -330,38 +330,38 @@
     
                 $this->form[] = [
                     'label' => 'Supplier Cost', 'name' => 'purchase_price', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->purchase_price ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->purchase_price ? 'required' : '', 'width' => 'col-sm-4',
+                    'style' => CRUDBooster::myEditForm()->purchase_price ?: 'display:none;'
                 ];
 				
                 $this->form[] = [
                     'label' => 'Sales Price', 'name' => 'ttp', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->ttp ? 'required' : '', 'width' => 'col-sm-4',
+                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
                 ];
 
 				$this->form[] = [
                     'label' => 'Sales Price Change', 'name' => 'ttp_price_change', 'type' => 'number',
                     'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
                 ];
 
 				$this->form[] = [
                     'label' => 'Sales Price Effective Date', 'name' => 'ttp_price_effective_date', 'type' => 'date',
                     'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp ?: 'display:none;'
+                    'style' => CRUDBooster::myEditForm()->ttp ?: 'display:none;'
                 ];
     
                 $this->form[] = [
                     'label' => 'Commi Margin', 'name' => 'ttp_percentage', 'type' => 'number', 'readonly' => true,
-                    'validation' => CRUDBooster::myAddForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->ttp_percentage ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->ttp_percentage ? 'required' : '', 'width' => 'col-sm-4',
+                    'style' => CRUDBooster::myEditForm()->ttp_percentage ?: 'display:none;'
                 ];
     
                 $this->form[] = [
                     'label' => 'Landed Cost', 'name' => 'landed_cost', 'type' => 'number',
-                    'validation' => CRUDBooster::myAddForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
-                    'style' => CRUDBooster::myAddForm()->landed_cost ?: 'display:none;'
+                    'validation' => CRUDBooster::myEditForm()->landed_cost ? 'required' : '', 'width' => 'col-sm-4',
+                    'style' => CRUDBooster::myEditForm()->landed_cost ?: 'display:none;'
                 ];
     
                 $this->form[] = [
@@ -373,7 +373,7 @@
                     'label' => 'Preferred Vendor', 'name' => 'suppliers_id', 'type' => 'select2', CRUDBooster::myEditForm()->suppliers_id ? : 'readonly' => true,
                     // 'disabled' => CRUDBooster::myEditReadOnly()->supplier ? true : false,
                     'validation' => CRUDBooster::myEditForm()->supplier ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                    'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myAddForm()->supplier ?: 'display:none;'
+                    'datatable' => 'suppliers,last_name', 'datatable_where' => "approval_status != 'NULL'", 'style' => CRUDBooster::myEditForm()->supplier ?: 'display:none;'
                 ];
         
                     // $this->form[] = ['label' => 'Tax Agency', 'name' => 'tax_agency', 'type' => 'text', 'width' => 'col-sm-4'];
@@ -387,33 +387,40 @@
         
                     $this->form[] = [
                         'label' => 'Group', 'name' => 'groups_id', 'type' => 'select2', CRUDBooster::myEditForm()->groups_id ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myAddForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->group ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->group ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                        'datatable' => 'groups,group_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->group ?: 'display:none;'
                     ];
         
                     $this->form[] = [
                         'label' => 'Category Description', 'name' => 'categories_id', 'type' => 'select',
-                        'validation' => CRUDBooster::myAddForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myAddForm()->category_description ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->category_description ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                        'datatable' => 'categories,category_description', 'datatable_where' => "status='ACTIVE'", 'style' => CRUDBooster::myEditForm()->category_description ?: 'display:none;'
                     ];
         
                     $this->form[] = [
                         'label' => 'Subcategory Description', 'name' => 'subcategories_id', 'type' => 'select', 
-                        'validation' => CRUDBooster::myAddForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
-                        'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myAddForm()->subcategory ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->subcategory ? 'required|integer|min:0' : '', 'width' => 'col-sm-4',
+                        'datatable' => 'subcategories,subcategory_description', 'datatable_where' => "status=%27ACTIVE%27", 'parent_select' => 'categories_id', 'style' => CRUDBooster::myEditForm()->subcategory ?: 'display:none;'
                     ];
         
                     $this->form[] = [
-                        'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text', CRUDBooster::myAddForm()->packaging_dimension ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myAddForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->packaging_dimension ?: 'display:none;'
+                        'label' => 'Dimension', 'name' => 'packaging_dimension', 'type' => 'text', CRUDBooster::myEditForm()->packaging_dimension ? : 'readonly' => true,
+                        'validation' => CRUDBooster::myEditForm()->packaging_dimension ? 'max:50' : '', 'width' => 'col-sm-4',
+                        'style' => CRUDBooster::myEditForm()->packaging_dimension ?: 'display:none;'
                     ];
                     
                     $this->form[] = [
                         'label' => 'Packaging Size', 'name' => 'packaging_size', 'type' => 'number',
-                        'validation' => CRUDBooster::myAddForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->packaging_size ? 'required' : '', 'width' => 'col-sm-4',
+                        'style' => CRUDBooster::myEditForm()->packaging_size ?: 'display:none;'
                     ];
+
+					$this->form[] = [
+        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
+						'validation' => CRUDBooster::myEditForm()->packagings_id ? 'required|integer|min:0' : '', 'width' => 'col-sm-4', 'readonly' => true,
+						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'",
+						'style' => CRUDBooster::myEditForm()->packagings_id ?: 'display:none;'
+        			];
 					
                     $this->form[] = [
                         'label' => 'Tax Status', 'name' => 'tax_status', 'type' => 'text', CRUDBooster::myEditForm()->tax_status ? : 'readonly' => true,
@@ -422,14 +429,14 @@
         
                     $this->form[] = [
                         'label' => 'Supplier Item Code', 'name' => 'supplier_item_code', 'type' => 'text', CRUDBooster::myEditForm()->supplier_item_code ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myAddForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->supplier_item_code ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->supplier_item_code ? 'max:50' : '', 'width' => 'col-sm-4',
+                        'style' => CRUDBooster::myEditForm()->supplier_item_code ?: 'display:none;'
                     ];
         
                     $this->form[] = [
                         'label' => 'MOQ Store', 'name' => 'moq_store', 'type' => 'number', CRUDBooster::myEditForm()->moq_store ? : 'readonly' => true,
-                        'validation' => CRUDBooster::myAddForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
-                        'style' => CRUDBooster::myAddForm()->moq_store ?: 'display:none;'
+                        'validation' => CRUDBooster::myEditForm()->moq_store ? 'required' : '', 'width' => 'col-sm-4',
+                        'style' => CRUDBooster::myEditForm()->moq_store ?: 'display:none;'
                     ];
         
                     $this->form[] = [
@@ -600,12 +607,11 @@
                         'style' => CRUDBooster::myAddForm()->packaging_size ?: 'display:none;'
                     ];
 					
-                    //----edited by cris 20201009-----
                     $this->form[] = [
-        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'text',
-        				'validation' => 'required', 'width' => 'col-sm-4','readonly' => true
+        				'label' => 'Packaging UOM', 'name' => 'packagings_id', 'type' => 'select2',
+						'validation' => 'required|integer|min:0', 'width' => 'col-sm-4', 'readonly' => true,
+						'datatable' => 'uoms_set,uom_description', 'datatable_where' => "status='ACTIVE'"
         			];
-        			//--------------------------------
         
                     $this->form[] = [
         				'label' => 'Tax Status', 'name' => 'tax_codes_id', 'type' => 'select2',

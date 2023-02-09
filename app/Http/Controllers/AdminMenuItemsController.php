@@ -747,17 +747,19 @@
 
 		public function submitEdit(Request $request) {
 			$data = [];
-			if($request->input('ingredient')) {
+			$total_cost = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
+			DB::table('menu_items')->where('id', $request->input('menu_items_id'))->update(['food_cost' => $total_cost]);
 
-				DB::table('menu_ingredients_details')
+			DB::table('menu_ingredients_details')
 				->where('status', 'ACTIVE')
 				->where('menu_items_id', $request->input('menu_items_id'))
 				->update(['status' => 'INACTIVE',
-					'row_id' => null,
-					'total_cost' => null,
-					'deleted_by' => CRUDBooster::myID(),
-					'deleted_at' => date('Y-m-d H:i:s')]);
-
+				'row_id' => null,
+				'total_cost' => null,
+				'deleted_by' => CRUDBooster::myID(),
+				'deleted_at' => date('Y-m-d H:i:s')]);
+			
+			if($request->input('ingredient')) {
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
 					$ingredient = explode(',', $request->input('ingredient')[$i]);
 					$data[$i]['item_masters_id'] = $ingredient[0];
@@ -780,7 +782,7 @@
 					} else {
 						$element['created_by'] = CRUDBooster::myId();
 					}
-					$element['total_cost'] = preg_replace("/[^0-9.]/", "", $request->input('total_cost'));
+					$element['total_cost'] = $total_cost;
 					$element['status'] = 'ACTIVE';
 					$element['deleted_at'] = null;
 					$element['deleted_by'] = null;

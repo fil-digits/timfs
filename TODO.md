@@ -9,8 +9,8 @@
 - [x] Implement cost vs. srp percentage
 - [x] Implement option to add substitute ingredient
 - [x] Add new column `ingredient_cost` in item_masters
-- [ ] brand searching
-- [ ] Max Ingredient Cost
+- [x] brand searching
+- [ ] Max Food Cost
 - [x] Fix the logic of the delete button
 - [ ] Add food cost and max food cost on database and frontend !!!!
 - [ ] Should be included on the extraction of menu item

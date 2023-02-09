@@ -366,9 +366,13 @@
                     .slice(0, 10)
                     .sort((a, b) => a.full_item_description - b.full_item_description);
 
-                if (!result.length || query == '') {
+                if (query == '') {
                     $('.item-list').html('');
                     return;
+                }
+
+                if (!result.length) {
+                    result.push({full_item_description: 'No Item Found'});
                 }
 
                 $('.item-list').html('');
@@ -384,6 +388,10 @@
                 result.forEach(e => {
                     const li = $(document.createElement('li'));
                     const a = $(document.createElement('a'));
+                    if (!e.item_masters_id) {
+                        li.css('color', 'red !important');
+                        // TODO: modify the css...
+                    }
                     li.addClass('list-item dropdown-item');
                     li.attr({
                         item_id: e.item_masters_id,
@@ -391,7 +399,7 @@
                         uom: e.packagings_id,
                         uom_desc: e.uom_description,
                     });
-                    a.text(e.full_item_description);
+                    a.text(e.full_item_description || 'No Item Description');
                     li.append(a);
                     ul.append(li);
                 });
@@ -527,6 +535,7 @@
             let entry = $(this).parents('.substitute');
             if (!entry[0]) entry = $(this).parents('.ingredient-entry');
             const ingredient = entry.find('.ingredient');
+            if (!$(this).attr('item_id')) return;
             ingredient.val($(this).attr('item_id'));
             ingredient.attr('cost', $(this).attr('cost'));
             ingredient.attr('uom', $(this).attr('uom'));
