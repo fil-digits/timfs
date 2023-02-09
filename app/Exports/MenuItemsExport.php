@@ -46,6 +46,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         foreach($prices as $price){
             array_push($header,$price->menu_price_column_description);
         }
+
+        array_push($header, 'INGREDIENT COST');
         
         array_push($header,'ORIGINAL CONCEPT');
         array_push($header,'STATUS');
@@ -92,6 +94,8 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             $item_price = $price->menu_price_column_name;
             array_push($data_items, $data_menu_item->$item_price);
         }
+
+        array_push($data_items, $data_menu_item->food_cost);
 
         array_push($data_items, $data_menu_item->original_concept);
         array_push($data_items, $data_menu_item->menu_item_status);

@@ -12,7 +12,8 @@
 - [x] brand searching
 - [ ] Max Food Cost
 - [x] Fix the logic of the delete button
-- [ ] Add food cost and max food cost on database and frontend !!!!
-- [ ] Should be included on the extraction of menu item
+- [x] Add food cost on database
+- [ ] Add food cost when extracting menu items
 - [ ] Dashboard summary of Low cost and High cost per concept
-- [ ] Clone the updated system
+- [ ] Add max food cost on frontend and database
+- [x] Update the localhost system like the one on production

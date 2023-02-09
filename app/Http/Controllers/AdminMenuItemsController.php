@@ -65,6 +65,9 @@
 			foreach($prices as $price){
 				$this->col[] = ["label"=>ucwords(strtolower($price->menu_price_column_description)),"name"=>$price->menu_price_column_name];
 			}
+
+			$this->col[] = ["label"=>"Ingredient Cost","name"=>"food_cost"];
+
             $this->col[] = ["label"=>"Original Concept","name"=>"original_concept"];;
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Created By","name"=>"created_by","join"=>"cms_users,name"];
