@@ -799,20 +799,6 @@
 			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
-		// public function deleteIngredient(Request $request) {
-		// 	$data = [];
-		// 	$item_masters_id = $request->get('item_masters_id');
-		// 	$menu_items_id = $request->get('menu_items_id');
-		// 	if ($request->get('item_masters_id')) {
-		// 		$response = DB::table('menu_ingredients_details')
-		// 			->where('menu_items_id', $menu_items_id)
-		// 			->whereIn('item_masters_id', $item_masters_id)
-		// 			->update(['status' => 'INACTIVE', 'row_id' => null, 'total_cost' => null, 'deleted_at' => date('Y-m-d H:i:s'), 'deleted_by' => CRUDBooster::myId()]);
-		// 		return $response;
-		// 	}
-
-		// }
-
 		public function getDetail($id) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
@@ -840,35 +826,5 @@
 				->get();
 			return $this->view('menu-items/detail-item', $data);
 		}
-
-
-
-		// public function autocompleteSearch(Request $request) {
-		// 	if($request->get('query')) {
-		// 		$query = $request->get('query');
-		// 		$current_ingredients = explode(',', $request->get('current_ingredients'));
-		// 		$data = DB::table('item_masters')
-		// 			->select('item_masters.packagings_id',
-		// 				'item_masters.ingredient_cost',
-		// 				'item_masters.full_item_description',
-		// 				\DB::raw('item_masters.id as item_masters_id'),
-		// 				'uoms.uom_description')
-		// 			->where('full_item_description', 'LIKE', "%{$query}%")
-		// 			->orWhere('tasteless_code', 'LIKE', "{$query}%")
-		// 			->join('uoms', 'item_masters.packagings_id', '=', 'uoms.id')
-		// 			->orderby('full_item_description')
-		// 			->take(10)
-		// 			->get();
-		// 		$output = '<ul class="dropdown-menu" style="display:block; position: absolute">';
-		// 		foreach ($data as $row) {
-		// 			if (in_array($row->item_masters_id, $current_ingredients)) {
-		// 				continue;
-		// 			}
-		// 			$output .= "<li item_id='$row->item_masters_id' cost='$row->ingredient_cost' uom='$row->packagings_id'  uom_desc='$row->uom_description' class='list-item dropdown-item'><a href='javascript:void(0)'>$row->full_item_description</a></li>";
-		// 		}
-		// 		$output .= '</ul>';
-		// 		echo $output;
-     	// 	}
-		// } 
 
 	}
