@@ -12,6 +12,7 @@
 */
 
 use App\Http\Controllers\AdminMenuItemsController;
+use App\Http\Controllers\AdminFoodCostController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -74,8 +75,5 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::get('/admin/item_masters/download-price-template','ItemPriceUploadController@downloadPriceTemplate')->name('downloadPriceTemplate');
 
     Route::post('/admin/menu_items/edit', [AdminMenuItemsController::class, 'submitEdit'])->name('edit_menu_item');
-    Route::post('/admin/menu_items/edit/search-ingredient', [AdminMenuItemsController::class, 'autocompleteSearch'])->name('type_search');
-    Route::post('/admin/menu_items/edit/delete-ingredient', [AdminMenuItemsController::class, 'deleteIngredient'])->name('delete_ingredient');
-    Route::get('/autocomplete', 'AutocompleteController@index');
-    Route::post('/autocomplete/fetch', 'AutocompleteController@fetch')->name('autocomplete.fetch');
+    Route::get('/admin/food_cost/{id}/{filter}/{items}', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
 });

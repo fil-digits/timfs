@@ -10,10 +10,10 @@
 - [x] Implement option to add substitute ingredient
 - [x] Add new column `ingredient_cost` in item_masters
 - [x] brand searching
-- [ ] Max Food Cost
 - [x] Fix the logic of the delete button
 - [x] Add food cost on database
 - [ ] Add food cost when extracting menu items
-- [ ] Dashboard summary of Low cost and High cost per concept
+- [x] Dashboard summary of Low cost and High cost per concept
+- [ ] When table data is clicked, it should redirect to a page of list of menu items
 - [ ] Add max food cost on frontend and database
 - [x] Update the localhost system like the one on production
