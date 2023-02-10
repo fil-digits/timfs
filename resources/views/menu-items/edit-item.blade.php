@@ -293,7 +293,6 @@
 @push('bottom')
 
 <script>
-//TODO: fix the saving of total cost on database.
     $(document).ready(function() {
 
         const savedIngredients = {!! json_encode($current_ingredients) !!}
