@@ -17,3 +17,4 @@
 - [ ] When table data is clicked, it should redirect to a page of list of menu items
 - [ ] Add max food cost on frontend and database
 - [x] Update the localhost system like the one on production
+- [x] Update the code uom_desc should be from the packagings_desc

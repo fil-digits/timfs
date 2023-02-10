@@ -319,7 +319,7 @@
                         element.find('.display-ingredient').val(savedIngredient.full_item_description);
                         element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
                         element.find('.uom').val(savedIngredient.uom_id);
-                        element.find('.display-uom').val(savedIngredient.uom_description);
+                        element.find('.display-uom').val(savedIngredient.packaging_description);
                         element.find('.cost').val(savedIngredient.cost);
                     } else {
                         element = $('.substitute').eq(0).clone();
@@ -330,7 +330,7 @@
                         element.find('.display-ingredient').val(savedIngredient.full_item_description);
                         element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
                         element.find('.uom').val(savedIngredient.uom_id);
-                        element.find('.display-uom').val(savedIngredient.uom_description);
+                        element.find('.display-uom').val(savedIngredient.packaging_description);
                         element.find('.cost').val(savedIngredient.cost);
                         element.css('display', '');
                     }
@@ -396,7 +396,7 @@
                         item_id: e.item_masters_id,
                         cost: e.ingredient_cost,
                         uom: e.packagings_id,
-                        uom_desc: e.uom_description,
+                        uom_desc: e.packaging_description,
                     });
                     a.text(e.full_item_description || 'No Item Description');
                     li.append(a);

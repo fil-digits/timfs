@@ -727,10 +727,10 @@
 													'cost',
 													'ingredient_group',
 													'uom_id',
-													'uoms.uom_description',
+													'packagings.packaging_description',
 													'item_masters.ingredient_cost',
 													'item_masters.full_item_description')
-											->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
+											->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
 											->orderBy('ingredient_group', 'ASC')
 											->orderBy('row_id', 'ASC')
 											->get();
@@ -741,8 +741,8 @@
 													'item_masters.ingredient_cost',
 													'item_masters.full_item_description',
 													'item_masters.tasteless_code',
-													'uoms.uom_description')
-											->leftJoin('uoms','item_masters.packagings_id', '=', 'uoms.id')
+													'packagings.packaging_description')
+											->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
 											->orderby('full_item_description')
 											->get();
 			return $this->view('menu-items/edit-item', $data);
