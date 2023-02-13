@@ -13,18 +13,16 @@ class CreateMenuOldCodeMastersTable extends Migration
      */
     public function up()
     {
-        if(!Schema::hasTable('menu_old_code_masters')) {
-            Schema::create('menu_old_code_masters', function (Blueprint $table) {
-                $table->id();
-                $table->string('menu_old_code_column_name',35)->nullable();
-                $table->string('menu_old_code_column_description',50)->nullable();
-                $table->enum('status', array('ACTIVE', 'INACTIVE'))->default('ACTIVE')->nullable();
-                $table->integer('created_by', false, true)->length(10)->unsigned()->nullable();
-                $table->integer('updated_by', false, true)->length(10)->unsigned()->nullable();
-                $table->timestamps();
-                $table->softDeletes();
-            });
-        }
+        Schema::create('menu_old_code_masters', function (Blueprint $table) {
+            $table->id();
+            $table->string('menu_old_code_column_name',35)->nullable();
+            $table->string('menu_old_code_column_description',50)->nullable();
+            $table->enum('status', array('ACTIVE', 'INACTIVE'))->default('ACTIVE')->nullable();
+            $table->integer('created_by', false, true)->length(10)->unsigned()->nullable();
+            $table->integer('updated_by', false, true)->length(10)->unsigned()->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**

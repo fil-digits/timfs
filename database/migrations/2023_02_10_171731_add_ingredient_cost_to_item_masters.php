@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddOldDecriptionToMenuItems extends Migration
+class AddIngredientCostToItemMasters extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddOldDecriptionToMenuItems extends Migration
      */
     public function up()
     {
-        Schema::table('menu_items', function (Blueprint $table) {
-            $table->string('pos_old_item_description',100)->nullable()->after('menu_item_description');
+        Schema::table('item_masters', function (Blueprint $table) {
+            $table->decimal('ingredient_cost', 18, 2)->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ class AddOldDecriptionToMenuItems extends Migration
      */
     public function down()
     {
-        Schema::table('menu_items', function (Blueprint $table) {
-            $table->dropColumn('pos_old_item_description');
+        Schema::table('item_masters', function (Blueprint $table) {
+            $table->dropColumn('ingredient_cost');
         });
     }
 }

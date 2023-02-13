@@ -12,9 +12,10 @@
 - [x] brand searching
 - [x] Fix the logic of the delete button
 - [x] Add food cost on database
-- [ ] Add food cost when extracting menu items
+- [x] Add food cost when extracting menu items
 - [x] Dashboard summary of Low cost and High cost per concept
-- [ ] When table data is clicked, it should redirect to a page of list of menu items
+- [x] When table data is clicked, it should redirect to a page of list of menu items
 - [ ] Add max food cost on frontend and database
 - [x] Update the localhost system like the one on production
 - [x] Update the code uom_desc should be from the packagings_desc
+- [ ] Add experimental menu
