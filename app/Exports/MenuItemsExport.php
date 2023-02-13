@@ -47,8 +47,9 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             array_push($header,$price->menu_price_column_description);
         }
 
-        array_push($header, 'INGREDIENT COST');
-        
+        array_push($header, 'FOOD COST');
+        array_push($header, 'FOOD COST PERCENTAGE');
+
         array_push($header,'ORIGINAL CONCEPT');
         array_push($header,'STATUS');
 
@@ -96,6 +97,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         }
 
         array_push($data_items, $data_menu_item->food_cost);
+        array_push($data_items, $data_menu_item->food_cost_percentage);
 
         array_push($data_items, $data_menu_item->original_concept);
         array_push($data_items, $data_menu_item->menu_item_status);
@@ -131,6 +133,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'menu_categories.category_description',
             'menu_subcategories.subcategory_description',
             'menu_items.food_cost',
+            'menu_items.food_cost_percentage',
             'menu_items.original_concept',
             'menu_items.status as menu_item_status',
             'menu_items.approved_at',

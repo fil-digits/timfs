@@ -19,3 +19,5 @@
 - [x] Update the localhost system like the one on production
 - [x] Update the code uom_desc should be from the packagings_desc
 - [ ] Add experimental menu
+- [x] Show the percentage of food cost vs srp on the list [new column]
+- [ ] Add percentage on database and exporting

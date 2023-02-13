@@ -258,23 +258,20 @@
             @csrf
             <input type="text" name="menu_items_id" value="{{$item->id}}" style="display: none;">
             <label class="menu-item-label">
-                Menu Item Code
-                <input class="form-control" type="text" value="{{$item->tasteless_menu_code}}" disabled>
+                Experimental Menu Description
+                <input class="form-control" type="text" value="{{$item->experimental_menu_desc}}" disabled>
             </label>
             <label class="menu-item-label">
-                Menu Item Description
-                <input class="form-control" type="text" value="{{$item->menu_item_description}}" disabled>
-            </label>
-            <label class="menu-item-label">
-                Menu Item SRP
-                <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
+                Experimental Menu SRP
+                <input class="form-control menu-item-srp" type="text" value="₱ {{$item->srp}}" disabled>
             </label>
             <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
             <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
             <section class="ingredient-section">
             </section>
             <section class="section-footer">
-                <button class="btn btn-success" id="add-row" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add ingredient</button>
+                <button class="btn btn-success" id="add-new" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add new ingredient</button>
+                <button class="btn btn-success" id="add-existing" name="button" type="button" value="add_ingredient"> <i class="fa fa-plus" ></i> Add existing ingredient</button>
                 <label class="label-total">
                     Food Cost (<span class="percentage"></span>)
                     <input class="form-control total-cost" name="total_cost" type="text" readonly>
@@ -489,11 +486,6 @@
                     if (result.isConfirmed) {
                         $(this).prop("disabled", true);
                         const form = $('form');
-                        const percentage = form.find('.label-total').text().replace(/[^0-9.]/g, '');
-                        const totalCost = form.find('.total-cost');
-                        totalCost.val(`${totalCost.val()},${percentage}`)
-                        console.log(totalCost.val());
-                        // return;
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));
                         /*
                             primaryIngredientValue / subIngredientValue = item_masters_id,
@@ -587,7 +579,7 @@
             );
         });
 
-        $(document).on('click', '#add-row', function() {
+        $(document).on('click', '#add-existing', function() {
             const section = $($('.ingredient-wrapper').eq(0).clone());
             section.find('input').val('');
             section.find('.ingredient').val('');
