@@ -93,8 +93,8 @@
         // TODO: IMPLEMENT THE TOTAL FILTERING!!
         const totalTR = $(document.createElement('tr'));
         const totalLabelTD = $(document.createElement('td'));
-        const allLow = [...menuItems].filter(item => item.food_cost && item.food_cost / item.menu_price_dine <= 0.30);
-        const allHigh = [...menuItems].filter(item => item.food_cost && item.food_cost / item.menu_price_dine > 0.30);
+        const allLow = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine <= 0.30);
+        const allHigh = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine > 0.30);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
         totalLabelTD.attr('colspan', '2');
@@ -106,7 +106,7 @@
                 td.text(allLow.length);
                 td.attr('filter', 'low');
                 td.attr('items', items);
-                td.addClass('low clickable')
+                td.addClass('low clickable');
             } else if (i==1) {
                 const items = allHigh.map(item => item.id).join(',');
                 td.text(allHigh.length);
@@ -115,7 +115,7 @@
                 td.addClass('high clickable');
             } 
             td.attr('id', 'all');
-            td.addClass('clickable')
+            td.addClass('clickable');
             totalTR.append(td);
         }
 
