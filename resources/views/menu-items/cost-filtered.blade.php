@@ -37,6 +37,7 @@
                     <th scope="col">Menu Item Description</th>
                     <th scope="col">SRP</th>
                     <th scope="col">Food Cost</th>
+                    <th scope="col">Percentage</th>
                     <th scope="col">Action</th>
                 </tr>
             </thead>
@@ -65,6 +66,7 @@
             const menuItemDescription = $(document.createElement('td')).text(item.menu_item_description); 
             const srp = $(document.createElement('td')).text(item.menu_price_dine); 
             const foodCost = $(document.createElement('td')).text(item.food_cost);
+            const percentage = $(document.createElement('td')).text(`${(item.food_cost / item.menu_price_dine * 100).toFixed(2)}%`)
             const action = $(document.createElement('td')).addClass('action');
             const detail = $(document.createElement('a')).append($(document
                     .createElement('i'))
@@ -75,7 +77,7 @@
                 .addClass('fa fa-pencil button'))
                 .attr('href', "{{ CRUDBooster::adminPath('menu_items/edit') }}" + `/${item.id}`);
             action.append(detail, edit);
-            tr.append(menuItemCode, menuItemDescription, srp, foodCost, action);
+            tr.append(menuItemCode, menuItemDescription, srp, foodCost, percentage, action);
             tbody.append(tr);
         });
     });
