@@ -22,4 +22,4 @@
 - [x] Show the percentage of food cost vs srp on the list [new column]
 - [x] Show the percentage of food cost vs srp on the details page of menu item
 - [x] Add percentage on database and exporting
-- [ ] Add new column (No Cost)
+- [x] Add new column (No Cost)

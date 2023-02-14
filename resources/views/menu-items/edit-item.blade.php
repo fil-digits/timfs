@@ -295,8 +295,9 @@
 <script>
     $(document).ready(function() {
 
-        const savedIngredients = {!! json_encode($current_ingredients) !!}
-        const item_masters = {!! json_encode($item_masters) !!}
+        const savedIngredients = {!! json_encode($current_ingredients) !!};
+        const item_masters = {!! json_encode($item_masters) !!};
+        const menuItem = {!! json_encode($item) !!};
 
         $.fn.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
@@ -438,9 +439,9 @@
                 }
                 
             });
-            const menuItemSRP = Number($('.menu-item-srp').val().replace(/[^0-9.]/g, ''));
+            const menuItemSRP = Number(menuItem.menu_price_dine.replace(/[^0-9.]/g, ''));
             $('.total-cost').val(sum);
-            const percentage = (Math.round(sum / menuItemSRP * 10000)) / 100;
+            const percentage = menuItemSRP != 0 ? ((sum / menuItemSRP * 100).toFixed(2)) : 0;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}%`);
             if (percentage > 30) {
