@@ -6,12 +6,8 @@
 	use CRUDBooster;
 
 	class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CBController {
-
-		public function __construct() {
-			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-		}
 		
-	    public function cbInit() {
+	function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "segment_column_name";
@@ -379,6 +375,4 @@
 			$data['filtered_items'] = $filtered_items;
 			return $this->view('menu-items/cost-filtered', $data);
 		}
-
-
 	}

@@ -57,21 +57,22 @@
 @push('bottom')
 <script>
     $(document).ready(function() {
-        const menuItems = {!! json_encode($filtered_items) !!};
-        console.log(menuItems);
+        let menuItems = {!! json_encode($filtered_items) !!};
+        menuItems = menuItems.sort((a, b) => Number((a.food_cost / a.menu_price_dine * 100)) - Number((b.food_cost / b.menu_price_dine * 100)))
         const tbody = $('tbody');
+
         menuItems.forEach((item, index) => {
             const tr = $(document.createElement('tr'));
             const menuItemCode = $(document.createElement('td')).text(item.tasteless_menu_code);
             const menuItemDescription = $(document.createElement('td')).text(item.menu_item_description); 
-            const srp = $(document.createElement('td')).text(item.menu_price_dine); 
-            const foodCost = $(document.createElement('td')).text(item.food_cost);
+            const srp = $(document.createElement('td')).text(`₱ ${item.menu_price_dine}`);
+            const foodCost = $(document.createElement('td')).text(`₱ ${item.food_cost}`);
             const percentage = $(document.createElement('td')).text(`${(item.food_cost / item.menu_price_dine * 100).toFixed(2)}%`)
             const action = $(document.createElement('td')).addClass('action');
             const detail = $(document.createElement('a')).append($(document
-                    .createElement('i'))
-                    .addClass('fa fa-eye button'))
-                    .attr('href', "{{ CRUDBooster::adminPath('menu_items/detail') }}" + `/${item.id}`);
+                .createElement('i'))
+                .addClass('fa fa-eye button'))
+                .attr('href', "{{ CRUDBooster::adminPath('menu_items/detail') }}" + `/${item.id}`);
             const edit = $(document.createElement('a')).append($(document
                 .createElement('i'))
                 .addClass('fa fa-pencil button'))
