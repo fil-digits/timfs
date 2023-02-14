@@ -86,6 +86,7 @@
 
         $('table').DataTable({
             pagingType: 'full_numbers',
+            pageLength: 50,
         });
     });
 
