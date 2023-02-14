@@ -6,7 +6,7 @@
         text-align: center;
     }
 
-    .total-cost-label {
+    .total-cost-label, .percentage-label {
         text-align: right;
         font-weight: bold;
     }
@@ -72,6 +72,7 @@
 <script>
      $(document).ready(function() {
         const ingredients = {!! json_encode($ingredients) !!};
+        const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
         const entryCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
         for (i of entryCount) {
@@ -96,7 +97,6 @@
                 }
 
                 tr.append(td);
-                console.log(td.html());
             }
             $('.ingredient-tbody').append(tr);
         }
@@ -106,10 +106,10 @@
         const totalCostValueTD = $(document.createElement('td'));
         totalCostLabelTD.attr('colspan', '4');
         totalCostLabelTD.addClass('total-cost-label');
-        totalCostLabelTD.text('Total Ingredient Cost');
+        totalCostLabelTD.text('Food Cost');
         totalCostValueTD.addClass('total-cost peso');
-        totalCostTR.append(totalCostLabelTD);
-        totalCostTR.append(totalCostValueTD);
+        totalCostTR.append(totalCostLabelTD, totalCostValueTD);        
+
         $('.ingredient-tbody').append(totalCostTR);
 
         if (!ingredients.length) {
@@ -118,12 +118,14 @@
             $('.with-ingredient').css('display', '');
         }
 
-        console.log(ingredients);
         const costsElems = jQuery.makeArray($('.cost'))
         const totalCostElem = $('.total-cost');
         const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
+        const percentage = (totalCost / item.menu_price_dine * 100).toFixed(2);
         $(totalCostElem).text(totalCost);
-
+        percentageSpan = $(document.createElement('span')).text(`(${percentage}%)`).addClass('percentage-text');
+        percentageSpan.css('color', percentage > 30 ? 'red' : '');
+        totalCostLabelTD.text(`Total Cost `).append(percentageSpan);
         function formatNumbers() {
             const elems = jQuery.makeArray($('.peso'));
             elems.forEach(elem => $(elem).text('₱ ' + Number($(elem).text()).toLocaleString(undefined, {maximumFractionDigits: 4})))
