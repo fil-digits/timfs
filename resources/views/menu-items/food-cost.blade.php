@@ -36,6 +36,7 @@
                     <th scope="col">Concept Name</th>
                     <th scope="col">Low Cost</th>
                     <th scope="col">High Cost</th>
+                    <th scope="col">No Cost</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,12 +64,12 @@
             const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
             const low = groupedItems.filter(item => item.food_cost && item.food_cost / item.menu_price_dine <= 0.30);
             const high = groupedItems.filter(item => item.food_cost && item.food_cost / item.menu_price_dine > 0.30);
-            for (let i=0; i<4; i++) {
+            for (let i=0; i<5; i++) {
                 const td = $(document.createElement('td'));
                 td.attr('id', concept.id);
                 if (i==0) {
                     td.text(index + 1);
-                } if (i==1) {
+                }else if (i==1) {
                     td.text(concept.menu_segment_column_description);
                 } else if (i==2) {
                     const items = low.map(item => item.id).join(',');
@@ -82,6 +83,12 @@
                     td.attr('filter', 'high');
                     td.attr('items', items);
                     td.addClass('high clickable');
+                } else if (i==4) {
+                    const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
+                    td.text(items.length);
+                    td.attr('filter', 'no-cost');
+                    td.attr('items', items.join(','));
+                    td.addClass('clickable');
                 }
                 tr.append(td)
             }
@@ -90,16 +97,16 @@
         });
 
         // TOTAL || ALL
-        // TODO: IMPLEMENT THE TOTAL FILTERING!!
         const totalTR = $(document.createElement('tr'));
         const totalLabelTD = $(document.createElement('td'));
         const allLow = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine <= 0.30);
         const allHigh = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine > 0.30);
+        const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
         totalLabelTD.attr('colspan', '2');
         totalTR.append(totalLabelTD);
-        for (let i=0; i<2; i++) {
+        for (let i=0; i<3; i++) {
             const td = $(document.createElement('td'));
             if (i==0) {
                 const items = allLow.map(item => item.id).join(',');
@@ -113,7 +120,13 @@
                 td.attr('filter', 'high');
                 td.attr('items', items);
                 td.addClass('high clickable');
-            } 
+            } else if (i==2) {
+                const items = allNoCost.map(item => item.id).join(',');
+                td.text(allNoCost.length);
+                td.attr('filter', 'no-cost');
+                td.attr('items', items);
+                td.addClass('clickable');
+            }
             td.attr('id', 'all');
             td.addClass('clickable');
             totalTR.append(td);
