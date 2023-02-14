@@ -70,13 +70,15 @@
             const percentage = $(document.createElement('td')).text(item.menu_price_dine == 0 ? '0.00%' : `${((item.food_cost || 0) / (item.menu_price_dine) * 100).toFixed(2)}%`)
             const action = $(document.createElement('td')).addClass('action');
             const detail = $(document.createElement('a')).append($(document
-                .createElement('i'))
-                .addClass('fa fa-eye button'))
-                .attr('href', "{{ CRUDBooster::adminPath('menu_items/detail') }}" + `/${item.id}`);
+                    .createElement('i'))
+                    .addClass('fa fa-eye button'))
+                .attr('href', "{{ CRUDBooster::adminPath('menu_items/detail') }}" + `/${item.id}`)
+                .attr('target', '_blank');
             const edit = $(document.createElement('a')).append($(document
-                .createElement('i'))
-                .addClass('fa fa-pencil button'))
-                .attr('href', "{{ CRUDBooster::adminPath('menu_items/edit') }}" + `/${item.id}`);
+                    .createElement('i'))
+                    .addClass('fa fa-pencil button'))
+                .attr('href', "{{ CRUDBooster::adminPath('menu_items/edit') }}" + `/${item.id}`)
+                .attr('target', '_blank');
             action.append(detail, edit);
             tr.append(menuItemCode, menuItemDescription, srp, foodCost, percentage, action);
             tbody.append(tr);
