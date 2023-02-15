@@ -713,7 +713,8 @@
 	    }
 
 		public function getEdit($id) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			// dd(CRUDBooster::myPrivilegeName());
+			if(CRUDBooster::myPrivilegeName() != 'Chef' && CRUDBooster::myPrivilegeId() != '1') return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'You do not have the access to edit the item.']);
 			$data = [];
 			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
 
