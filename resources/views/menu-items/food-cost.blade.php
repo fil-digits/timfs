@@ -143,9 +143,6 @@
             const id = td.attr('id');
             const filter = td.attr('filter');
             const items = td.attr('items');
-            // let url = "{{ route('filter_by_cost', ['id' => ':concept', 'filter' => ':filter', 'items'=> ':items']) }}";
-            // url = url.replace(':concept', id).replace(':filter', filter).replace(':items', (items ? items : 0));
-            // window.location.href = url;
 
             const form = $(document.createElement('form'))
                 .attr('method', 'POST')

@@ -24,4 +24,19 @@
 - [x] Add percentage on database and exporting
 - [x] Add new column (No Cost)
 - [x] fix the hacky way of cost filter (use form instead)
-- [ ] Implement the workflow
+
+## Workflow
+
+- [ ] Create various privileges (chef, marketing(approver), accounting(approver))
+
+  - Only the chef can edit the ingredients
+
+- [ ] Create new column `temp_qty` and `temp_cost` in `menu_ingredients_details`
+- [ ] Create new column `ingredients_approval_status` in `menu_items`
+
+  - Once the edit is saved, the qty and cost will be inserted to the temp cost and qty
+
+- [ ] Restrict the chef to edit again the menu items until approved or rejected by any or both of the approvers
+
+  - Only marketing and accounting can approve or reject the edited menu items
+  - The approval of the edit (by: marketing and accounting) can be done in any order
