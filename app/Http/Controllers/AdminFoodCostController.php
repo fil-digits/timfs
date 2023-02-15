@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -342,7 +342,7 @@
 			return $this->view('menu-items/food-cost', $data);
 		}
 
-		public function filterByCost(Request $request, $id, $filter, $items) {
+		public function filterByCost(Request $request) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 			$concept;
@@ -351,17 +351,17 @@
 			$filtered_menu_items_id;
 			$filtered_items;
 
-			if ($id != 'all') {
-				$concept = DB::table('menu_segmentations')->where('id', $id)->get();
+			if ($request->id != 'all') {
+				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
 				$column_name = $concept[0]->menu_segment_column_name;
 				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
-				$filtered_menu_items_id = explode(',', $items);
+				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')
 					->get();
 			} else {
-				$filtered_menu_items_id = explode(',', $items);
+				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')

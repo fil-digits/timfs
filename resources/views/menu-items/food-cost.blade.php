@@ -143,9 +143,32 @@
             const id = td.attr('id');
             const filter = td.attr('filter');
             const items = td.attr('items');
-            let url = "{{ route('filter_by_cost', ['id' => ':concept', 'filter' => ':filter', 'items'=> ':items']) }}";
-            url = url.replace(':concept', id).replace(':filter', filter).replace(':items', (items ? items : 0));
-            window.location.href = url;
+            // let url = "{{ route('filter_by_cost', ['id' => ':concept', 'filter' => ':filter', 'items'=> ':items']) }}";
+            // url = url.replace(':concept', id).replace(':filter', filter).replace(':items', (items ? items : 0));
+            // window.location.href = url;
+
+            const form = $(document.createElement('form'))
+                .attr('method', 'POST')
+                .attr('action', "{{ route('filter_by_cost') }}")
+                .css('display', 'none');
+            const csrf = $(document.createElement('input'))
+                .attr({
+                    type: 'hidden',
+                    name: '_token',
+                })
+                .val("{{ csrf_token() }}");
+            const idInput = $(document.createElement('input'))
+                .attr('name', 'id')
+                .val(id);
+            const itemInput = $(document.createElement('input'))
+                .attr('name', 'items')
+                .val(items);
+            const filterInput = $(document.createElement('input'))
+                .attr('name', 'filter')
+                .val(filter);
+            $('.panel-body').append(form);
+            form.append(csrf, idInput, itemInput, filterInput);
+            form.submit();
         });
 
         $(document).on('click', '#export', function() {

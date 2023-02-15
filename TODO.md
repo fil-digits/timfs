@@ -23,5 +23,5 @@
 - [x] Show the percentage of food cost vs srp on the details page of menu item
 - [x] Add percentage on database and exporting
 - [x] Add new column (No Cost)
-- [ ] fix the hacky way of cost filter (use form instead)
+- [x] fix the hacky way of cost filter (use form instead)
 - [ ] Implement the workflow
