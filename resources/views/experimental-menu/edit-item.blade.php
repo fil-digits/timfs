@@ -9,7 +9,7 @@
         gap: 10px;
     }
 
-    .ingredient-wrapper {
+    .ingredient-wrapper, .new-ingredient-wrapper {
         position: relative;
         margin-bottom: 10px;
         border: 2px solid grey;
@@ -39,7 +39,7 @@
         margin-bottom: 10px;
     }
 
-    .display-ingredient {
+    .display-ingredient, .new-ingredient {
         min-width: 27vw;
     }
 
@@ -210,6 +210,45 @@
     END OF COPY
  --}}
 
+ <div class="new-ingredient-wrapper" style="display: none;">
+    <div class="ingredient-entry">
+        <div class="ingredient-inputs">
+            <label>
+                <span class="required-star">*</span> Ingredient
+                <div>
+                    <input value="" type="text" name="ingredient[]" class="new-ingredient form-control" required/>
+                    {{-- <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/> --}}
+                    <div class="item-list">
+                    </div>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Quantity
+                <input value="" name="quantity[]" class="form-control new-quantity" type="number" min="0" step="any" required/>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient UOM
+                <div>
+                    <input type="text" class="form-control uom" name="uom[]" value="" style="display: none;"/>
+                    <input type="text" class="form-control display-uom" value="" readonly>
+                </div>
+            </label>
+            <label>
+                <span class="required-star">*</span> Ingredient Cost
+                <input value="" name="cost[]" class="form-control cost" type="text" readonly required>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="btn btn-info move-up" title="Move Up" type="button"> <i class="fa fa-arrow-up" ></i></button>
+            <button class="btn btn-info move-down" title="Move Down" type="button"> <i class="fa fa-arrow-down" ></i></button>
+            <button class="btn btn-danger delete" title="Delete Ingredient" type="button"> <i class="fa fa-trash" ></i></button>
+        </div>
+    </div>
+    <div class="add-sub-btn" title="Add Substitute Ingredient">
+        <i class="fa fa-plus"></i>
+    </div>
+</div>
+
  <div class="substitute" style="display: none;">
     <div class="ingredient-inputs">
         <label>
@@ -262,6 +301,10 @@
                 <input class="form-control" type="text" value="{{$item->experimental_menu_desc}}" disabled>
             </label>
             <label class="menu-item-label">
+                Concept
+                <input class="form-control" type="text" value="{{$item->concept}}" disabled>
+            </label>
+            <label class="menu-item-label">
                 Experimental Menu SRP
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->srp}}" disabled>
             </label>
@@ -295,52 +338,53 @@
         const savedIngredients = {!! json_encode($current_ingredients) !!}
         const item_masters = {!! json_encode($item_masters) !!}
 
-        $.fn.firstLoad = function() {
-            const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
+        // $.fn.firstLoad = function() {
+        //     const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
 
-            const section = $('.ingredient-section');
+        //     const section = $('.ingredient-section');
 
-            for (i of entryCount) {
-                const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
-                const wrapperTemplate = $(document.createElement('div'));
-                wrapperTemplate.addClass('ingredient-wrapper');
-                wrapperTemplate.append($('.add-sub-btn').eq(0).clone());
+        //     for (i of entryCount) {
+        //         const groupedIngredients = savedIngredients.filter(e => e.ingredient_group == i);
+        //         const wrapperTemplate = $(document.createElement('div'));
+        //         wrapperTemplate.addClass('ingredient-wrapper');
+        //         wrapperTemplate.append($('.add-sub-btn').eq(0).clone());
 
-                groupedIngredients.forEach(savedIngredient => {
-                    let element = undefined;
-                    if (savedIngredient.is_primary == 'TRUE') {
-                        element = $('.ingredient-entry').eq(0).clone();
-                        const ingredientInput = element.find('.ingredient');
-                        ingredientInput.val(savedIngredient.item_masters_id);
-                        ingredientInput.attr('cost', savedIngredient.ingredient_cost);
-                        element.find('.display-ingredient').val(savedIngredient.full_item_description);
-                        element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                        element.find('.uom').val(savedIngredient.uom_id);
-                        element.find('.display-uom').val(savedIngredient.packaging_description);
-                        element.find('.cost').val(savedIngredient.cost);
-                    } else {
-                        element = $('.substitute').eq(0).clone();
-                        if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
-                        const ingredientInput = element.find('.ingredient');
-                        ingredientInput.val(savedIngredient.item_masters_id);
-                        ingredientInput.attr('cost', savedIngredient.ingredient_cost);
-                        element.find('.display-ingredient').val(savedIngredient.full_item_description);
-                        element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
-                        element.find('.uom').val(savedIngredient.uom_id);
-                        element.find('.display-uom').val(savedIngredient.packaging_description);
-                        element.find('.cost').val(savedIngredient.cost);
-                        element.css('display', '');
-                    }
-                    wrapperTemplate.append(element);
-                });
-                section.append(wrapperTemplate);
-            }
-        }
+        //         groupedIngredients.forEach(savedIngredient => {
+        //             let element = undefined;
+        //             if (savedIngredient.is_primary == 'TRUE') {
+        //                 element = $('.ingredient-entry').eq(0).clone();
+        //                 const ingredientInput = element.find('.ingredient');
+        //                 ingredientInput.val(savedIngredient.item_masters_id);
+        //                 ingredientInput.attr('cost', savedIngredient.ingredient_cost);
+        //                 element.find('.display-ingredient').val(savedIngredient.full_item_description);
+        //                 element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
+        //                 element.find('.uom').val(savedIngredient.uom_id);
+        //                 element.find('.display-uom').val(savedIngredient.packaging_description);
+        //                 element.find('.cost').val(savedIngredient.cost);
+        //             } else {
+        //                 element = $('.substitute').eq(0).clone();
+        //                 if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
+        //                 const ingredientInput = element.find('.ingredient');
+        //                 ingredientInput.val(savedIngredient.item_masters_id);
+        //                 ingredientInput.attr('cost', savedIngredient.ingredient_cost);
+        //                 element.find('.display-ingredient').val(savedIngredient.full_item_description);
+        //                 element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
+        //                 element.find('.uom').val(savedIngredient.uom_id);
+        //                 element.find('.display-uom').val(savedIngredient.packaging_description);
+        //                 element.find('.cost').val(savedIngredient.cost);
+        //                 element.css('display', '');
+        //             }
+        //             wrapperTemplate.append(element);
+        //         });
+        //         section.append(wrapperTemplate);
+        //     }
+        // }
 
         $.fn.reload = function() {
-            if($('.ingredient-entry').length == 1) {
+            if($('.ingredient-wrapper').length == 1) {
                 $('.no-ingredient-warning').css('display', '')
             }
+            console.log($('.no-ingredient-warning'));
 
             $('.display-ingredient').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
@@ -595,6 +639,22 @@
             $.fn.reload();
         });
 
+        $(document).on('click', '#add-new', function() {
+            const section = $($('.new-ingredient-wrapper').eq(0).clone());
+            section.find('input').val('').attr('readonly', false);
+            section.find('.ingredient').val('');
+            section.find('.display-ingredient').val('');
+            section.find('.ingredient').val('');
+            section.find('.quantity').val('');
+            section.find('.uom').val('');
+            section.find('.cost').val('');
+            section.css('display', '');
+            $('.ingredient-section').append(section);
+            $('.item-list').fadeOut();
+            $('.no-ingredient-warning').hide();
+            $.fn.reload();
+        });
+
         $(document).on('click', '.move-down', function() {
             const entry = $(this).parents('.ingredient-wrapper');
             const sibling = entry.next()[0];
@@ -666,7 +726,7 @@
                 $.fn.sumCost();
             });
         });
-        $.fn.firstLoad();
+        // $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();

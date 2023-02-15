@@ -52,7 +52,7 @@
 			//$this->form[] = ['label'=>'Menu Description','name'=>'experimental_menu_desc','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			//$this->form[] = ['label'=>'Concept','name'=>'concept','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			//$this->form[] = ['label'=>'SRP','name'=>'srp','type'=>'number','validation'=>'required|min:1','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required|min:1|max:255','width'=>'col-sm-10','dataenum'=>'INACTIVE','default'=>'ACTIVE'];
+			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required|min:1|max:255','width'=>'col-sm-10','dataenum'=>'ACTIVE; INACTIVE'];
 			# OLD END FORM
 
 			/* 
