@@ -24,6 +24,10 @@
 - [x] Add percentage on database and exporting
 - [x] Add new column (No Cost)
 - [x] fix the hacky way of cost filter (use form instead)
+- [ ] Show the version of the ingredient lists
+- [ ] Price as of Date
+- [ ] Substitute filtering (filter all menu items that has substitute ingredient)
+- [ ] Mass update of ingredient substitute
 
 ## Workflow
 

@@ -13,6 +13,7 @@
 
 use App\Http\Controllers\AdminMenuItemsController;
 use App\Http\Controllers\AdminFoodCostController;
+use App\Http\Controllers\AdminExperimentalMenuItemsController;
 
 Route::get('/', function () {
     return redirect('admin/login');
@@ -76,4 +77,5 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
 
     Route::post('/admin/menu_items/edit', [AdminMenuItemsController::class, 'submitEdit'])->name('edit_menu_item');
     Route::post('/admin/food_cost/filter', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
+    Route::post('/admin/experimental_menu_items/edit', [AdminExperimentalMenuItemsController::class, 'submitEdit'])->name('edit_experimental_menu_item');
 });

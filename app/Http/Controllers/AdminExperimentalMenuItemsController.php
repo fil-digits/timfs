@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
 
@@ -347,7 +347,73 @@
 				->orderby('full_item_description')
 				->get();
 
+			$data['current_ingredients'] = DB::table('experimental_menu_ingredients_details')
+				->where('experimental_menu_items_id', $id)
+				->where('experimental_menu_ingredients_details.status', 'ACTIVE')
+				->leftJoin('item_masters', 'experimental_menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'row_id',
+					'ingredient_group',
+					'is_primary',
+					'is_selected',
+					'is_existing',
+					'qty',
+					'uom_id',
+					'uom_name',
+					'cost',
+					'total_cost',
+					'packagings.packaging_description',
+					'item_masters.ingredient_cost',
+					'item_masters.full_item_description')
+				->leftJoin('packagings', 'experimental_menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get();
+
 			return $this->view('experimental-menu/edit-item', $data);
+		}
+
+		public function submitEdit(Request $request) {
+			$data = json_decode($request->input('data'));
+			// dd($data);
+			$experimental_menu_id = $data[0][0]->experimental_menu_items_id;
+			DB::table('experimental_menu_ingredients_details')
+				->where('experimental_menu_items_id', $experimental_menu_id)
+				->where('status', 'ACTIVE')
+				->update(['status' => 'INACTIVE',
+					'row_id' => null,
+					'total_cost' => null,
+					'deleted_by' => CRUDBooster::myID(),
+					'deleted_at' => date('Y-m-d H:i:s')]);
+			foreach ($data as $index => $ingredient_group) {
+				foreach ($ingredient_group as $member_id => $ingredient_member) {
+					$row = (array) $ingredient_member;
+
+					if (!$row['ingredient_name'] && !$row['item_masters_id']) continue;
+
+					$is_existing =  !!count(DB::table('experimental_menu_ingredients_details')
+						->where('experimental_menu_items_id', $experimental_menu_id)
+						->where('item_masters_id', $row['item_masters_id'])
+						->get());
+					if ($existing) {
+						$row['updated_at'] = date('Y-m-d H:i:s');
+						$row['updated_by'] = CRUDBooster::myId();
+					} else {
+						$row['created_by'] = CRUDBooster::myId();
+					}
+
+					$row['status'] = 'ACTIVE';
+
+					DB::table('experimental_menu_ingredients_details')
+						->where('experimental_menu_items_id', $row['experimental_menu_items_id'])
+						->updateOrInsert(['item_masters_id' => $row['item_masters_id'], 'ingredient_name' => $row['ingredient_name']], $row);
+
+					// DB::table('experimental_menu_ingredients_details')->insert($row);
+				}
+			}
+
+			return redirect('admin/experimental_menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
 		}
 
 	}
