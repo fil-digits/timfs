@@ -536,6 +536,11 @@
                 entry.find('.cost').val($(this).val() * ingredientCost);
                 $.fn.sumCost();
             });
+
+            $('.cost').keyup(function() {
+                const entry = $(this).parents('.ingredient-entry, .substitute, .new-substitute');
+                $.fn.sumCost();
+            });
         }
 
         $.fn.sumCost = function() {
@@ -570,6 +575,11 @@
         $.fn.formatNumbers = function() {
             const costs = jQuery.makeArray($('.cost, .total-cost'));
             costs.forEach(cost => {
+                const ingredientEntry = $(cost).parents('.substitute, .new-substitute, .ingredient-entry');
+                if (ingredientEntry.attr('isExisting') == 'false') {
+                    $(cost).val(`₱ ${$(cost).val().replace(/[^0-9.]/g, '')}`);
+                    return;
+                }
                 const val = Number($(cost).val().replace(/[^0-9.]/g, '')).toLocaleString(undefined, {maximumFractionDigits: 4});
                 $(cost).val(`₱ ${val}`);
             })
@@ -723,7 +733,7 @@
             section.css('display', '');
             $('.ingredient-section').append(section);
             $('.item-list').fadeOut();
-            $('.no-ingredient-warning').hide();
+            $('.no-ingredient-warning').remove();
             $.fn.reload();
         });
 
@@ -739,7 +749,7 @@
             section.css('display', '');
             $('.ingredient-section').append(section);
             $('.item-list').fadeOut();
-            $('.no-ingredient-warning').hide();
+            $('.no-ingredient-warning').remove();
             $.fn.reload();
         });
 

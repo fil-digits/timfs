@@ -56,11 +56,12 @@
         // PER CONCEPT !!!
         const concepts = {!! json_encode($concepts) !!};
         const menuItems = {!! json_encode($menu_items) !!};
+        // console.log(menuItems.filter(e => e.food_cost == 0));
         concepts.forEach((concept, index) => {
             const tr = $(document.createElement('tr'));
             const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
-            const low = groupedItems.filter(item => item.food_cost && item.food_cost / item.menu_price_dine <= 0.30);
-            const high = groupedItems.filter(item => item.food_cost && item.food_cost / item.menu_price_dine > 0.30);
+            const low = groupedItems.filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
+            const high = groupedItems.filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
             for (let i=0; i<4; i++) {
                 const td = $(document.createElement('td'));
                 td.attr('id', concept.id);
@@ -94,8 +95,8 @@
         // TOTAL || ALL
         const totalTR = $(document.createElement('tr'));
         const totalLabelTD = $(document.createElement('td'));
-        const allLow = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine <= 0.30);
-        const allHigh = [...menuItems].filter(item => Number(item.food_cost) > 0 && item.food_cost / item.menu_price_dine > 0.30);
+        const allLow = [...menuItems].filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
+        const allHigh = [...menuItems].filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
         const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
