@@ -13,6 +13,20 @@
         justify-content: space-around;
         align-items: center;
     }
+
+    .concept-name {
+        text-align: center;
+        letter-spacing: 3px;
+        font-weight: 600;
+    }
+
+    .filter-name {
+        text-align: center;
+        font-size: 16px;
+        text-transform: uppercase;
+        font-style: italic;
+        color: grey;
+    }
 </style>
 @endpush
 
@@ -30,6 +44,8 @@
     </div>
 
     <div class="panel-body">
+        <h3 class="concept-name">{{$concept[0]->menu_segment_column_description}}</h3>
+        <p class="filter-name">{{$filter}} Cost</p>
         <table id="tableData" class="table table-striped table-bordered">
             <thead>
                 <tr class="active">

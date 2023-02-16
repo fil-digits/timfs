@@ -82,7 +82,7 @@
                 } else if (i==3) {
                     const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
                     td.text(items.length);
-                    td.attr('filter', 'no-cost');
+                    td.attr('filter', 'no');
                     td.attr('items', items.join(','));
                     td.addClass('clickable');
                 }
@@ -100,7 +100,6 @@
         const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
         totalTR.css('font-weight', 'bold');
         totalLabelTD.text('All');
-        // totalLabelTD.attr('colspan', '2');
         totalTR.append(totalLabelTD);
         for (let i=0; i<3; i++) {
             const td = $(document.createElement('td'));

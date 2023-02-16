@@ -348,9 +348,10 @@
 			$concept;
 			$column_name;
 			$menu_items;
+			$filter;
 			$filtered_menu_items_id;
 			$filtered_items;
-
+			
 			if ($request->id != 'all') {
 				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
 				$column_name = $concept[0]->menu_segment_column_name;
@@ -368,6 +369,7 @@
 					->get();
 			}
 
+			$data['filter'] = $request->input('filter');
 			$data['concept'] = $concept;
 			$data['column_name'] = $column_name;
 			$data['menu_items'] = $menu_items;
