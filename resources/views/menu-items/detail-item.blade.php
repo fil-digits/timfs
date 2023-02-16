@@ -123,7 +123,7 @@
         const totalCost = costsElems.reduce((total, cost) => total + Number($(cost).text().replace(/[^0-9.]/g, '')), 0);
         const percentage = (totalCost / item.menu_price_dine * 100).toFixed(2);
         $(totalCostElem).text(totalCost);
-        percentageSpan = $(document.createElement('span')).text(`(${percentage}%)`).addClass('percentage-text');
+        percentageSpan = $(document.createElement('span')).text(`(${item.menu_price_dine == 0 ? '0' : percentage}%)`).addClass('percentage-text');
         percentageSpan.css('color', percentage > 30 ? 'red' : '');
         totalCostLabelTD.text(`Total Cost `).append(percentageSpan);
         function formatNumbers() {
