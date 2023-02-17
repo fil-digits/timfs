@@ -845,7 +845,8 @@
 						->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
 				}
 			}
-			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated!']);
+
+			CRUDBooster::redirect(CRUDBooster::adminPath('menu_items'), 'INGREDIENTS UPDATED!!');
 		}
 
 		public function getDetail($id) {
@@ -878,6 +879,7 @@
 
 		public function approveOrReject(Request $request) {
 			$data = $request->input();
+			$privilege = CRUDBooster::myPrivilegeName();
 			if ($data['approver'] == 'Ingredient Approver (Accounting)') {
 				if ($data['action'] == 'APPROVED') {
 					DB::table('menu_ingredients_approval')
@@ -900,6 +902,7 @@
 							'accounting_rejected_at' => date('Y-m-d H:i:s')
 						]);
 				}
+				return redirect('admin/menu_items_accounting')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
 			}
 
 			if ($data['approver'] == 'Ingredient Approver (Marketing)') {
@@ -924,8 +927,10 @@
 							'marketing_rejected_at' => date('Y-m-d H:i:s')
 						]);
 				}
+
+				return redirect('admin/menu_items_marketing')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
 			}
-			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
+
 		}
 
 	}
