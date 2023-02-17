@@ -14,9 +14,8 @@ class AddTempColumnsToMenuIngredientsDetails extends Migration
     public function up()
     {
         Schema::table('menu_ingredients_details', function (Blueprint $table) {
-            $table->float('temp_qty')->after('qty');
-            $table->float('temp_cost')->after('cost');
-            $table->float('is_approved')->after('item_masters_id');
+            $table->float('temp_qty')->after('qty')->nullable();
+            $table->float('temp_cost')->after('cost')->nullable();
         });
     }
 

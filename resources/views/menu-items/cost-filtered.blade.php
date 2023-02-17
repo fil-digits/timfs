@@ -45,7 +45,7 @@
 
     <div class="panel-body">
         <h3 class="concept-name">{{$concept[0]->menu_segment_column_description}}</h3>
-        <p class="filter-name">{{$filter}} Cost</p>
+        <p class="filter-name">{{$filter != 'no-cost' ? $filter : 'no'}} Cost</p>
         <table id="tableData" class="table table-striped table-bordered">
             <thead>
                 <tr class="active">

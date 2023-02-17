@@ -245,7 +245,7 @@
 
  {{-- DOM STARTS HERE !!!! --}}
 
- <a title="Return" href="{{ CRUDBooster::mainpath() }}">
+ <a title="Return" href="javascript:history.back()">
     <i class="fa fa-chevron-circle-left "></i>
     Back To List Data Menu Item Masterfile
 </a>
@@ -298,6 +298,10 @@
         const savedIngredients = {!! json_encode($current_ingredients) !!};
         const item_masters = {!! json_encode($item_masters) !!};
         const menuItem = {!! json_encode($item) !!};
+        const privilege = {!! json_encode($privilege) !!};
+        const canBeEdited = (menuItem.accounting_approval_status == 'APPROVED' && menuItem.marketing_approval_status == 'APPROVED') ||
+            [menuItem.accounting_approval_status, menuItem.marketing_approval_status].some(status => status == 'REJECTED') ||
+            [menuItem.accounting_approval_status, menuItem.marketing_approval_status].every(status => !status);
 
         $.fn.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
@@ -473,6 +477,50 @@
                     $(sub).find('.set-primary').css('color', '');
                 }
             });
+        }
+
+        $.fn.restrictionFormat = function() {
+            if (!canBeEdited || privilege != 'Chef') {
+                $('button').remove();
+                $('.add-sub-btn').remove();
+            }
+            
+            if (privilege == 'Ingredient Approver (Accounting)' && 
+                (menuItem.accounting_approval_status != 'APPROVED' &&
+                menuItem.accounting_approval_status != 'REJECTED')) {
+                const approveButton = $(document.createElement('button'))
+                    .addClass('btn btn-success pull-right approve-btn accounting')
+                    .attr('action', 'APPROVED')
+                    .append($(document.createElement('i')).addClass('fa fa-thumbs-up'))
+                    .append(' Approve');
+                
+                const rejectButton = $(document.createElement('button'))
+                    .addClass('btn btn-danger pull-right reject-btn accounting')
+                    .attr('action', 'REJECTED')
+                    .css('margin-right', '10px')
+                    .append($(document.createElement('i')).addClass('fa fa-circle'))
+                    .append(' Reject');
+                $('.panel-footer').append(approveButton, rejectButton);
+            }
+
+            if (privilege == 'Ingredient Approver (Marketing)' && 
+                (menuItem.marketing_approval_status != 'APPROVED' &&
+                menuItem.marketing_approval_status != 'REJECTED')) {
+                const approveButton = $(document.createElement('button'))
+                    .addClass('btn btn-success pull-right approve-btn marketing')
+                    .attr('action', 'APPROVED')
+                    .append($(document.createElement('i')).addClass('fa fa-thumbs-up'))
+                    .append(' Approve');
+                
+                const rejectButton = $(document.createElement('button'))
+                    .addClass('btn btn-danger pull-right reject-btn marketing')
+                    .attr('action', 'REJECTED')
+                    .css('margin-right', '10px')
+                    .append($(document.createElement('i')).addClass('fa fa-circle'))
+                    .append(' Reject');
+                $('.panel-footer').append(approveButton, rejectButton);
+            }
+
         }
 
         $(document).on('click', '#save-edit', function(event) {
@@ -675,10 +723,50 @@
                 $.fn.sumCost();
             });
         });
+
+        $(document).on('click', '.approve-btn, .reject-btn', function(event) {
+            const button = $(this);
+            const action = button.attr('action');
+            Swal.fire({
+                    title: `Do you want to ${action == 'APPROVED' ? 'approve' : 'reject'} this menu item?`,
+                    showCancelButton: true,
+                    confirmButtonText: action == 'APPROVED' ? 'Approve' : 'Reject',
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = $(document.createElement('form'))
+                        .attr('method', 'POST')
+                        .attr('action', "{!! route('approve_or_reject') !!}")
+                        .css('display', 'none');
+                    const csrf = $(document.createElement('input'))
+                        .attr({
+                            type: 'hidden',
+                            name: '_token',
+                        })
+                        .val("{{ csrf_token() }}");
+                    const actionInput = $(document.createElement('input'))
+                        .attr('name', 'action')
+                        .val(action);
+                    const idInput = $(document.createElement('input'))
+                        .attr('name', 'menu_items_id')
+                        .val(menuItem.id);
+                    const approverInput = $(document.createElement('input'))
+                        .attr('name', 'approver')
+                        .val(privilege);
+                    
+                    form.append(csrf, actionInput, idInput, approverInput);
+                    $('.panel-body').append(form);
+                    form.submit();
+            $('button').attr('disabled', true);
+                }
+                return
+            });
+        });
+
         $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();
         $.fn.sumCost();
+        $.fn.restrictionFormat();
     });
 
 </script>

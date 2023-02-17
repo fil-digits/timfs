@@ -28,19 +28,21 @@
 - [ ] Price as of Date
 - [ ] Substitute filtering (filter all menu items that has substitute ingredient)
 - [ ] Mass update of ingredient substitute
+- [ ] Improve the brand searching
 
 ## Workflow
 
-- [ ] Create various privileges (chef, marketing(approver), accounting(approver))
+- [x] Create various privileges (chef, marketing(approver), accounting(approver))
 
   - Only the chef can edit the ingredients
 
-- [ ] Create new column `temp_qty` and `temp_cost` in `menu_ingredients_details`
-- [ ] Create new column `ingredients_approval_status` in `menu_items`
+- [x] Create new column `temp_qty` and `temp_cost` in `menu_ingredients_details`
+- [x] Create new table `menu_ingredients_approval`
 
   - Once the edit is saved, the qty and cost will be inserted to the temp cost and qty
 
-- [ ] Restrict the chef to edit again the menu items until approved or rejected by any or both of the approvers
+- [x] Restrict the chef to edit again the menu items until approved by both or rejected by any or both of the approvers
+- [ ] Implement notification if any of the approvers approved or rejected the menu item.
 
   - Only marketing and accounting can approve or reject the edited menu items
   - The approval of the edit (by: marketing and accounting) can be done in any order

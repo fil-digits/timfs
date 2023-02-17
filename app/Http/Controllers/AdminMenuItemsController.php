@@ -51,6 +51,8 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 
+			$this->col[] = ["label"=>"Approval Status (Accounting)","name"=>"id","join"=>"menu_ingredients_approval,accounting_approval_status","join_id"=>"menu_items_id"];
+			$this->col[] = ["label"=>"Approval Status (Marketing)","name"=>"id","join"=>"menu_ingredients_approval,marketing_approval_status","join_id"=>"menu_items_id"];
 			$this->col[] = ["label"=>"Tasteless Menu Code","name"=>"tasteless_menu_code"];
 			foreach($old_item_codes as $old_code){
 				$this->col[] = ["label"=>ucwords(strtolower($old_code->menu_old_code_column_description)),"name"=>$old_code->menu_old_code_column_name];
@@ -339,6 +341,7 @@
 				$sub_query->where('menu_items.approval_status',	$create_item_status);
 				
 			});
+			
 	    }
 
 	    /*
@@ -349,6 +352,15 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+			if ($column_index == 2 || $column_index == 3) {
+				if ($column_value == "REJECTED") {
+					$column_value = '<span class="label label-danger">REJECTED</span>';
+				} else if ($column_value == "APPROVED") {
+					$column_value = '<span class="label label-success">APPROVED</span>';
+				} else if ($column_value == 'PENDING') {
+					$column_value = '<span class="label label-warning">PENDING</span>';
+				}
+			}			
 	    }
 
 	    /*
@@ -713,40 +725,52 @@
 	    }
 
 		public function getEdit($id) {
-			// dd(CRUDBooster::myPrivilegeName());
-			if(CRUDBooster::myPrivilegeName() != 'Chef' && CRUDBooster::myPrivilegeId() != '1') return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'You do not have the access to edit the item.']);
+			if (CRUDBooster::myPrivilegeName() != 'Chef' &&
+				CRUDBooster::myPrivilegeId() != '1' &&
+				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Accounting)' &&
+				CRUDBooster::myPrivilegeName() != 'Ingredient Approver (Marketing)') return redirect('admin/menu_items')->with(['message_type' => 'danger', 'message' => 'You do not have the access to edit the item.']);
+
 			$data = [];
-			$data['item'] = DB::table('menu_items')->where('id', $id)->get()[0];
+			$data['item'] = DB::table('menu_items')
+				->select('*', 'menu_items.id as id')
+				->where('menu_items.id', $id)
+				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
+				->get()[0];
+
+			$data['privilege'] = CRUDBooster::myPrivilegeName();
+
+			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED';
 
 			$data['current_ingredients'] = DB::table('menu_ingredients_details')
-											->where('menu_items_id', $id)
-											->where('menu_ingredients_details.status', 'ACTIVE')
-											->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
-											->select(\DB::raw('item_masters.id as item_masters_id'),
-													'is_selected',
-													'is_primary',
-													'qty',
-													'cost',
-													'ingredient_group',
-													'uom_id',
-													'packagings.packaging_description',
-													'item_masters.ingredient_cost',
-													'item_masters.full_item_description')
-											->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
-											->orderBy('ingredient_group', 'ASC')
-											->orderBy('row_id', 'ASC')
-											->get();
+				->where('menu_items_id', $id)
+				->where('menu_ingredients_details.status', 'ACTIVE')
+				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'is_selected',
+					'is_primary',
+					'qty',
+					'cost',
+					'ingredient_group',
+					'uom_id',
+					'packagings.packaging_description',
+					'item_masters.ingredient_cost',
+					'item_masters.full_item_description')
+				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
-											->select(\DB::raw('item_masters.id as item_masters_id'),
-													'item_masters.packagings_id',
-													'item_masters.ingredient_cost',
-													'item_masters.full_item_description',
-													'item_masters.tasteless_code',
-													'packagings.packaging_description')
-											->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
-											->orderby('full_item_description')
-											->get();
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'item_masters.packagings_id',
+					'item_masters.ingredient_cost',
+					'item_masters.full_item_description',
+					'item_masters.tasteless_code',
+					'packagings.packaging_description')
+				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->orderby('full_item_description')
+				->get();
+			
 			return $this->view('menu-items/edit-item', $data);
 		}
 
@@ -755,18 +779,37 @@
 			$total_cost_details = explode(',', $request->input('total_cost'));
 			$total_cost = preg_replace("/[^0-9.]/", "", $total_cost_details[0]);
 			$percentage = $total_cost_details[1];
+			$menu_items_id = $request->input('menu_items_id');
+
 			DB::table('menu_items')
-				->where('id', $request->input('menu_items_id'))
+				->where('id', $menu_items_id)
 				->update(['food_cost' => $total_cost, 'food_cost_percentage' => $percentage]);
+			
+			DB::table('menu_ingredients_approval')
+				->updateOrInsert(['menu_items_id' => $menu_items_id], [
+					'menu_items_id' => $menu_items_id,
+					'chef_updated_by' => CRUDBooster::myID(),
+					'chef_updated_at' => date('Y-m-d H:i:s'),
+					'marketing_approval_status' => 'PENDING',
+					'accounting_approval_status' => 'PENDING',
+					'marketing_approved_by' => null,
+					'accounting_approved_by' => null,
+					'marketing_rejected_by' => null,
+					'accounting_rejected_by' => null,
+					'marketing_approved_at' => null,
+					'accounting_approved_at' => null,
+					'marketing_rejected_at' => null,
+					'accounting_rejected_at' => null
+				]);
 
 			DB::table('menu_ingredients_details')
 				->where('status', 'ACTIVE')
 				->where('menu_items_id', $request->input('menu_items_id'))
 				->update(['status' => 'INACTIVE',
-				'row_id' => null,
-				'total_cost' => null,
-				'deleted_by' => CRUDBooster::myID(),
-				'deleted_at' => date('Y-m-d H:i:s')]);
+					'row_id' => null,
+					'total_cost' => null,
+					'deleted_by' => CRUDBooster::myID(),
+					'deleted_at' => date('Y-m-d H:i:s')]);
 			
 			if($request->input('ingredient')) {
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
@@ -777,10 +820,10 @@
 					$data[$i]['row_id'] = $ingredient[3];
 					$data[$i]['is_selected'] = $ingredient[4];
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
-					$data[$i]['qty'] = $request->input('quantity')[$i];
+					$data[$i]['temp_qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
 					$cost = preg_replace("/[^0-9.]/", "", $request->input('cost')[$i]);
-					$data[$i]['cost'] = $cost;
+					$data[$i]['temp_cost'] = $cost;
 				}
 				
 				foreach($data as $index => $element) {
@@ -831,6 +874,58 @@
 				->orderby('ingredient_group')
 				->get();
 			return $this->view('menu-items/detail-item', $data);
+		}
+
+		public function approveOrReject(Request $request) {
+			$data = $request->input();
+			if ($data['approver'] == 'Ingredient Approver (Accounting)') {
+				if ($data['action'] == 'APPROVED') {
+					DB::table('menu_ingredients_approval')
+						->where('menu_items_id', $data['menu_items_id'])
+						->update([
+							'accounting_approval_status' => $data['action'],
+							'accounting_approved_by' => CRUDBooster::myId(),
+							'accounting_approved_at' => date('Y-m-d H:i:s'),
+							'accounting_rejected_by' => null,
+							'accounting_rejected_at' => null
+						]);
+				} else if ($data['action'] == 'REJECTED') {
+					DB::table('menu_ingredients_approval')
+						->where('menu_items_id', $data['menu_items_id'])
+						->update([
+							'accounting_approval_status' => $data['action'],
+							'accounting_approved_by' => null,
+							'accounting_approved_at' => null,
+							'accounting_rejected_by' => CRUDBooster::myId(),
+							'accounting_rejected_at' => date('Y-m-d H:i:s')
+						]);
+				}
+			}
+
+			if ($data['approver'] == 'Ingredient Approver (Marketing)') {
+				if ($data['action'] == 'APPROVED') {
+					DB::table('menu_ingredients_approval')
+						->where('menu_items_id', $data['menu_items_id'])
+						->update([
+							'marketing_approval_status' => $data['action'],
+							'marketing_approved_by' => CRUDBooster::myId(),
+							'marketing_approved_at' => date('Y-m-d H:i:s'),
+							'marketing_rejected_by' => null,
+							'marketing_rejected_at' => null
+						]);
+				} else if ($data['action'] == 'REJECTED') {
+					DB::table('menu_ingredients_approval')
+						->where('menu_items_id', $data['menu_items_id'])
+						->update([
+							'marketing_approval_status' => $data['action'],
+							'marketing_approved_by' => null,
+							'marketing_approved_at' => null,
+							'marketing_rejected_by' => CRUDBooster::myId(),
+							'marketing_rejected_at' => date('Y-m-d H:i:s')
+						]);
+				}
+			}
+			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
 		}
 
 	}
