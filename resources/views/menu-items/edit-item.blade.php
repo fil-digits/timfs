@@ -516,7 +516,7 @@
             }
 
             if (privilege == 'Ingredient Approver (Marketing)' && 
-                menuItem.marketing_approval_status != 'PENDING') {
+                menuItem.marketing_approval_status == 'PENDING') {
                 const approveButton = $(document.createElement('button'))
                     .addClass('btn btn-success pull-right approve-btn marketing')
                     .attr('action', 'APPROVED')
@@ -765,7 +765,7 @@
                         .val(menuItem.id);
                     const approverInput = $(document.createElement('input'))
                         .attr('name', 'approver')
-                        .val(privilege);
+                        .val(privilege.toLowerCase().includes('accounting') ? 'accounting' : 'marketing');
                     const hasOneApprovalInput = $(document.createElement('input'))
                         .attr('name', 'has_one_approval')
                         .val(hasOneApproval);

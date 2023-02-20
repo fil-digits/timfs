@@ -761,13 +761,16 @@
 				->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
-					'packagings.packaging_description')
+					'packagings.packaging_description',
+					'brands.brand_description')
 				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
 				->orderby('full_item_description')
 				->get();
 			
@@ -869,7 +872,7 @@
 					'total_cost',
 					'full_item_description',
 					'qty', 'uom_description',
-					'cost')
+					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'))
 				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 				->orderby('ingredient_group')
@@ -879,78 +882,61 @@
 
 		public function approveOrReject(Request $request) {
 			$data = $request->input();
+			$approver = $data['approver'];
 			$privilege = CRUDBooster::myPrivilegeName();
-			if ($data['approver'] == 'Ingredient Approver (Accounting)') {
-				if ($data['action'] == 'APPROVED') {
-					DB::table('menu_ingredients_approval')
-						->where('menu_items_id', $data['menu_items_id'])
-						->update([
-							'accounting_approval_status' => $data['action'],
-							'accounting_approved_by' => CRUDBooster::myId(),
-							'accounting_approved_at' => date('Y-m-d H:i:s'),
-							'accounting_rejected_by' => null,
-							'accounting_rejected_at' => null
-						]);
-				} else if ($data['action'] == 'REJECTED') {
-					DB::table('menu_ingredients_approval')
-						->where('menu_items_id', $data['menu_items_id'])
-						->update([
-							'accounting_approval_status' => $data['action'],
-							'accounting_approved_by' => null,
-							'accounting_approved_at' => null,
-							'accounting_rejected_by' => CRUDBooster::myId(),
-							'accounting_rejected_at' => date('Y-m-d H:i:s')
-						]);
 
-					$chef_to_notify = DB::table('menu_ingredients_approval')
+			if ($data['action'] == 'APPROVED') {
+				DB::table('menu_ingredients_approval')
+					->where('menu_items_id', $data['menu_items_id'])
+					->update([
+						$approver . '_approval_status' => $data['action'],
+						$approver . '_approved_by' => CRUDBooster::myId(),
+						$approver . '_approved_at' => date('Y-m-d H:i:s'),
+						$approver . '_rejected_by' => null,
+						$approver . '_rejected_at' => null
+					]);
+			}
+			
+			if ($data['action'] == 'REJECTED') {
+				DB::table('menu_ingredients_approval')
+					->where('menu_items_id', $data['menu_items_id'])
+					->update([
+						$approver . '_approval_status' => $data['action'],
+						$approver . '_approved_by' => null,
+						$approver . '_approved_at' => null,
+						$approver . '_rejected_by' => CRUDBooster::myId(),
+						$approver . '_rejected_at' => date('Y-m-d H:i:s')
+					]);
+
+				$chef_to_notify = DB::table('menu_ingredients_approval')
 					->where('menu_items_id', $data['menu_items_id'])
 					->first()
 					->chef_updated_by;
 
-					$config['content'] = 'A menu item has been rejected by ' . CRUDBooster::myName();
-					$config['to'] = CRUDBooster::adminPath('menu_items/edit/' . $data['menu_items_id']);
-					$config['id_cms_users'] = [$chef_to_notify];
-					CRUDBooster::sendNotification($config);
-					
-				}
-				return redirect('admin/menu_items_accounting')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
+				$config['content'] = 'A menu item has been rejected by ' . $approver;
+				$config['to'] = CRUDBooster::adminPath('menu_items/edit/' . $data['menu_items_id']);
+				$config['id_cms_users'] = [$chef_to_notify];
+				CRUDBooster::sendNotification($config);
 			}
 
-			if ($data['approver'] == 'Ingredient Approver (Marketing)') {
-				if ($data['action'] == 'APPROVED') {
-					DB::table('menu_ingredients_approval')
-						->where('menu_items_id', $data['menu_items_id'])
-						->update([
-							'marketing_approval_status' => $data['action'],
-							'marketing_approved_by' => CRUDBooster::myId(),
-							'marketing_approved_at' => date('Y-m-d H:i:s'),
-							'marketing_rejected_by' => null,
-							'marketing_rejected_at' => null
-						]);
-				} else if ($data['action'] == 'REJECTED') {
-					DB::table('menu_ingredients_approval')
-						->where('menu_items_id', $data['menu_items_id'])
-						->update([
-							'marketing_approval_status' => $data['action'],
-							'marketing_approved_by' => null,
-							'marketing_approved_at' => null,
-							'marketing_rejected_by' => CRUDBooster::myId(),
-							'marketing_rejected_at' => date('Y-m-d H:i:s')
-						]);
-					$chef_to_notify = DB::table('menu_ingredients_approval')
-						->where('menu_items_id', $data['menu_items_id'])
-						->first()
-						->chef_updated_by;
-					
-					$config['content'] = 'A menu item has been rejected by ' . CRUDBooster::myName();
-					$config['to'] = CRUDBooster::adminPath('menu_items/edit/' . $data['menu_items_id']);
-					$config['id_cms_users'] = [$chef_to_notify];
-					CRUDBooster::sendNotification($config);
-				}
+			$updated_item = DB::table('menu_ingredients_approval')
+					->where('menu_items_id', $data['menu_items_id'])
+					->first();
 
-				return redirect('admin/menu_items_marketing')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
+			if ($updated_item->marketing_approval_status == 'APPROVED' &&
+				$updated_item->accounting_approval_status == 'APPROVED') {
+				DB::table('menu_ingredients_details as table')
+					->where('table.menu_items_id', $data['menu_items_id'])
+					->update([
+						'table.qty' => DB::raw('table.temp_qty'),
+						'table.temp_qty' => null,
+						'table.cost' => DB::raw('table.temp_cost'),
+						'table.temp_cost' => null
+					]);
 			}
 
+			return redirect('admin/menu_items_' . $approver)
+				->with(['message_type' => 'success', 'message' => 'Menu Items Approval Status Updated!']);
 		}
 
 	}
