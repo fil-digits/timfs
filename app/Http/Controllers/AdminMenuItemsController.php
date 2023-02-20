@@ -846,7 +846,7 @@
 				}
 			}
 
-			CRUDBooster::redirect(CRUDBooster::adminPath('menu_items'), 'INGREDIENTS UPDATED!!');
+			return redirect('admin/menu_items')->with(['message_type' => 'success', 'message' => 'Ingredients Updated']);
 		}
 
 		public function getDetail($id) {
@@ -901,6 +901,17 @@
 							'accounting_rejected_by' => CRUDBooster::myId(),
 							'accounting_rejected_at' => date('Y-m-d H:i:s')
 						]);
+
+					$chef_to_notify = DB::table('menu_ingredients_approval')
+					->where('menu_items_id', $data['menu_items_id'])
+					->first()
+					->chef_updated_by;
+
+					$config['content'] = 'A menu item has been rejected by ' . CRUDBooster::myName();
+					$config['to'] = CRUDBooster::adminPath('menu_items/edit/' . $data['menu_items_id']);
+					$config['id_cms_users'] = [$chef_to_notify];
+					CRUDBooster::sendNotification($config);
+					
 				}
 				return redirect('admin/menu_items_accounting')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);
 			}
@@ -926,6 +937,15 @@
 							'marketing_rejected_by' => CRUDBooster::myId(),
 							'marketing_rejected_at' => date('Y-m-d H:i:s')
 						]);
+					$chef_to_notify = DB::table('menu_ingredients_approval')
+						->where('menu_items_id', $data['menu_items_id'])
+						->first()
+						->chef_updated_by;
+					
+					$config['content'] = 'A menu item has been rejected by ' . CRUDBooster::myName();
+					$config['to'] = CRUDBooster::adminPath('menu_items/edit/' . $data['menu_items_id']);
+					$config['id_cms_users'] = [$chef_to_notify];
+					CRUDBooster::sendNotification($config);
 				}
 
 				return redirect('admin/menu_items_marketing')->with(['message_type' => 'success', 'message' => 'Menu Item Approval Status Updated!']);

@@ -3,6 +3,12 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
+    .loading-label {
+        text-align: center;
+        font-style: italic;
+        color: grey;
+    }
+
     .ingredient-section {
         display: flex;
         flex-direction: column;
@@ -271,6 +277,7 @@
             </label>
             <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
             <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
+            <p class="loading-label">Loading...</p>
             <section class="ingredient-section">
             </section>
             <section class="section-footer">
@@ -301,7 +308,8 @@
         const privilege = {!! json_encode($privilege) !!};
         const canBeEdited = (menuItem.accounting_approval_status == 'APPROVED' && menuItem.marketing_approval_status == 'APPROVED') ||
             [menuItem.accounting_approval_status, menuItem.marketing_approval_status].some(status => status == 'REJECTED') ||
-            [menuItem.accounting_approval_status, menuItem.marketing_approval_status].every(status => !status);
+            [menuItem.accounting_approval_status, menuItem.marketing_approval_status].every(status => !status) ||
+            [menuItem.accounting_approval_status, menuItem.marketing_approval_status].every(status => status == 'PENDING');
 
         $.fn.firstLoad = function() {
             const entryCount = [...new Set([...savedIngredients.map(e => e.ingredient_group)])];
@@ -483,6 +491,7 @@
             if (!canBeEdited || privilege != 'Chef') {
                 $('button').remove();
                 $('.add-sub-btn').remove();
+                $('input').attr('disabled', true);
             }
             
             if (privilege == 'Ingredient Approver (Accounting)' && 
@@ -733,6 +742,7 @@
                     confirmButtonText: action == 'APPROVED' ? 'Approve' : 'Reject',
                 }).then((result) => {
                 if (result.isConfirmed) {
+                    const hasOneApproval = [menuItem.accounting_approval_status, menuItem.marketing_approval_status].some(status => status == 'APPROVED');
                     const form = $(document.createElement('form'))
                         .attr('method', 'POST')
                         .attr('action', "{!! route('approve_or_reject') !!}")
@@ -752,8 +762,11 @@
                     const approverInput = $(document.createElement('input'))
                         .attr('name', 'approver')
                         .val(privilege);
+                    const hasOneApprovalInput = $(document.createElement('input'))
+                        .attr('name', 'has_one_approval')
+                        .val(hasOneApproval);
                     
-                    form.append(csrf, actionInput, idInput, approverInput);
+                    form.append(csrf, actionInput, idInput, approverInput, hasOneApprovalInput);
                     $('.panel-body').append(form);
                     form.submit();
             $('button').attr('disabled', true);
@@ -762,6 +775,7 @@
             });
         });
 
+        $('.loading-label').remove();
         $.fn.firstLoad();
         $.fn.reload();
         $.fn.formatSelected();

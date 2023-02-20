@@ -16,6 +16,12 @@
         outline: 2px solid blue;
         background: rgb(220, 220, 220);
     }
+
+    .loading-label {
+        text-align: center;
+        font-style: italic;
+        color: grey;
+    }
 </style>
 @endpush
 
@@ -40,6 +46,7 @@
 
             </tbody>
         </table>
+        <p class="loading-label">Loading...</p>
     </div>
 
     {{-- <div class="panel-footer">
@@ -52,6 +59,8 @@
 @push('bottom')
 <script>
     $(document).ready(function() {
+
+        $('.loading-label').remove();
 
         // PER CONCEPT !!!
         const concepts = {!! json_encode($concepts) !!};
