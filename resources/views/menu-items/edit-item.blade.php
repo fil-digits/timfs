@@ -164,6 +164,10 @@
         font-size: 18px !important;
     }
 
+    .swal2-html-container {
+        line-height: 5rem;
+    }
+
 </style>
 @endpush
 
@@ -495,8 +499,7 @@
             }
             
             if (privilege == 'Ingredient Approver (Accounting)' && 
-                (menuItem.accounting_approval_status != 'APPROVED' &&
-                menuItem.accounting_approval_status != 'REJECTED')) {
+                menuItem.accounting_approval_status == 'PENDING') {
                 const approveButton = $(document.createElement('button'))
                     .addClass('btn btn-success pull-right approve-btn accounting')
                     .attr('action', 'APPROVED')
@@ -513,8 +516,7 @@
             }
 
             if (privilege == 'Ingredient Approver (Marketing)' && 
-                (menuItem.marketing_approval_status != 'APPROVED' &&
-                menuItem.marketing_approval_status != 'REJECTED')) {
+                menuItem.marketing_approval_status != 'PENDING') {
                 const approveButton = $(document.createElement('button'))
                     .addClass('btn btn-success pull-right approve-btn marketing')
                     .attr('action', 'APPROVED')
@@ -538,6 +540,7 @@
             if (isValid) {
                 Swal.fire({
                     title: 'Do you want to save the changes?',
+                    html: 'Doing so will turn the status of this item to <span class="label label-warning">PENDING</span>',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -738,6 +741,7 @@
             const action = button.attr('action');
             Swal.fire({
                     title: `Do you want to ${action == 'APPROVED' ? 'approve' : 'reject'} this menu item?`,
+                    html: `Doing so will turn the status of this item to <span class="label label-${action == 'APPROVED' ? 'success' : 'danger'}">${action}</span>`,
                     showCancelButton: true,
                     confirmButtonText: action == 'APPROVED' ? 'Approve' : 'Reject',
                 }).then((result) => {

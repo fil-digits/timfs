@@ -18,17 +18,20 @@
 - [ ] Add max food cost on frontend and database
 - [x] Update the localhost system like the one on production
 - [x] Update the code uom_desc should be from the packagings_desc
-- [ ] Add experimental menu
+- [x] Add experimental menu
 - [x] Show the percentage of food cost vs srp on the list [new column]
 - [x] Show the percentage of food cost vs srp on the details page of menu item
 - [x] Add percentage on database and exporting
 - [x] Add new column (No Cost)
 - [x] fix the hacky way of cost filter (use form instead)
+- [x] Use the `ttp` / `packaging_size` \* qty formula instead for cost
+- [ ] Update the view details page also
 - [ ] Show the version of the ingredient lists
 - [ ] Price as of Date
 - [ ] Substitute filtering (filter all menu items that has substitute ingredient)
 - [ ] Mass update of ingredient substitute
 - [ ] Improve the brand searching
+- [ ] Implement the workflow of the experimental menu
 
 ## Workflow
 

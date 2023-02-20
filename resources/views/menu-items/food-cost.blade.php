@@ -65,7 +65,6 @@
         // PER CONCEPT !!!
         const concepts = {!! json_encode($concepts) !!};
         const menuItems = {!! json_encode($menu_items) !!};
-        // console.log(menuItems.filter(e => e.food_cost == 0));
         concepts.forEach((concept, index) => {
             const tr = $(document.createElement('tr'));
             const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);

@@ -749,11 +749,11 @@
 					'is_selected',
 					'is_primary',
 					'qty',
-					'cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'),
 					'ingredient_group',
 					'uom_id',
 					'packagings.packaging_description',
-					'item_masters.ingredient_cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description')
 				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
 				->orderBy('ingredient_group', 'ASC')
@@ -763,7 +763,7 @@
 			$data['item_masters'] = DB::table('item_masters')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
-					'item_masters.ingredient_cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
 					'packagings.packaging_description')
@@ -811,7 +811,7 @@
 					'deleted_by' => CRUDBooster::myID(),
 					'deleted_at' => date('Y-m-d H:i:s')]);
 			
-			if($request->input('ingredient')) {
+			if ($request->input('ingredient')) {
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
 					$ingredient = explode(',', $request->input('ingredient')[$i]);
 					$data[$i]['item_masters_id'] = $ingredient[0];
@@ -826,7 +826,7 @@
 					$data[$i]['temp_cost'] = $cost;
 				}
 				
-				foreach($data as $index => $element) {
+				foreach ($data as $index => $element) {
 					$is_existing = !!count(DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->get());
 					if ($is_existing) {
 						$element['updated_at'] = date('Y-m-d H:i:s');
