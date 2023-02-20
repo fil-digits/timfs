@@ -22,6 +22,16 @@
         font-style: italic;
         color: grey;
     }
+
+    .percentage-input-label {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .percentage-input-label > * {
+        width: revert;
+    }
 </style>
 @endpush
 
@@ -33,6 +43,11 @@
     </div>
 
     <div class="panel-body">
+        {{-- <label class="percentage-input-label">
+             Set Low Cost
+            <input class="percentage-input form-control" type="number" step="any"/>
+            <button class="btn btn-primary">Set</button>
+        </label> --}}
         <table class="table table-striped table-bordered">
             <thead>
                 <tr class="active">

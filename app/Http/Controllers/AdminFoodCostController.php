@@ -336,8 +336,13 @@
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 
-			$data['concepts'] = DB::table('menu_segmentations')->where('status', 'ACTIVE')->orderBy('menu_segment_column_description')->get();
-			$data['menu_items'] = DB::table('menu_items')->get();
+			$data['concepts'] = DB::table('menu_segmentations')
+				->where('status', 'ACTIVE')
+				->orderBy('menu_segment_column_description')
+				->get();
+
+			$data['menu_items'] = DB::table('menu_items')
+				->get();
 
 			return $this->view('menu-items/food-cost', $data);
 		}
