@@ -319,7 +319,7 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-			$status = ['APPROVED', 'REJECTED', 'PENDING'];
+			$status = ['PENDING'];
 			$query
 				->whereIn('menu_ingredients_approval.marketing_approval_status', $status)
 				->orderByRaw("FIELD(menu_ingredients_approval.marketing_approval_status, 'PENDING', 'APPROVED', 'REJECTED') ASC");;
