@@ -445,12 +445,12 @@
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'is_selected',
 					'is_primary',
-					'qty',
-					'cost',
+					($is_approved ? 'qty' : 'temp_qty as qty'),
+					($is_approved ? 'cost' : 'temp_cost as cost'),
 					'ingredient_group',
 					'uom_id',
 					'packagings.packaging_description',
-					'item_masters.ingredient_cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description')
 				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
 				->orderBy('ingredient_group', 'ASC')
@@ -458,13 +458,16 @@
 				->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
-					'item_masters.ingredient_cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description',
 					'item_masters.tasteless_code',
-					'packagings.packaging_description')
+					'packagings.packaging_description',
+					'brands.brand_description')
 				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
 				->orderby('full_item_description')
 				->get();
 			

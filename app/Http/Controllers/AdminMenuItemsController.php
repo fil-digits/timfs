@@ -768,8 +768,8 @@
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'is_selected',
 					'is_primary',
-					'qty',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'),
+					($is_approved ? 'qty' : 'temp_qty as qty'),
+					($is_approved ? 'cost' : 'temp_cost as cost'),
 					'ingredient_group',
 					'uom_id',
 					'packagings.packaging_description',
@@ -815,14 +815,6 @@
 					'chef_updated_at' => date('Y-m-d H:i:s'),
 					'marketing_approval_status' => 'PENDING',
 					'accounting_approval_status' => 'PENDING',
-					'marketing_approved_by' => null,
-					'accounting_approved_by' => null,
-					'marketing_rejected_by' => null,
-					'accounting_rejected_by' => null,
-					'marketing_approved_at' => null,
-					'accounting_approved_at' => null,
-					'marketing_rejected_at' => null,
-					'accounting_rejected_at' => null
 				]);
 
 			DB::table('menu_ingredients_details')
@@ -876,9 +868,12 @@
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
 			$data['item'] = DB::table('menu_items')
-				->where('id', $id)
-				->get()
-				->first();
+				->select('*', 'menu_items.id as id')
+				->where('menu_items.id', $id)
+				->leftJoin('menu_ingredients_approval', 'menu_ingredients_approval.menu_items_id', '=', 'menu_items.id')
+				->get()[0];
+
+			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED';
 
 			$data['ingredients'] = DB::table('menu_ingredients_details')
 				->where('menu_items_id', $id)
@@ -891,8 +886,10 @@
 					'is_selected',
 					'total_cost',
 					'full_item_description',
-					'qty', 'uom_description',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as cost'))
+					'qty',
+					'uom_description',
+					'cost',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size * menu_ingredients_details.qty as updated_cost'))
 				->join('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
 				->leftJoin('uoms', 'menu_ingredients_details.uom_id', '=', 'uoms.id')
 				->orderby('ingredient_group')
@@ -940,8 +937,8 @@
 			}
 
 			$updated_item = DB::table('menu_ingredients_approval')
-					->where('menu_items_id', $data['menu_items_id'])
-					->first();
+				->where('menu_items_id', $data['menu_items_id'])
+				->first();
 
 			if ($updated_item->marketing_approval_status == 'APPROVED' &&
 				$updated_item->accounting_approval_status == 'APPROVED') {
