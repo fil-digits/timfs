@@ -3,6 +3,21 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
+    .info-label {
+        position: relative;
+    }
+
+    .brand-search {
+        position: absolute;
+        left: 20px;
+    }
+    
+    .dropdown-menu {
+        overflow-y: scroll;
+        max-height: 255px;
+        max-width: 700px;
+    }
+
     .loading-label {
         text-align: center;
         font-style: italic;
@@ -279,9 +294,17 @@
                 Menu Item SRP
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-            <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
-            <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
-            <p class="loading-label">Loading...</p>
+            <div class="info-label">
+                <div class="brand-search">
+                    {{-- <label class="switch">
+                        <input type="checkbox" id="brand-search">
+                        Search by brandname
+                    </label> --}}
+                </div>
+                <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
+                <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
+                <p class="loading-label">Loading...</p>
+            </div>
             <section class="ingredient-section">
             </section>
             <section class="section-footer">
@@ -370,6 +393,10 @@
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
                 const itemList = entry.find('.item-list');
+                let searchFilter = 'full_item_description';
+                if ($('#brand-search').is(':checked')) {
+                    searchFilter = 'brand_description';
+                }
                 current_ingredients.forEach((item, item_index) => {
                     // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
                     // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
@@ -377,10 +404,9 @@
                 });
 
                 const result = [...item_masters]
-                    .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
+                    .filter(e => (query.every(f => e[searchFilter]?.toLowerCase().includes(f))
                             || query.every(f => e.tasteless_code?.includes(f)))
                             && !arrayOfIngredients.includes(e.item_masters_id.toString()))
-                    .slice(0, 10)
                     .sort((a, b) => a.full_item_description - b.full_item_description);
 
                 if (query == '') {
@@ -445,8 +471,7 @@
         $.fn.sumCost = function() {
             const wrappers = jQuery.makeArray($('.ingredient-wrapper')) ;
             let sum = 0;
-            let setPercentage = sessionStorage.setPercentage || 30;
-            setPercentage = setPercentage / 100;
+            let setPercentage = Number(sessionStorage.setPercentage) || 30;
             wrappers.forEach(wrapper => {
                 const primary = $(wrapper).find('.ingredient-entry');
                 const substitute = jQuery.makeArray($(wrapper).find('.substitute'));

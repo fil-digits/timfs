@@ -79,8 +79,6 @@
     const privilege = {!! json_encode($privilege) !!};
     $(document).ready(function() {
 
-        console.log(sessionStorage.setPercentage);
-
         $('.loading-label').remove();
 
         // PER CONCEPT !!!
