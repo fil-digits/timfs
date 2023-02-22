@@ -339,10 +339,26 @@
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
 				->orderBy('menu_segment_column_description')
-				->get();
+				->select('menu_segment_column_description', 'menu_segment_column_name', 'id')
+				->get()
+				->toArray();
+
+			$segmentation_columns = [];
+			foreach ($data['concepts'] as $index => $value) {
+				$segmentation_columns[$index] = $value->menu_segment_column_name;
+			}
 			
 			$data['menu_items'] = DB::table('menu_items')
 				->where('status', 'ACTIVE')
+				->select(DB::raw('id,
+					status,
+					menu_price_dine,
+					menu_price_dlv,
+					menu_price_take,
+					food_cost,
+					food_cost_percentage,
+					menu_item_description,' 
+					. implode(', ', $segmentation_columns)))
 				->get();
 			
 			$concept_access_id = DB::table('user_concept_acess')
@@ -362,7 +378,7 @@
 			}
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 			$data['chef_access'] = implode(',', $concept_column_names);
-			
+
 			return $this->view('menu-items/food-cost', $data);
 		}
 
