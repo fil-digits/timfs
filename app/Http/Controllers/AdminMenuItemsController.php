@@ -804,9 +804,6 @@
 			$percentage = $total_cost_details[1];
 			$menu_items_id = $request->input('menu_items_id');
 
-			DB::table('menu_items')
-				->where('id', $menu_items_id)
-				->update(['food_cost' => $total_cost, 'food_cost_percentage' => $percentage]);
 			
 			DB::table('menu_ingredients_approval')
 				->updateOrInsert(['menu_items_id' => $menu_items_id], [
@@ -950,6 +947,9 @@
 						'table.cost' => DB::raw('table.temp_cost'),
 						'table.temp_cost' => null
 					]);
+				DB::table('menu_items')
+					->where('id', $data['menu_items_id'])
+					->update(['food_cost' => $data['food_cost']]);
 			}
 
 			return redirect('admin/menu_items_' . $approver)

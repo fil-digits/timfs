@@ -49,3 +49,4 @@
 
   - Only marketing and accounting can approve or reject the edited menu items
   - The approval of the edit (by: marketing and accounting) can be done in any order
+  - If both of the approvers approved the menu item, the food cost should be updated in menu items masterfile.

@@ -351,6 +351,7 @@
                         element.find('.cost').val(savedIngredient.cost);
                         element.css('display', '');
                     }
+                    element.append($(document.createElement('p')).val(savedIngredient.updated_cost));
                     wrapperTemplate.append(element);
                 });
                 section.append(wrapperTemplate);
@@ -769,8 +770,11 @@
                     const hasOneApprovalInput = $(document.createElement('input'))
                         .attr('name', 'has_one_approval')
                         .val(hasOneApproval);
+                    const foodCost = $(document.createElement('input'))
+                        .attr('name', 'food_cost')
+                        .val($('.total-cost').val().replace(/[^0-9.]/g, ''));
                     
-                    form.append(csrf, actionInput, idInput, approverInput, hasOneApprovalInput);
+                    form.append(csrf, actionInput, idInput, approverInput, hasOneApprovalInput, foodCost);
                     $('.panel-body').append(form);
                     form.submit();
             $('button').attr('disabled', true);

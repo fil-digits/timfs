@@ -43,11 +43,11 @@
     </div>
 
     <div class="panel-body">
-        {{-- <label class="percentage-input-label">
-             Set Low Cost
-            <input class="percentage-input form-control" type="number" step="any"/>
-            <button class="btn btn-primary">Set</button>
-        </label> --}}
+        <label class="percentage-input-label">
+             Low Cost Percentage
+            <input class="percentage-input form-control percentage-text" value="30" type="number" step="any"/>
+            <button class="btn btn-primary set-percentage-btn">Set</button>
+        </label>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr class="active">
@@ -87,78 +87,81 @@
             menuItems = [...menuItems].filter(menuItem => conceptColumnNames.every(conceptColumnName => !!menuItem[conceptColumnName]));
         }
 
-        concepts.forEach((concept, index) => {
-            const tr = $(document.createElement('tr'));
-            const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
-            const low = groupedItems.filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
-            const high = groupedItems.filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
-            for (let i=0; i<4; i++) {
+        function renderByPercent(setPercentage = 0.30) {
+            $('tbody').html('');
+
+            concepts.forEach((concept, index) => {
+                const tr = $(document.createElement('tr'));
+                const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
+                const low = groupedItems.filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= setPercentage));
+                const high = groupedItems.filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > setPercentage && !!Number(item.menu_price_dine));
+                for (let i=0; i<4; i++) {
+                    const td = $(document.createElement('td'));
+                    td.attr('id', concept.id);
+                    if (i==0) {
+                        td.text(concept.menu_segment_column_description);
+                    } else if (i==1) {
+                        const items = low.map(item => item.id).join(',');
+                        td.text(low.length);
+                        td.attr('filter', 'low');
+                        td.attr('items', items);
+                        td.addClass('low clickable');
+                    } else if (i==2) {
+                        const items = high.map(item => item.id).join(',');
+                        td.text(high.length);
+                        td.attr('filter', 'high');
+                        td.attr('items', items);
+                        td.addClass('high clickable');
+                    } else if (i==3) {
+                        const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
+                        td.text(items.length);
+                        td.attr('filter', 'no');
+                        td.attr('items', items.join(','));
+                        td.addClass('clickable');
+                    }
+                    tr.append(td)
+                }
+    
+                $('tbody').append(tr);
+            });
+    
+            // TOTAL || ALL
+            const totalTR = $(document.createElement('tr'));
+            const totalLabelTD = $(document.createElement('td'));
+            const allLow = [...menuItems].filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= setPercentage));
+            const allHigh = [...menuItems].filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > setPercentage && !!Number(item.menu_price_dine));
+            const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
+            totalTR.css('font-weight', 'bold');
+            totalLabelTD.text('All');
+            totalTR.append(totalLabelTD);
+            for (let i=0; i<3; i++) {
                 const td = $(document.createElement('td'));
-                td.attr('id', concept.id);
                 if (i==0) {
-                    td.text(concept.menu_segment_column_description);
-                } else if (i==1) {
-                    const items = low.map(item => item.id).join(',');
-                    td.text(low.length);
+                    const items = allLow.map(item => item.id).join(',');
+                    td.text(allLow.length);
                     td.attr('filter', 'low');
                     td.attr('items', items);
                     td.addClass('low clickable');
-                } else if (i==2) {
-                    const items = high.map(item => item.id).join(',');
-                    td.text(high.length);
+                } else if (i==1) {
+                    const items = allHigh.map(item => item.id).join(',');
+                    td.text(allHigh.length);
                     td.attr('filter', 'high');
                     td.attr('items', items);
                     td.addClass('high clickable');
-                } else if (i==3) {
-                    const items = groupedItems.filter(item => item.food_cost == 0 || !item.food_cost).map(item => item.id);
-                    td.text(items.length);
-                    td.attr('filter', 'no');
-                    td.attr('items', items.join(','));
+                } else if (i==2) {
+                    const items = allNoCost.map(item => item.id).join(',');
+                    td.text(allNoCost.length);
+                    td.attr('filter', 'no-cost');
+                    td.attr('items', items);
                     td.addClass('clickable');
                 }
-                tr.append(td)
-            }
-
-            $('tbody').append(tr);
-        });
-
-        // TOTAL || ALL
-        const totalTR = $(document.createElement('tr'));
-        const totalLabelTD = $(document.createElement('td'));
-        const allLow = [...menuItems].filter(item => !!Number(item.food_cost) && (!Number(item.menu_price_dine) || item.food_cost / item.menu_price_dine <= 0.30));
-        const allHigh = [...menuItems].filter(item => !!Number(item.food_cost) && item.food_cost / item.menu_price_dine > 0.30 && !!Number(item.menu_price_dine));
-        const allNoCost = [...menuItems].filter(item => item.food_cost == 0 || !item.food_cost);
-        totalTR.css('font-weight', 'bold');
-        totalLabelTD.text('All');
-        totalTR.append(totalLabelTD);
-        for (let i=0; i<3; i++) {
-            const td = $(document.createElement('td'));
-            if (i==0) {
-                const items = allLow.map(item => item.id).join(',');
-                td.text(allLow.length);
-                td.attr('filter', 'low');
-                td.attr('items', items);
-                td.addClass('low clickable');
-            } else if (i==1) {
-                const items = allHigh.map(item => item.id).join(',');
-                td.text(allHigh.length);
-                td.attr('filter', 'high');
-                td.attr('items', items);
-                td.addClass('high clickable');
-            } else if (i==2) {
-                const items = allNoCost.map(item => item.id).join(',');
-                td.text(allNoCost.length);
-                td.attr('filter', 'no-cost');
-                td.attr('items', items);
+                td.attr('id', 'all');
                 td.addClass('clickable');
+                totalTR.append(td);
             }
-            td.attr('id', 'all');
-            td.addClass('clickable');
-            totalTR.append(td);
-        }
-
-        $('tbody').append(totalTR);
-        
+    
+            $('tbody').append(totalTR);
+        } 
 
         function exportToExcel(type, fn, dl) {
             var elt = document.querySelector('table');
@@ -201,6 +204,13 @@
         $(document).on('click', '#export', function() {
             exportToExcel('.xlsx');
         });
+
+        $(document).on('click', '.set-percentage-btn', function() {
+            const setPercentage = Number($('.percentage-text').val().replace(/[^0-9.]/g, '')) / 100;
+            renderByPercent(setPercentage);
+        });
+
+        renderByPercent();
 
         $('table').DataTable({
             pagingType: 'full_numbers',
