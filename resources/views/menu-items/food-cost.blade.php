@@ -45,7 +45,7 @@
     <div class="panel-body">
         <label class="percentage-input-label">
              Low Cost Percentage
-            <input class="percentage-input form-control percentage-text" value="30" type="number" step="any"/>
+            <input class="percentage-input form-control percentage-text" type="number" step="any"/>
             <button class="btn btn-primary set-percentage-btn">Set</button>
         </label>
         <table class="table table-striped table-bordered">
@@ -79,6 +79,8 @@
     const privilege = {!! json_encode($privilege) !!};
     $(document).ready(function() {
 
+        console.log(sessionStorage.setPercentage);
+
         $('.loading-label').remove();
 
         // PER CONCEPT !!!
@@ -87,9 +89,11 @@
             menuItems = [...menuItems].filter(menuItem => conceptColumnNames.every(conceptColumnName => !!menuItem[conceptColumnName]));
         }
 
-        function renderByPercent(setPercentage = 0.30) {
+        function renderByPercent() {
             $('tbody').html('');
-
+            let setPercentage = sessionStorage.setPercentage || 30;
+            $('.percentage-text').val(setPercentage);
+            setPercentage = setPercentage / 100;
             concepts.forEach((concept, index) => {
                 const tr = $(document.createElement('tr'));
                 const groupedItems = [...menuItems].filter(menuItem => !!menuItem[concept.menu_segment_column_name]);
@@ -206,8 +210,9 @@
         });
 
         $(document).on('click', '.set-percentage-btn', function() {
-            const setPercentage = Number($('.percentage-text').val().replace(/[^0-9.]/g, '')) / 100;
-            renderByPercent(setPercentage);
+            const setPercentage = $('.percentage-text').val();
+            sessionStorage.setPercentage = setPercentage;
+            renderByPercent();
         });
 
         renderByPercent();

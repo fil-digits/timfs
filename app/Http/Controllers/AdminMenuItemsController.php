@@ -759,7 +759,8 @@
 
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 
-			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED';
+			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
+			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
 			$data['current_ingredients'] = DB::table('menu_ingredients_details')
 				->where('menu_items_id', $id)
