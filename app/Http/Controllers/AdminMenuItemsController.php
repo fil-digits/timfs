@@ -335,6 +335,26 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
+			if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+				$concept_access_id = DB::table('user_concept_acess')
+					->where('cms_users_id', CRUDBooster::myID())
+					->get('menu_segmentations_id')
+					->first()
+					->menu_segmentations_id;
+				
+				$concepts = DB::table('menu_segmentations')
+					->whereIn('id', explode(',', $concept_access_id))
+					->get('menu_segment_column_name')
+					->toArray();
+
+				foreach ($concepts as $id => $value) {
+					$query->where(function($subQuery) use ($value){
+						$subQuery->orWhere('menu_items.' . $value->menu_segment_column_name, '1');
+					});
+				}
+			}
+
 	       $query->where(function($sub_query){
 				$create_item_status = ApprovalWorkflowSetting::where('workflow_number', 1)->where('action_type', 'Create')->where('cms_moduls_id', 'LIKE', '%' . CRUDBooster::getCurrentModule()->id . '%')->value('next_state');
 				
@@ -936,7 +956,14 @@
 			}
 
 			return redirect('admin/menu_items_' . $approver)
-				->with(['message_type' => 'success', 'message' => 'Menu Items Approval Status Updated!']);
+				->with([
+					'message_type' => 'info',
+					'message' => 'Menu Items Approval Status Updated!	' . (
+						$data['action'] == 'APPROVED' ?
+						'<span class="label label-success">APPROVED</span>' :
+						'<span class="label label-danger">REJECTED</span>'
+					)
+				]);
 		}
 
 	}

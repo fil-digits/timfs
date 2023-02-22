@@ -25,7 +25,7 @@
 - [x] Add new column (No Cost)
 - [x] fix the hacky way of cost filter (use form instead)
 - [x] Use the `ttp` / `packaging_size` \* qty formula instead for cost
-- [ ] Update the view details page also
+- [x] Update the view details page also
 - [ ] Show the version of the ingredient lists
 - [ ] Price as of Date
 - [ ] Substitute filtering (filter all menu items that has substitute ingredient)
@@ -45,7 +45,7 @@
   - Once the edit is saved, the qty and cost will be inserted to the temp cost and qty
 
 - [x] Restrict the chef to edit again the menu items until approved by both or rejected by any or both of the approvers
-- [ ] Implement notification if any of the approvers approved or rejected the menu item.
+- [x] Implement notification if any of the approvers approved or rejected the menu item.
 
   - Only marketing and accounting can approve or reject the edited menu items
   - The approval of the edit (by: marketing and accounting) can be done in any order

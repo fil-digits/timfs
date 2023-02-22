@@ -79,10 +79,10 @@
 
 @push('bottom')
 <script type="text/javascript">
+    let menuItems = {!! json_encode($filtered_items) !!};
     $(document).ready(function() {
         $('.loading-label').remove();
 
-        let menuItems = {!! json_encode($filtered_items) !!};
         menuItems = menuItems.sort((a, b) => Number((a.food_cost / a.menu_price_dine * 100)) - Number((b.food_cost / b.menu_price_dine * 100)))
         const tbody = $('tbody');
 

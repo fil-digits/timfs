@@ -1,23 +1,26 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Illuminate\Http\Request;
+	use Request;
 	use DB;
 	use CRUDBooster;
 
-	class AdminFoodCostController extends \crocodicstudio\crudbooster\controllers\CBController {
-		
-	function cbInit() {
+	class AdminUserConceptAcessController extends \crocodicstudio\crudbooster\controllers\CBController {
+		public function __construct() {
+			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+		}
+
+	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "segment_column_name";
+			$this->title_field = "id";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = false;
+			$this->button_add = true;
 			$this->button_edit = true;
 			$this->button_delete = true;
 			$this->button_detail = true;
@@ -25,36 +28,36 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "menu_segmentations";
+			$this->table = "user_concept_acess";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
-			$this->col[] = ["label"=>"Segment Column Code","name"=>"segment_column_code"];
-			$this->col[] = ["label"=>"Segment Column Description","name"=>"segment_column_description"];
-			$this->col[] = ["label"=>"Segment Column Name","name"=>"segment_column_name"];
+			$this->col[] = ["label"=>"Privileges","name"=>"id_cms_privileges","join"=>"cms_privileges,name"];
+			$this->col[] = ["label"=>"Users Id","name"=>"cms_users_id","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Concept Access","name"=>"menu_segmentations_id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by"];
+			$this->col[] = ["label"=>"Created Date","name"=>"created_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by"];
+			$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			$this->form[] = ['label'=>'Privilege','name'=>'id_cms_privileges','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_privileges,name','datatable_where'=>'name NOT LIKE \'%Admin%\''];
+			$this->form[] = ['label'=>'User Name','name'=>'cms_users_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-6','datatable'=>'cms_users,email','datatable_where'=>'status=%27ACTIVE%27','parent_select'=>'id_cms_privileges'];
+			$this->form[] = ['label'=>'Concept Access','name'=>'menu_segmentations_id','type'=>'select2-multi','validation'=>'required','width'=>'col-sm-6','datatable'=>'menu_segmentations,menu_segment_column_description'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Code','name'=>'segment_column_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Description','name'=>'segment_column_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Segment Column Name','name'=>'segment_column_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Status','name'=>'status','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
+			//$this->form[] = ["label"=>"Cms Privileges","name"=>"id_cms_privileges","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"cms_privileges,name"];
+			//$this->form[] = ["label"=>"Cms Users Id","name"=>"cms_users_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"cms_users,first_name"];
+			//$this->form[] = ["label"=>"Menu Segmentations Id","name"=>"menu_segmentations_id","type"=>"select2","required"=>TRUE,"validation"=>"required|string|min:5|max:5000","datatable"=>"menu_segmentations,menu_segment_column_name"];
+			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
 			# OLD END FORM
 
 			/* 
@@ -253,6 +256,19 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
+			if ($column_index == 4) {
+				$column_array = explode(',', $column_value);
+				$concepts = DB::table('menu_segmentations')
+					->whereIn('id', $column_array)
+					->get('menu_segment_column_description');
+
+				$column_value = [];
+				foreach ($concepts as $index => $concept) {
+					$column_value[$index] = '<span class="label label-info">' . $concept->menu_segment_column_description . '</span>';
+				}
+				
+				$column_value = implode(' ', $column_value);
+			}
 	    }
 
 	    /*
@@ -264,7 +280,11 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-
+			$postdata['created_by']=CRUDBooster::myId();
+			$postdata['created_at']=date('Y-m-d H:i:s');
+			if (is_array($postdata['menu_segmentations_id'])){
+				$postdata['menu_segmentations_id'] = implode(",", $postdata['menu_segmentations_id']);
+			}
 	    }
 
 	    /* 
@@ -276,7 +296,6 @@
 	    */
 	    public function hook_after_add($id) {        
 	        //Your code here
-
 	    }
 
 	    /* 
@@ -289,7 +308,11 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-
+			$postdata['updated_by']=CRUDBooster::myId();
+			$postdata['updated_at']=date('Y-m-d H:i:s');
+			if (is_array($postdata['menu_segmentations_id'])){
+				$postdata['menu_segmentations_id'] = implode(",", $postdata['menu_segmentations_id']);
+			}
 	    }
 
 	    /* 
@@ -332,73 +355,5 @@
 
 	    //By the way, you can still create your own method in here... :) 
 
-		public function getIndex() {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			$data = [];
 
-			$data['concepts'] = DB::table('menu_segmentations')
-				->where('status', 'ACTIVE')
-				->orderBy('menu_segment_column_description')
-				->get();
-			
-			$data['menu_items'] = DB::table('menu_items')
-				->where('status', 'ACTIVE')
-				->get();
-			
-			$concept_access_id = DB::table('user_concept_acess')
-				->where('cms_users_id', CRUDBooster::myID())
-				->get('menu_segmentations_id')
-				->first()
-				->menu_segmentations_id;
-			
-			$concepts = DB::table('menu_segmentations')
-				->whereIn('id', explode(',', $concept_access_id))
-				->get('menu_segment_column_name')
-				->toArray();
-			$concept_column_names = [];
-
-			foreach ($concepts as $index => $value) {
-				$concept_column_names[$index] = $value->menu_segment_column_name;
-			}
-			$data['privilege'] = CRUDBooster::myPrivilegeName();
-			$data['chef_access'] = implode(',', $concept_column_names);
-			
-			return $this->view('menu-items/food-cost', $data);
-		}
-
-		public function filterByCost(Request $request) {
-			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
-			$data = [];
-			$concept;
-			$column_name;
-			$menu_items;
-			$filter;
-			$filtered_menu_items_id;
-			$filtered_items;
-			
-			if ($request->id != 'all') {
-				$concept = DB::table('menu_segmentations')->where('id', $request->input('id'))->get();
-				$column_name = $concept[0]->menu_segment_column_name;
-				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->get();
-			} else {
-				$filtered_menu_items_id = explode(',', $request->input('items'));
-				$filtered_items = DB::table('menu_items')
-					->whereIn('id', $filtered_menu_items_id)
-					->orderBy('menu_item_description')
-					->get();
-			}
-
-			$data['filter'] = $request->input('filter');
-			$data['concept'] = $concept;
-			$data['column_name'] = $column_name;
-			$data['menu_items'] = $menu_items;
-			$data['filtered_menu_items_id'] = $filtered_menu_items_id;
-			$data['filtered_items'] = $filtered_items;
-			return $this->view('menu-items/cost-filtered', $data);
-		}
 	}

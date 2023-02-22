@@ -156,6 +156,26 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             $menu_items->addSelect('menu_items.'.$price->menu_price_column_name);
         }
 
+        if (CRUDBooster::myPrivilegeName() == 'Chef') {
+
+            $concept_access_id = DB::table('user_concept_acess')
+                ->where('cms_users_id', CRUDBooster::myID())
+                ->get('menu_segmentations_id')
+                ->first()
+                ->menu_segmentations_id;
+            
+            $concepts = DB::table('menu_segmentations')
+                ->whereIn('id', explode(',', $concept_access_id))
+                ->get('menu_segment_column_name')
+                ->toArray();
+
+            foreach ($concepts as $id => $value) {
+                $menu_items->where(function($subQuery) use ($value){
+                    $subQuery->orWhere('menu_items.' . $value->menu_segment_column_name, '1');
+                });
+            }
+        }
+
         if (request()->has('filter_column')) {
             $filter_column = request()->filter_column;
 
