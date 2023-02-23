@@ -351,6 +351,7 @@
 
                 groupedIngredients.forEach(savedIngredient => {
                     let element = undefined;
+                    console.log(savedIngredient)
                     if (savedIngredient.is_primary == 'TRUE') {
                         element = $('.ingredient-entry').eq(0).clone();
                         const ingredientInput = element.find('.ingredient');
@@ -361,6 +362,7 @@
                         element.find('.uom').val(savedIngredient.uom_id);
                         element.find('.display-uom').val(savedIngredient.packaging_description);
                         element.find('.cost').val(savedIngredient.cost);
+                        // console.log(savedIngredient.cost)
                     } else {
                         element = $('.substitute').eq(0).clone();
                         if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
@@ -581,8 +583,6 @@
                         const percentage = form.find('.label-total').text().replace(/[^0-9.]/g, '');
                         const totalCost = form.find('.total-cost');
                         totalCost.val(`${totalCost.val().replace(/[^0-9.]/g, '')},${percentage}`)
-                        console.log(totalCost.val());
-                        // return;
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));
                         /*
                             primaryIngredientValue / subIngredientValue = item_masters_id,
@@ -804,7 +804,7 @@
                     form.append(csrf, actionInput, idInput, approverInput, hasOneApprovalInput, foodCost);
                     $('.panel-body').append(form);
                     form.submit();
-            $('button').attr('disabled', true);
+                    $('button').attr('disabled', true);
                 }
                 return
             });

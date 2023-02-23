@@ -810,7 +810,6 @@
 			$percentage = $total_cost_details[1];
 			$menu_items_id = $request->input('menu_items_id');
 
-			
 			DB::table('menu_ingredients_approval')
 				->updateOrInsert(['menu_items_id' => $menu_items_id], [
 					'menu_items_id' => $menu_items_id,
@@ -828,6 +827,9 @@
 					'total_cost' => null,
 					'deleted_by' => CRUDBooster::myID(),
 					'deleted_at' => date('Y-m-d H:i:s')]);
+			
+			DB::table('menu_items')
+				->updateOrInsert(['id' => $menu_items_id], ['food_cost_temp' => $total_cost]);
 			
 			if ($request->input('ingredient')) {
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {

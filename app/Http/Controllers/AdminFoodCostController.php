@@ -335,6 +335,7 @@
 		public function getIndex() {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
+			$privilege = CRUDBooster::myPrivilegeName();
 
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
@@ -354,11 +355,11 @@
 					status,
 					menu_price_dine,
 					menu_price_dlv,
-					menu_price_take,
-					food_cost,
-					food_cost_percentage,
-					menu_item_description,' 
-					. implode(', ', $segmentation_columns)))
+					menu_price_take,' .
+					($privilege == 'Chef' ? 'food_cost_temp as food_cost,' : 'food_cost,') .
+					'food_cost_percentage,
+					menu_item_description,' .
+					implode(', ', $segmentation_columns)))
 				->get();
 			
 			$concept_access_id = DB::table('user_concept_acess')
@@ -376,7 +377,7 @@
 			foreach ($concepts as $index => $value) {
 				$concept_column_names[$index] = $value->menu_segment_column_name;
 			}
-			$data['privilege'] = CRUDBooster::myPrivilegeName();
+			$data['privilege'] = $privilege;
 			$data['chef_access'] = implode(',', $concept_column_names);
 
 			return $this->view('menu-items/food-cost', $data);
@@ -384,6 +385,7 @@
 
 		public function filterByCost(Request $request) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
+			$privilege = CRUDBooster::myPrivilegeName();
 			$data = [];
 			$concept;
 			$column_name;
@@ -398,14 +400,32 @@
 				$menu_items = DB::table('menu_items')->where($column_name, '1')->get();
 				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
+					->where('status', 'ACTIVE')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')
+					->select('id',
+						'menu_price_dine',
+						'menu_price_dlv',
+						'menu_price_take',
+						'tasteless_menu_code',
+						'menu_item_description',
+						($privilege == 'Chef' ? 'food_cost_temp as food_cost' : 'food_cost'),
+						'food_cost_percentage')
 					->get();
 			} else {
 				$filtered_menu_items_id = explode(',', $request->input('items'));
 				$filtered_items = DB::table('menu_items')
+					->where('status', 'ACTIVE')
 					->whereIn('id', $filtered_menu_items_id)
 					->orderBy('menu_item_description')
+					->select('id',
+						'menu_price_dine',
+						'menu_price_dlv',
+						'menu_price_take',
+						'tasteless_menu_code',
+						'menu_item_description',
+						($privilege == 'Chef' ? 'food_cost_temp as food_cost' : 'food_cost'),
+						'food_cost_percentage')
 					->get();
 			}
 
