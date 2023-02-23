@@ -485,7 +485,7 @@
             });
             const menuItemSRP = Number(menuItem.menu_price_dine.replace(/[^0-9.]/g, ''));
             $('.total-cost').val(sum);
-            const percentage = menuItemSRP != 0 ? ((sum / menuItemSRP * 100).toFixed(2)) : 0;
+            const percentage = menuItemSRP != 0 ? Number(((sum / menuItemSRP * 100).toFixed(2))) : 0;
             const percentageText = $('.percentage');
             $(percentageText).text(`${percentage}%`);
             if (percentage > setPercentage) {
@@ -580,7 +580,7 @@
                         const form = $('form');
                         const percentage = form.find('.label-total').text().replace(/[^0-9.]/g, '');
                         const totalCost = form.find('.total-cost');
-                        totalCost.val(`${totalCost.val()},${percentage}`)
+                        totalCost.val(`${totalCost.val().replace(/[^0-9.]/g, '')},${percentage}`)
                         console.log(totalCost.val());
                         // return;
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));

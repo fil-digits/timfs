@@ -762,21 +762,26 @@
 			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
 			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
-			$data['current_ingredients'] = DB::table('menu_ingredients_details')
+			$data['current_ingredients'] = DB::table($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
 				->where('menu_items_id', $id)
-				->where('menu_ingredients_details.status', 'ACTIVE')
-				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->where(($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
+					. '.status', 'ACTIVE')
+				->leftJoin('item_masters', 
+					($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
+					. '.item_masters_id', '=', 'item_masters.id')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'is_selected',
 					'is_primary',
-					($is_approved ? 'qty' : 'temp_qty as qty'),
-					($is_approved ? 'cost' : 'temp_cost as cost'),
+					'qty',
+					'cost',
 					'ingredient_group',
 					'uom_id',
 					'packagings.packaging_description',
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description')
-				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->leftJoin('packagings', 
+					($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp') 
+					. '.uom_id', '=', 'packagings.id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get();
@@ -815,7 +820,7 @@
 					'accounting_approval_status' => 'PENDING',
 				]);
 
-			DB::table('menu_ingredients_details')
+			DB::table('menu_ingredients_details_temp')
 				->where('status', 'ACTIVE')
 				->where('menu_items_id', $request->input('menu_items_id'))
 				->update(['status' => 'INACTIVE',
@@ -833,26 +838,31 @@
 					$data[$i]['row_id'] = $ingredient[3];
 					$data[$i]['is_selected'] = $ingredient[4];
 					$data[$i]['menu_items_id'] = $request->input('menu_items_id');
-					$data[$i]['temp_qty'] = $request->input('quantity')[$i];
+					$data[$i]['qty'] = $request->input('quantity')[$i];
 					$data[$i]['uom_id'] = $request->input('uom')[$i];
 					$cost = preg_replace("/[^0-9.]/", "", $request->input('cost')[$i]);
-					$data[$i]['temp_cost'] = $cost;
+					$data[$i]['cost'] = $cost;
 				}
 				
 				foreach ($data as $index => $element) {
-					$is_existing = !!count(DB::table('menu_ingredients_details')->where('menu_items_id', $element['menu_items_id'])->where('item_masters_id', $element['item_masters_id'])->get());
+					$is_existing = !!count(DB::table('menu_ingredients_details_temp')
+						->where('menu_items_id', $element['menu_items_id'])
+						->where('item_masters_id', $element['item_masters_id'])
+						->get());
+
 					if ($is_existing) {
 						$element['updated_at'] = date('Y-m-d H:i:s');
 						$element['updated_by'] = CRUDBooster::myId();
 					} else {
 						$element['created_by'] = CRUDBooster::myId();
+						$element['created_at'] = date('Y-m-d H:i:s');
 					}
 					$element['total_cost'] = $total_cost;
 					$element['status'] = 'ACTIVE';
 					$element['deleted_at'] = null;
 					$element['deleted_by'] = null;
 					
-					DB::table('menu_ingredients_details')
+					DB::table('menu_ingredients_details_temp')
 						->where('menu_items_id', $element['menu_items_id'])
 						->where('item_masters_id', $element['item_masters_id'])
 						->updateOrInsert(['item_masters_id' => $element['item_masters_id']], $element);
@@ -939,15 +949,21 @@
 				->first();
 
 			if ($updated_item->marketing_approval_status == 'APPROVED' &&
-				$updated_item->accounting_approval_status == 'APPROVED') {
-				DB::table('menu_ingredients_details as table')
-					->where('table.menu_items_id', $data['menu_items_id'])
-					->update([
-						'table.qty' => DB::raw('table.temp_qty'),
-						'table.temp_qty' => null,
-						'table.cost' => DB::raw('table.temp_cost'),
-						'table.temp_cost' => null
-					]);
+			$updated_item->accounting_approval_status == 'APPROVED') {
+				
+				$ingredients = DB::table('menu_ingredients_details_temp')
+					->where('menu_items_id', $data['menu_items_id'])
+					->orderBy('id', 'ASC')
+					->each(function ($ingredient) {
+						$newRecord = (array) $ingredient;
+						unset($newRecord['id']);
+						DB::table('menu_ingredients_details')
+							->updateOrInsert([
+								'menu_items_id' => $newRecord['menu_items_id'],
+								'item_masters_id' => $newRecord['item_masters_id']
+							], $newRecord);
+					});
+				
 				DB::table('menu_items')
 					->where('id', $data['menu_items_id'])
 					->update(['food_cost' => $data['food_cost']]);
