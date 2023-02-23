@@ -102,28 +102,6 @@
                 } $(tbody).append(tr).css('outline', '1px solid yellowgreen');
                 $('.ingredient-table').append(tbody).css('border', '1px solid yellowgreen');
             });
-            // const isSelected = groupedIngredients.filter(e => e.is_selected == 'TRUE');
-            // let primary;
-            // if (isSelected.length) {
-            //     primary = isSelected[0];
-            // } else {
-            //     primary = groupedIngredients.filter(e => e.is_primary == 'TRUE')[0];
-            // }
-            // const tr = $(document.createElement('tr'));
-            // for (let i=0; i<5; i++) {
-            //     const td = $(document.createElement('td'));
-            //     if (i == 0) td.text(primary.tasteless_code);
-            //     if (i == 1) td.text(primary.full_item_description);
-            //     if (i == 2) td.text(primary.qty);
-            //     if (i == 3) td.text(primary.uom_description);
-            //     if (i == 4) {
-            //         td.text(primary.cost);
-            //         td.addClass('cost peso');
-            //     }
-
-            //     tr.append(td);
-            // }
-            // $('.ingredient-tbody').append(tr);
         }
 
         const totalCostTR = $(document.createElement('tr'));

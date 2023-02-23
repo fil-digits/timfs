@@ -829,7 +829,8 @@
 					'deleted_at' => date('Y-m-d H:i:s')]);
 			
 			DB::table('menu_items')
-				->updateOrInsert(['id' => $menu_items_id], ['food_cost_temp' => $total_cost]);
+				->updateOrInsert(['id' => $menu_items_id],
+				['food_cost_temp' => $total_cost, 'food_cost_percentage_temp' => $percentage]);
 			
 			if ($request->input('ingredient')) {
 				for ($i=0; $i<count($request->input('ingredient')); $i++) {
@@ -968,7 +969,8 @@
 				
 				DB::table('menu_items')
 					->where('id', $data['menu_items_id'])
-					->update(['food_cost' => $data['food_cost']]);
+					->update(['food_cost' => $data['food_cost'],
+					'food_cost_percentage' => $data['food_cost_percentage']]);
 			}
 
 			return redirect('admin/menu_items_' . $approver)
