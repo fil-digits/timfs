@@ -123,6 +123,7 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
         ->leftJoin('menu_types','menu_items.menu_types_id','=','menu_types.id')
         ->leftJoin('menu_categories','menu_items.menu_categories_id','=','menu_categories.id')
         ->leftJoin('menu_subcategories','menu_items.menu_subcategories_id','=','menu_subcategories.id')
+        ->leftJoin('menu_ingredients_approval','menu_items.id','=','menu_ingredients_approval.menu_items_id')
         ->select(
             
             'menu_items.tasteless_menu_code',
@@ -137,7 +138,10 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
             'menu_items.original_concept',
             'menu_items.status as menu_item_status',
             'menu_items.approved_at',
-            'menu_items.available_concepts');
+            'menu_items.available_concepts',
+            'menu_ingredients_approval.accounting_approval_status',
+            'menu_ingredients_approval.marketing_approval_status'
+            );
             
         foreach($old_item_codes as $old_codes){
             $menu_items->addSelect('menu_items.'.$old_codes->menu_old_code_column_name);

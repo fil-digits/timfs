@@ -49,7 +49,7 @@
         <div class="with-ingredient" style="display: none;">
             <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
             <div class="box-body table-responsive no-padding">
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered ingredient-table">
                     <thead>
                         <tr>
                             <th scoped="col">Tasteless Code</th>
@@ -76,41 +76,68 @@
         const tbody = $('.ingredient-tbody');
         const entryCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
         for (i of entryCount) {
-            const groupedIngredients = ingredients.filter(e => e.ingredient_group == i);
+            const groupedIngredients = ingredients.filter(e => e.ingredient_group == i).sort((a, b) => a.row_id - b.row_id);
+            const tbody = $(document.createElement('tbody'));
             const isSelected = groupedIngredients.filter(e => e.is_selected == 'TRUE');
-            let primary;
-            if (isSelected.length) {
-                primary = isSelected[0];
-            } else {
-                primary = groupedIngredients.filter(e => e.is_primary == 'TRUE')[0];
-            }
-            const tr = $(document.createElement('tr'));
-            for (let i=0; i<5; i++) {
-                const td = $(document.createElement('td'));
-                if (i == 0) td.text(primary.tasteless_code);
-                if (i == 1) td.text(primary.full_item_description);
-                if (i == 2) td.text(primary.qty);
-                if (i == 3) td.text(primary.uom_description);
-                if (i == 4) {
-                    td.text(primary.cost);
-                    td.addClass('cost peso');
-                }
+            groupedIngredients.forEach(ingredient => {
+                const tr = $(document.createElement('tr'));
+                for (let i=0; i<5; i++) {
+                    const td = $(document.createElement('td'));
+                    if (i == 0) td.text(ingredient.tasteless_code);
+                    if (i == 1) td.text(ingredient.full_item_description);
+                    if (i == 2) td.text(ingredient.qty);
+                    if (i == 3) td.text(ingredient.uom_description);
+                    if (i == 4) {
+                        td.text(ingredient.cost);
+                        if (ingredient.is_selected == 'TRUE' ||
+                        (ingredient.is_primary == 'TRUE' && !isSelected.length) ) {
+                            td.addClass('cost peso');
+                            tr.css('background', '#d3eaf2');
+                            tr.css('font-weight', '700');
+                        } else {
+                            td.addClass('peso');
+                        }
+                    }
+                    tr.append(td);
+                } $(tbody).append(tr).css('outline', '1px solid yellowgreen');
+                $('.ingredient-table').append(tbody).css('border', '1px solid yellowgreen');
+            });
+            // const isSelected = groupedIngredients.filter(e => e.is_selected == 'TRUE');
+            // let primary;
+            // if (isSelected.length) {
+            //     primary = isSelected[0];
+            // } else {
+            //     primary = groupedIngredients.filter(e => e.is_primary == 'TRUE')[0];
+            // }
+            // const tr = $(document.createElement('tr'));
+            // for (let i=0; i<5; i++) {
+            //     const td = $(document.createElement('td'));
+            //     if (i == 0) td.text(primary.tasteless_code);
+            //     if (i == 1) td.text(primary.full_item_description);
+            //     if (i == 2) td.text(primary.qty);
+            //     if (i == 3) td.text(primary.uom_description);
+            //     if (i == 4) {
+            //         td.text(primary.cost);
+            //         td.addClass('cost peso');
+            //     }
 
-                tr.append(td);
-            }
-            $('.ingredient-tbody').append(tr);
+            //     tr.append(td);
+            // }
+            // $('.ingredient-tbody').append(tr);
         }
 
         const totalCostTR = $(document.createElement('tr'));
         const totalCostLabelTD = $(document.createElement('td'));
         const totalCostValueTD = $(document.createElement('td'));
+        const totalTbody = $(document.createElement('tbody'));
         totalCostLabelTD.attr('colspan', '4');
         totalCostLabelTD.addClass('total-cost-label');
         totalCostLabelTD.text('Food Cost');
         totalCostValueTD.addClass('total-cost peso');
         totalCostTR.append(totalCostLabelTD, totalCostValueTD);        
 
-        $('.ingredient-tbody').append(totalCostTR);
+        $(totalTbody).append(totalCostTR);
+        $('.ingredient-table').append(totalTbody);
 
         if (!ingredients.length) {
             $('.no-ingredient-warning').css('display', '');
