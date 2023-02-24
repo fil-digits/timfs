@@ -522,7 +522,7 @@
         }
 
         $.fn.restrictionFormat = function() {
-            if (!canBeEdited || privilege != 'Chef') {
+            if (!canBeEdited || privilege != 'Chef' && privilege != 'Super Administrator') {
                 $('button').remove();
                 $('.add-sub-btn').remove();
                 $('input').attr('disabled', true);
@@ -581,6 +581,7 @@
                         $(this).prop("disabled", true);
                         const form = $('form');
                         const percentage = form.find('.label-total').text().replace(/[^0-9.]/g, '');
+                        console.log(percentage);
                         const totalCost = form.find('.total-cost');
                         totalCost.val(`${totalCost.val().replace(/[^0-9.]/g, '')},${percentage}`)
                         const wrappers = jQuery.makeArray(form.find('.ingredient-wrapper'));
