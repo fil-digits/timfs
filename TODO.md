@@ -26,11 +26,12 @@
 - [x] fix the hacky way of cost filter (use form instead)
 - [x] Use the `ttp` / `packaging_size` \* qty formula instead for cost
 - [x] Update the view details page also
+- [x] Implement the workflow of menu item
 - [ ] Show the version of the ingredient lists
 - [ ] Price as of Date
 - [ ] Substitute filtering (filter all menu items that has substitute ingredient)
 - [ ] Mass update of ingredient substitute
-- [ ] Improve the brand searching
+- [x] Improve the brand searching
 - [ ] Implement the workflow of the experimental menu
 
 ## Workflow

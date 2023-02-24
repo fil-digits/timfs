@@ -200,7 +200,7 @@
                 <span class="required-star">*</span> Ingredient
                 <div>
                     <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                    <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                    <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand, or Item Code" required/>
                     <div class="item-list">
                     </div>
                 </div>
@@ -241,7 +241,7 @@
             <span class="required-star">*</span> Ingredient
             <div>
                 <input value="" type="text" name="ingredient[]" class="ingredient form-control" required/>
-                <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search Item" required/>
+                <input value="" type="text" class="form-control display-ingredient span-2" placeholder="Search by Item Desc, Brand, or Item Code" required/>
                 <div class="item-list">
                 </div>
             </div>
@@ -388,7 +388,7 @@
 
             $('.display-ingredient').keyup(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
-                const query = ($(this).val().toLowerCase().split(' '));
+                const query = ($(this).val().toLowerCase().split(' ')).filter(e => !!e);
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
@@ -404,7 +404,8 @@
                 });
 
                 const result = [...item_masters]
-                    .filter(e => (query.every(f => e[searchFilter]?.toLowerCase().includes(f))
+                    .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
+                            || query.every(f => e.brand_description?.toLowerCase().includes(f))
                             || query.every(f => e.tasteless_code?.includes(f)))
                             && !arrayOfIngredients.includes(e.item_masters_id.toString()))
                     .sort((a, b) => a.full_item_description - b.full_item_description);

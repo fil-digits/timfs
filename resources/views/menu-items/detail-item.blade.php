@@ -48,7 +48,7 @@
             <h4 class="no-ingredient-warning" style="color: gray; text-align: center; font-style: italic; display: none"> <i class="fa fa-spoon"></i> No ingredients to show...</h4>
         <div class="with-ingredient" style="display: none;">
             <h4 style="font-weight: 600; text-align: center;">Ingredients List</h4>
-            <div class="box-body table-responsive no-padding">
+            <div class="box-body table-responsive no-padding" id="ingredient-div">
                 <table class="table table-striped table-bordered ingredient-table">
                     <thead>
                         <tr>
@@ -59,8 +59,6 @@
                             <th scoped="col">Cost</th>
                         </tr>
                     </thead>
-                    <tbody class="ingredient-tbody">
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -91,16 +89,15 @@
                         td.text(ingredient.cost);
                         if (ingredient.is_selected == 'TRUE' ||
                         (ingredient.is_primary == 'TRUE' && !isSelected.length) ) {
-                            td.addClass('cost peso');
-                            tr.css('background', '#d3eaf2');
-                            tr.css('font-weight', '700');
+                            td.addClass('cost peso').css('font-weight', 'bold');
+                            tr.css('background', '#DCDCDC');
                         } else {
                             td.addClass('peso');
                         }
                     }
                     tr.append(td);
-                } $(tbody).append(tr).css('outline', '1px solid yellowgreen');
-                $('.ingredient-table').append(tbody).css('border', '1px solid yellowgreen');
+                } $(tbody).append(tr);
+                $('.ingredient-table').append(tbody);
             });
         }
 
