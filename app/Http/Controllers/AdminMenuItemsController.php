@@ -780,6 +780,24 @@
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get();
+			
+			// $data['ingredient_versions'] = DB::table('menu_ingredients_details')
+			// 	->where('menu_ingredients_details.status', 'ACTIVE')
+			// 	->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
+			// 	->select(\DB::raw('item_masters.id as item_masters_id'),
+			// 		'is_selected',
+			// 		'is_primary',
+			// 		'qty',
+			// 		'cost',
+			// 		'ingredient_group',
+			// 		'uom_id',
+			// 		'packagings.packaging_description',
+			// 		\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+			// 		'item_masters.full_item_description')
+			// 	->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
+			// 	->orderBy('ingredient_group', 'ASC')
+			// 	->orderBy('row_id', 'ASC')
+			// 	->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
 				->where('sku_statuses_id', '!=', '2')
@@ -885,6 +903,7 @@
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details.status', 'ACTIVE')
 				->select('tasteless_code',
+					'version_id',
 					'item_masters_id',
 					'ingredient_group',
 					'row_id',

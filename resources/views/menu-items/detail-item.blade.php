@@ -70,11 +70,15 @@
 <script>
      $(document).ready(function() {
         const ingredients = {!! json_encode($ingredients) !!};
+        const versions = ingredients.map(e => e.version_id);
+        const versionSets = [...new Set(versions)];
+        const sortedVersions = versionSets.sort((a, b) => +(new Date(b)) - +(new Date(a)));
+        const latestIngredients = ingredients.filter(e => e.version_id == sortedVersions[0]);
         const item = {!! json_encode($item) !!};
         const tbody = $('.ingredient-tbody');
-        const entryCount = [...new Set([...ingredients.map(e => e.ingredient_group)])];
+        const entryCount = [...new Set([...latestIngredients.map(e => e.ingredient_group)])];
         for (i of entryCount) {
-            const groupedIngredients = ingredients.filter(e => e.ingredient_group == i).sort((a, b) => a.row_id - b.row_id);
+            const groupedIngredients = latestIngredients.filter(e => e.ingredient_group == i).sort((a, b) => a.row_id - b.row_id);
             const tbody = $(document.createElement('tbody'));
             const isSelected = groupedIngredients.filter(e => e.is_selected == 'TRUE');
             groupedIngredients.forEach(ingredient => {
