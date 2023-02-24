@@ -438,13 +438,10 @@
 			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
 			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
-			$data['current_ingredients'] = DB::table($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
+			$data['current_ingredients'] = DB::table('menu_ingredients_details_temp')
 				->where('menu_items_id', $id)
-				->where(($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
-					. '.status', 'ACTIVE')
-				->leftJoin('item_masters', 
-					($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp')
-					. '.item_masters_id', '=', 'item_masters.id')
+				->where('menu_ingredients_details_temp.status', 'ACTIVE')
+				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'is_selected',
 					'is_primary',
@@ -455,9 +452,7 @@
 					'packagings.packaging_description',
 					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
 					'item_masters.full_item_description')
-				->leftJoin('packagings', 
-					($is_approved ? 'menu_ingredients_details' : 'menu_ingredients_details_temp') 
-					. '.uom_id', '=', 'packagings.id')
+				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get();

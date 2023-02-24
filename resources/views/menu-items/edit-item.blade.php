@@ -330,6 +330,7 @@
     $(document).ready(function() {
 
         const savedIngredients = {!! json_encode($current_ingredients) !!};
+        console.log(savedIngredients);
         const item_masters = {!! json_encode($item_masters) !!};
         const menuItem = {!! json_encode($item) !!};
         const privilege = {!! json_encode($privilege) !!};
@@ -802,6 +803,9 @@
                     const foodCostPercentage = $(document.createElement('input'))
                         .attr('name', 'food_cost_percentage')
                         .val($('.percentage').text().replace(/[^0-9.]/g, ''));
+                    const versionId = $(document.createElement('input'))
+                        .attr('name', 'version_id')
+                        .val(new Date().toLocaleString());
                     
                     form.append(
                         csrf,
@@ -810,7 +814,8 @@
                         approverInput, 
                         hasOneApprovalInput, 
                         foodCost, 
-                        foodCostPercentage
+                        foodCostPercentage,
+                        versionId
                     );
                     $('.panel-body').append(form);
                     form.submit();
