@@ -3,6 +3,16 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://kit.fontawesome.com/aee358fec0.js" crossorigin="anonymous"></script>
 <style type="text/css">
+    .info-div {
+        position: relative;
+    }
+
+    .version-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
     .info-label {
         position: relative;
     }
@@ -152,7 +162,7 @@
     }
 
     .add-sub-btn {
-        background-color: #1E90FF;
+        background-color: #367fa9;
         font-size: 14;
         height: 30px;
         width: 30px;
@@ -170,7 +180,7 @@
     }
 
     .new-add-sub-btn {
-        background-color: #1ebfff;
+        background-color: #008d4c;
         font-size: 14;
         height: 30px;
         width: 30px;
@@ -387,9 +397,14 @@
                 Menu Item SRP
                 <input class="form-control menu-item-srp" type="text" value="₱ {{$item->menu_price_dine}}" disabled>
             </label>
-            <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
-            <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
-            <p class="loading-label">Loading...</p>
+            <div class="info-div">
+                <h4 class="recipe-text""><i class="fa fa-cheese"></i> RECIPE <i class="fa fa-utensils"></i></h4>
+                <h5 class="no-ingredient-warning" style="display: none;"><i class="fa fa-spoon"></i> No ingredients currently saved.</h5>
+                <p class="loading-label">Loading...</p>
+                <button class="btn btn-primary version-btn" type="button">
+                    See Versions
+                </button>
+            </div>
             <section class="ingredient-section">
             </section>
             <section class="section-footer">
@@ -415,10 +430,19 @@
 @push('bottom')
 
 <script>
+    function groupBy(xs, key) {
+        return xs.reduce(function(rv, x) {
+            (rv[x[key]] = rv[x[key]] || []).push(x);
+            return rv;
+        }, {});
+    };
     $(document).ready(function() {
 
-        const savedIngredients = {!! json_encode($current_ingredients) !!};
-        console.log(savedIngredients);
+        const allIngredients = {!! json_encode($ingredient_versions) !!};
+        let ingredientSet = groupBy(allIngredients, 'version_id');
+        const ingredientVersions = Object.keys(ingredientSet).sort((a, b) => new Date(b) - new Date(a));
+        const currentIngredients = {!! json_encode($current_ingredients) !!};
+        let savedIngredients = currentIngredients;
         const item_masters = {!! json_encode($item_masters) !!};
         const menuItem = {!! json_encode($item) !!};
         const privilege = {!! json_encode($privilege) !!};
@@ -442,6 +466,7 @@
                     let element = undefined;
                     if (savedIngredient.is_primary == 'TRUE') {
                         if (savedIngredient.is_existing == 'TRUE') {
+                            //primary and existing
                             element = $('.ingredient-wrapper .ingredient-entry').eq(0).clone();
                             const ingredientInput = element.find('.ingredient');
                             ingredientInput.val(savedIngredient.item_masters_id);
@@ -452,6 +477,7 @@
                             element.find('.display-uom').val(savedIngredient.packaging_description);
                             element.find('.cost').val(savedIngredient.cost);
                         } else {
+                            //primary and new
                             element = $('.new-ingredient-wrapper .ingredient-entry').eq(0).clone();
                             element.find('.ingredient_name').val(savedIngredient.ingredient_name);
                             element.find('.quantity').val(savedIngredient.qty).attr('readonly', false);
@@ -459,6 +485,7 @@
                             element.find('.cost').val(savedIngredient.cost);
                         }
                     } else {
+                        //substitute and existing
                         if (savedIngredient.is_existing == 'TRUE') {
                             element = $('.substitute').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
@@ -472,6 +499,7 @@
                             element.find('.cost').val(savedIngredient.cost);
                             element.css('display', '');
                         } else {
+                            //subsitute and new
                             element = $('.new-substitute').eq(0).clone();
                             if (savedIngredient.is_selected == 'TRUE') element.attr('primary', true);
                             element.find('.ingredient_name').val(savedIngredient.ingredient_name);
@@ -990,6 +1018,34 @@
                 }
                 return
             });
+        });
+
+        $(document).on('click', '.version-btn', async function(event) {
+            const versions = {};
+            for (let version of Object.keys(ingredientSet)) {
+                versions[version] = version;
+            }
+            const { value: version } = await Swal.fire({
+                title: 'Select Versions',
+                input: 'select',
+                inputOptions: {
+                    ...versions,
+                },
+                inputPlaceholder: 'Select ingredient version',
+                showCancelButton: true,
+            });
+
+            if (version) {
+                savedIngredients = allIngredients.filter(e => e.version_id == version);
+                const wrappers = $('#form .ingredient-wrapper, #form .new-ingredient-wrapper')
+                wrappers.remove();
+                $.fn.firstLoad();
+                $.fn.sumCost();
+                $('#form button').not('.version-btn').remove();
+                $('#form .add-sub-btn').remove();
+                $('#form .new-add-sub-btn').remove();
+                $('input').attr('disabled', true);
+            }
         });
 
         $('.loading-label').remove();

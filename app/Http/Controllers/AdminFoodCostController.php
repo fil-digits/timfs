@@ -357,8 +357,8 @@
 					menu_price_dlv,
 					menu_price_take,' .
 					($privilege == 'Chef' ? 'food_cost_temp as food_cost,' : 'food_cost,') .
-					'food_cost_percentage,
-					menu_item_description,' .
+					($privilege == 'Chef' ? 'food_cost_percentage_temp as food_cost_percentage,' : 'food_cost_percentage,') .
+					'menu_item_description,' .
 					implode(', ', $segmentation_columns)))
 				->get();
 			

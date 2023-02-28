@@ -767,40 +767,44 @@
 				->where('menu_ingredients_details_temp.status', 'ACTIVE')
 				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
-						'ingredient_name',
-						'is_selected',
-						'is_primary',
-						'is_existing',
-						'qty',
-						'cost',
-						'ingredient_group',
-						'uom_id',
-						'uom_name',
-						'packagings.packaging_description',
-						\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-						'item_masters.full_item_description')
+					'ingredient_name',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'qty',
+					'cost',
+					'ingredient_group',
+					'uom_id',
+					'uom_name',
+					'packagings.packaging_description',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description')
 				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
 				->get();
 			
-			// $data['ingredient_versions'] = DB::table('menu_ingredients_details')
-			// 	->where('menu_ingredients_details.status', 'ACTIVE')
-			// 	->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
-			// 	->select(\DB::raw('item_masters.id as item_masters_id'),
-			// 		'is_selected',
-			// 		'is_primary',
-			// 		'qty',
-			// 		'cost',
-			// 		'ingredient_group',
-			// 		'uom_id',
-			// 		'packagings.packaging_description',
-			// 		\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-			// 		'item_masters.full_item_description')
-			// 	->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
-			// 	->orderBy('ingredient_group', 'ASC')
-			// 	->orderBy('row_id', 'ASC')
-			// 	->get();
+			$data['ingredient_versions'] = DB::table('menu_ingredients_details')
+				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'version_id',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'qty',
+					'cost',
+					'ingredient_group',
+					'uom_id',
+					'uom_name',
+					'packagings.packaging_description',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description')
+				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
+				->orderBy('version_id')
+				->orderBy('ingredient_group', 'ASC')
+				->orderBy('row_id', 'ASC')
+				->get();
 											
 			$data['item_masters'] = DB::table('item_masters')
 				->where('sku_statuses_id', '!=', '2')
@@ -838,7 +842,7 @@
 			//updating food cost and percentage to menu items table
 			DB::table('menu_items')
 				->where('id', $menu_items_id)
-				->update(['food_cost' => $food_cost, 'food_cost_percentage' => $food_cost_percentage]);
+				->update(['food_cost_temp' => $food_cost, 'food_cost_percentage_temp' => $food_cost_percentage]);
 
 			//inactivating all active ingredients of menu item
 			DB::table('menu_ingredients_details_temp')
@@ -995,6 +999,7 @@
 			$approver = $data['approver'];
 			$privilege = CRUDBooster::myPrivilegeName();
 
+			//updating the menu ingredients approval status
 			if ($data['action'] == 'APPROVED') {
 				DB::table('menu_ingredients_approval')
 					->where('menu_items_id', $data['menu_items_id'])
@@ -1018,6 +1023,7 @@
 						$approver . '_rejected_at' => date('Y-m-d H:i:s')
 					]);
 
+				//notifying the chef about the rejection
 				$chef_to_notify = DB::table('menu_ingredients_approval')
 					->where('menu_items_id', $data['menu_items_id'])
 					->first()
@@ -1033,6 +1039,7 @@
 				->where('menu_items_id', $data['menu_items_id'])
 				->first();
 
+			//checking if the menu item has been approved by 2 approvers
 			if ($updated_item->marketing_approval_status == 'APPROVED' &&
 			$updated_item->accounting_approval_status == 'APPROVED') {
 				
@@ -1043,17 +1050,21 @@
 					->orderBy('id', 'ASC')
 					->get()
 					->toArray();
+					// dd($ingredients);
 				foreach($ingredients as $ingredient) {
 					$newRecord = (array) $ingredient;
 					$newRecord['version_id'] = $data['version_id'];
 					unset($newRecord['id']);
+
+					//copying and inserting the ingredients to to the main ingredients table
 					DB::table('menu_ingredients_details')
 						->updateOrInsert(['version_id' => $newRecord['version_id'],
 							'menu_items_id' => $newRecord['menu_items_id'],
-							'item_masters_id' => $newRecord['item_masters_id']], $newRecord);
+							'item_masters_id' => $newRecord['item_masters_id'],
+							'ingredient_name' => $newRecord['ingredient_name']], $newRecord);
 				}
 				
-				
+				//finally, updating the food cost and percentage
 				DB::table('menu_items')
 					->where('id', $data['menu_items_id'])
 					->update(['food_cost' => $data['food_cost'],
