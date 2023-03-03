@@ -439,51 +439,39 @@
 			$is_approved = $data['item']->accounting_approval_status == 'APPROVED' && $data['item']->marketing_approval_status == 'APPROVED' || 
 			$data['item']->accounting_approval_status == null && $data['item']->marketing_approval_status == null;
 
-			$data['current_ingredients'] = DB::table('menu_ingredients_details_temp')
+			$current_ingredients = DB::table('menu_ingredients_details_temp')
 				->where('menu_items_id', $id)
 				->where('menu_ingredients_details_temp.status', 'ACTIVE')
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'ingredient_name',
+					'menu_as_ingredient_id',
+					'menu_item_description',
+					'is_selected',
+					'is_primary',
+					'is_existing',
+					'qty',
+					'cost',
+					'food_cost',
+					'ingredient_group',
+					'uom_id',
+					'uom_name',
+					'packagings.packaging_description',
+					'uoms.uom_description',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description',
+					'sku_status_description as item_status',
+					'menu_items.status as menu_status')
 				->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'ingredient_name',
-					'is_selected',
-					'is_primary',
-					'is_existing',
-					'qty',
-					'cost',
-					'ingredient_group',
-					'uom_id',
-					'uom_name',
-					'packagings.packaging_description',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-					'item_masters.full_item_description')
 				->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
+				->leftJoin('uoms', 'menu_ingredients_details_temp.uom_id', '=', 'uoms.id')
+				->leftJoin('menu_items', 'menu_ingredients_details_temp.menu_as_ingredient_id', '=', 'menu_items.id')
+				->leftJoin('sku_statuses', 'item_masters.sku_statuses_id', '=', 'sku_statuses.id')
 				->orderBy('ingredient_group', 'ASC')
 				->orderBy('row_id', 'ASC')
-				->get();
-			
-			$data['ingredient_versions'] = DB::table('menu_ingredients_details')
-				->leftJoin('item_masters', 'menu_ingredients_details.item_masters_id', '=', 'item_masters.id')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'ingredient_name',
-					'version_id',
-					'is_selected',
-					'is_primary',
-					'is_existing',
-					'qty',
-					'cost',
-					'ingredient_group',
-					'uom_id',
-					'uom_name',
-					'packagings.packaging_description',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-					'item_masters.full_item_description')
-				->leftJoin('packagings', 'menu_ingredients_details.uom_id', '=', 'packagings.id')
-				->orderBy('version_id')
-				->orderBy('ingredient_group', 'ASC')
-				->orderBy('row_id', 'ASC')
-				->get();
-											
-			$data['item_masters'] = DB::table('item_masters')
+				->get()
+				->toArray();
+
+			$item_masters = DB::table('item_masters')
 				->where('sku_statuses_id', '!=', '2')
 				->select(\DB::raw('item_masters.id as item_masters_id'),
 					'item_masters.packagings_id',
@@ -495,8 +483,45 @@
 				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
 				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
 				->orderby('full_item_description')
-				->get();
+				->get()
+				->toArray();
+
+			$menu_items = DB::table('menu_items')
+				->where('menu_items.status', 'ACTIVE')
+				->where('menu_items.id', '!=', $id)
+				->select('menu_items.id as menu_item_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'food_cost',
+					'food_cost_percentage',
+					'menu_items.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+				->get()
+				->toArray();
 			
+				$data['ingredient_versions'] = DB::table('menu_ingredients_details_temp')
+					->where('menu_ingredients_details_temp.status', 'ACTIVE')
+					->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
+					->select(\DB::raw('item_masters.id as item_masters_id'),
+						'is_selected',
+						'is_primary',
+						'qty',
+						'cost',
+						'ingredient_group',
+						'uom_id',
+						'packagings.packaging_description',
+						\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+						'item_masters.full_item_description')
+					->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
+					->orderBy('ingredient_group', 'ASC')
+					->orderBy('row_id', 'ASC')
+					->get();
+				
+			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
+			$data['item_masters'] = array_map(fn ($object) =>(object) array_filter((array) $object), $item_masters);
+			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
+
 			return $this->view('menu-items/edit-item', $data);
 		}
 

@@ -335,7 +335,6 @@
 		public function getIndex() {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			$data = [];
-			$privilege = CRUDBooster::myPrivilegeName();
 
 			$data['concepts'] = DB::table('menu_segmentations')
 				->where('status', 'ACTIVE')
@@ -349,7 +348,7 @@
 				$segmentation_columns[$index] = $value->menu_segment_column_name;
 			}
 			
-			$data['menu_items'] = DB::table('menu_items')
+			$menu_items = DB::table('menu_items')
 				->where('status', 'ACTIVE')
 				->select(DB::raw('id,
 					status,
@@ -360,7 +359,8 @@
 					($privilege == 'Chef' ? 'food_cost_percentage_temp as food_cost_percentage,' : 'food_cost_percentage,') .
 					'menu_item_description,' .
 					implode(', ', $segmentation_columns)))
-				->get();
+				->get()
+				->toArray();
 			
 			$concept_access_id = DB::table('user_concept_acess')
 				->where('cms_users_id', CRUDBooster::myID())
@@ -377,7 +377,9 @@
 			foreach ($concepts as $index => $value) {
 				$concept_column_names[$index] = $value->menu_segment_column_name;
 			}
-			$data['privilege'] = $privilege;
+
+			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
+			$data['privilege'] = CRUDBooster::myPrivilegeName();
 			$data['chef_access'] = implode(',', $concept_column_names);
 
 			return $this->view('menu-items/food-cost', $data);
