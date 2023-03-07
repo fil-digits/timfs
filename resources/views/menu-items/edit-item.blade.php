@@ -586,7 +586,7 @@
                             || query.every(f => e.menu_item_description?.toLowerCase().includes(f))
                             || query.every(f => e.tasteless_menu_code?.includes(f))
                             && !arrayOfIngredients.includes(e.item_masters_id?.toString()))
-                    .sort((a, b) => (b.full_item_description || b.menu_item_description) - (a.full_item_description || a.menu_item_description));
+                    .sort((a, b) => (a.full_item_description || a.menu_item_description).localeCompare(b.full_item_description || b.menu_item_description));
 
                 if (query == '') {
                     $('.item-list').html('');
