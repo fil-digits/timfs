@@ -355,11 +355,11 @@
 	    
 	    public static function createMenuSegmentColumn($column_name) {
 			Schema::table('menu_items', function (Blueprint $table) use ($column_name) {
-				$table->string($column_name, 30)->nullable()->after('segmentation_22');
+				$table->string($column_name, 30)->nullable()->after('segmentation');
 			});
 
 			Schema::table('menu_item_approvals', function (Blueprint $table) use ($column_name) {
-				$table->string($column_name, 30)->nullable()->after('segmentation_22');
+				$table->string($column_name, 30)->nullable()->after('segmentation');
 			});
 		}
 
