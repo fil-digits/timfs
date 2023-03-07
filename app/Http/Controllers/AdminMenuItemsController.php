@@ -1191,4 +1191,56 @@
 				]);
 		}
 
+		public function searchIngredient(Request $request) {
+			$search_terms = json_decode($request->content);
+			
+			$item_masters = DB::table('item_masters')
+				->where('sku_statuses_id', '!=', '2')
+				->where(function($query_item_desc) use ($search_terms) {
+					$query_item_desc->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->where('full_item_description', 'like', "%{$term}%");
+						}
+					})->orWhere(function($q) use ($search_terms) {
+						foreach ($search_terms as $term) {
+							$q->where('brands.brand_description', 'like', "%{$term}%");
+						}
+					});
+				})
+				->select(\DB::raw('item_masters.id as item_masters_id'),
+					'item_masters.packagings_id',
+					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
+					'item_masters.full_item_description',
+					'item_masters.tasteless_code',
+					'packagings.packaging_description',
+					'brands.brand_description')
+				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
+				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
+				->orderby('full_item_description')
+				->get()
+				->toArray();
+			
+			$menu_items = DB::table('menu_items')
+				->where('menu_items.status', 'ACTIVE')
+				->where(function($q) use ($search_terms) {
+					foreach ($search_terms as $term) {
+						$q->where('menu_item_description', 'like', "%{$term}%");
+					}
+				})
+				->select('menu_items.id as menu_item_id',
+					'menu_item_description',
+					'tasteless_menu_code',
+					'food_cost',
+					'food_cost_percentage',
+					'menu_items.uoms_id',
+					'uom_description')
+				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+				->get()
+				->toArray();
+
+			$response = array_merge($item_masters, $menu_items);
+			
+			return json_encode($response);
+		}
+
 	}

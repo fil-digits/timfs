@@ -79,6 +79,7 @@ Route::group(['middleware' => ['web','\crocodicstudio\crudbooster\middlewares\CB
     Route::post('/admin/menu_items/edit', [AdminMenuItemsController::class, 'submitEdit'])->name('edit_menu_item');
     Route::post('/admin/food_cost/filter', [AdminFoodCostController::class, 'filterByCost'])->name('filter_by_cost');
     Route::post('/admin/menu_items/approve-or-reject', [AdminMenuItemsController::class, 'approveOrReject'])->name('approve_or_reject');
+    Route::post('/admin/menu_items/search', [AdminMenuItemsController::class, 'searchIngredient'])->name('search_ingredient');
 
     //experimental menu
     Route::post('/admin/experimental_menu_items/edit', [AdminExperimentalMenuItemsController::class, 'submitEdit'])->name('edit_experimental_menu_item');

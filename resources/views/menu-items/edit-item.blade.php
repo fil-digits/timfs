@@ -435,21 +435,9 @@
 @push('bottom')
 
 <script>
-    function groupBy(xs, key) {
-        return xs.reduce(function(rv, x) {
-            (rv[x[key]] = rv[x[key]] || []).push(x);
-            return rv;
-        }, {});
-    };
-        // const allIngredients = {!! json_encode($ingredient_versions) !!};
-        // let ingredientSet = groupBy(allIngredients, 'version_id');
-        // const ingredientVersions = Object.keys(ingredientSet).sort((a, b) => new Date(b) - new Date(a));
         const ingredientVersions = {!! json_encode($versions) !!};
         const currentIngredients = {!! json_encode($current_ingredients) !!};
         let savedIngredients = currentIngredients;
-        let item_masters = {!! json_encode($item_masters) !!};
-        const menu_items = {!! json_encode($menu_items) !!};
-        item_masters = [...item_masters, ...menu_items];
         const menuItem = {!! json_encode($item) !!};
         const privilege = {!! json_encode($privilege) !!};
         const canBeEdited = (menuItem.accounting_approval_status == 'APPROVED' && menuItem.marketing_approval_status == 'APPROVED') ||
@@ -567,69 +555,86 @@
 
             $('.display-ingredient').keyup(debounce(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
-                const query = ($(this).val().trim().toLowerCase().split(' '));
+                const query = $(this).val().trim().toLowerCase().split(' ').filter(e => !!e);
                 const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
                 const itemList = entry.find('.item-list');
-                current_ingredients.forEach((item, item_index) => {
-                    // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
-                    // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
-                    if (item_index != index) arrayOfIngredients.push(item.value);
-                });
+                let searchResult  = [];
 
-                const result = [...item_masters]
-                    .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
-                            || query.every(f => e.brand_description?.toLowerCase().includes(f))
-                            || query.every(f => e.tasteless_code?.includes(f)))
-                            // for menu
-                            || query.every(f => e.menu_item_description?.toLowerCase().includes(f))
-                            || query.every(f => e.tasteless_menu_code?.includes(f))
-                            && !arrayOfIngredients.includes(e.item_masters_id?.toString()))
-                    .sort((a, b) => (a.full_item_description || a.menu_item_description).localeCompare(b.full_item_description || b.menu_item_description));
-
-                if (query == '') {
+                if (!query.length) {
                     $('.item-list').html('');
                     return;
                 }
 
-                if (!result.length) {
-                    result.push({full_item_description: 'No Item Found'});
-                }
-
-                $('.item-list').html('');
-                
-               itemList.fadeIn('fast');
-
-                const ul = $(document.createElement('ul'));
-                ul.addClass('dropdown-menu');
-                ul.css({
-                    display: 'block',
-                    position: 'absolute',
+                $.ajax({
+                    type: 'POST',
+                    url: "{{route('search_ingredient')}}",
+                    data: { content: JSON.stringify(query)},
+                    success: function(response) {
+                        searchResult = JSON.parse(response);
+                        renderSearchResult();
+                    },
+                    error: function(response) { 
+                        console.log(response); 
+                    }  
                 });
-                result.forEach(e => {
-                    const li = $(document.createElement('li'));
-                    const a = $(document.createElement('a'));
-                    if (!e.item_masters_id && !e.menu_item_id) {
-                        a.css('color', 'red !important');
-                    }
-                    li.addClass('list-item dropdown-item');
-                    li.attr({
-                        item_id: e.item_masters_id,
-                        cost: e.ingredient_cost,
-                        uom: e.packagings_id || e.uoms_id,
-                        uom_desc: e.packaging_description || e.uom_description,
-                        menu_item_id: e.menu_item_id,
-                        food_cost: e.food_cost,
-                        item_desc: e.full_item_description || e.menu_item_description,
+
+                function renderSearchResult() {
+                    current_ingredients.forEach((item, item_index) => {
+                        // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
+                        // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
+                        if (item_index != index) arrayOfIngredients.push(item.value);
                     });
-                    a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
-                        : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
-                        : 'No Item Found');
-                    li.append(a);
-                    ul.append(li);
-                });
-                itemList.append(ul);
+    
+                    const result = [...searchResult]
+                        .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
+                                || query.every(f => e.brand_description?.toLowerCase().includes(f))
+                                || query.every(f => e.tasteless_code?.includes(f)))
+                                // for menu
+                                || query.every(f => e.menu_item_description?.toLowerCase().includes(f))
+                                || query.every(f => e.tasteless_menu_code?.includes(f))
+                                && !arrayOfIngredients.includes(e.item_masters_id?.toString()))
+                        .sort((a, b) => (a.full_item_description || a.menu_item_description)?.localeCompare(b.full_item_description || b.menu_item_description));
+    
+                    if (!result.length) {
+                        result.push({full_item_description: 'No Item Found'});
+                    }
+    
+                    $('.item-list').html('');
+                    
+                   itemList.fadeIn('fast');
+    
+                    const ul = $(document.createElement('ul'));
+                    ul.addClass('dropdown-menu');
+                    ul.css({
+                        display: 'block',
+                        position: 'absolute',
+                    });
+                    result.forEach(e => {
+                        const li = $(document.createElement('li'));
+                        const a = $(document.createElement('a'));
+                        if (!e.item_masters_id && !e.menu_item_id) {
+                            a.css('color', 'red !important');
+                        }
+                        li.addClass('list-item dropdown-item');
+                        li.attr({
+                            item_id: e.item_masters_id,
+                            cost: e.ingredient_cost,
+                            uom: e.packagings_id || e.uoms_id,
+                            uom_desc: e.packaging_description || e.uom_description,
+                            menu_item_id: e.menu_item_id,
+                            food_cost: e.food_cost,
+                            item_desc: e.full_item_description || e.menu_item_description,
+                        });
+                        a.html(e.full_item_description && e.item_masters_id ? `<span class="label label-info">IMFS</span> ${e.full_item_description}`
+                            : e.menu_item_description ? `<span class="label label-warning">MIMF</span> ${e.menu_item_description}` 
+                            : 'No Item Found');
+                        li.append(a);
+                        ul.append(li);
+                    });
+                    itemList.append(ul);
+                }
             }, 750));
 
             $(window).keydown(function(event) {
