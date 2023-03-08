@@ -381,7 +381,28 @@
 			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
 			$data['privilege'] = CRUDBooster::myPrivilegeName();
 			$data['chef_access'] = implode(',', $concept_column_names);
+			$restricted_menu = [];
 
+			// if (CRUDBooster::myPrivilegeName() == 'Chef') {
+			// 	$data['menu_itemss'] = DB::table('menu_items')
+			// 	->where('status', 'ACTIVE')
+			// 	->where(function($q) use ($concept_column_names) {
+			// 		foreach ($concept_column_names as $concept_column_name) {
+			// 			$q->orwhere($concept_column_name, '!=', null);
+			// 		}
+			// 	})
+			// 	->select(DB::raw('id,
+			// 		status,
+			// 		menu_price_dine,
+			// 		menu_price_dlv,
+			// 		menu_price_take,' .
+			// 		($privilege == 'Chef' ? 'food_cost_temp as food_cost,' : 'food_cost,') .
+			// 		($privilege == 'Chef' ? 'food_cost_percentage_temp as food_cost_percentage,' : 'food_cost_percentage,') .
+			// 		'menu_item_description,' .
+			// 		implode(', ', $segmentation_columns)))
+			// 	->get()
+			// 	->toArray();
+			// }
 			return $this->view('menu-items/food-cost', $data);
 		}
 
