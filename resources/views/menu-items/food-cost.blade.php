@@ -84,7 +84,7 @@
         // PER CONCEPT !!!
         if (privilege.toLowerCase() == 'chef') {
             concepts = [...concepts].filter(concept => conceptColumnNames.includes(concept.menu_segment_column_name));
-            menuItems = [...menuItems].filter(menuItem => conceptColumnNames.every(conceptColumnName => !!menuItem[conceptColumnName]));
+            menuItems = [...menuItems].filter(menuItem => conceptColumnNames.some(conceptColumnName => !!menuItem[conceptColumnName]));
         }
 
         function renderByPercent() {

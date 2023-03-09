@@ -347,6 +347,8 @@
 			foreach ($data['concepts'] as $index => $value) {
 				$segmentation_columns[$index] = $value->menu_segment_column_name;
 			}
+
+			$privilege = CRUDBooster::myPrivilegeName();
 			
 			$menu_items = DB::table('menu_items')
 				->where('status', 'ACTIVE')
@@ -379,7 +381,7 @@
 			}
 
 			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
-			$data['privilege'] = CRUDBooster::myPrivilegeName();
+			$data['privilege'] = $privilege;
 			$data['chef_access'] = implode(',', $concept_column_names);
 			$restricted_menu = [];
 

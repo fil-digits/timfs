@@ -348,11 +348,11 @@
 					->get('menu_segment_column_name')
 					->toArray();
 
-				foreach ($concepts as $id => $value) {
-					$query->where(function($subQuery) use ($value){
-						$subQuery->orWhere('menu_items.' . $value->menu_segment_column_name, '1');
-					});
-				}
+				$query->where(function($subQuery) use ($concepts) {
+					foreach($concepts as $concept) {
+						$subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
+					}
+				});
 			}
 
 	       $query->where(function($sub_query){
@@ -856,8 +856,8 @@
 							->first();
 					}
 					$ingredient_version[$group_index] = array_merge($member, (array) $ingredient_data);
-					}
 				}
+			}
 			
 			//inserting new version
 			DB::table('menu_ingredients_versions')
@@ -945,7 +945,7 @@
 					$updated_ingredient = tap(DB::table('menu_ingredients_details')
 						->where('status', 'ACTIVE')
 						->where('id', $ingredient_to_update->id))
-						->update(['cost' => $ingredient_to_update->qty * $updated_cost])
+						->update(['cost' => round($ingredient_to_update->qty * $updated_cost, 4)])
 						->first();
 					
 					//getting the new total cost of the menu
