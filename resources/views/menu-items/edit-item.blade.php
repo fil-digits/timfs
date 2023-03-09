@@ -556,7 +556,6 @@
             $('.display-ingredient').keyup(debounce(function() {
                 const entry = $(this).parents('.ingredient-entry, .substitute');
                 const query = $(this).val().trim().toLowerCase().split(' ').filter(e => !!e);
-                const current_ingredients = $(".ingredient").serializeArray();
                 const arrayOfIngredients = [];
                 const index = $('.display-ingredient').index(this);
                 const itemList = entry.find('.item-list');
@@ -581,21 +580,20 @@
                 });
 
                 function renderSearchResult() {
-                    current_ingredients.forEach((item, item_index) => {
-                        // TO STILL SHOW THE CURRENT INGREDIENT OF THE SELECTED INPUT
-                        // BUT HIDE THE INGREDIENTS OF OTHER INPUTS
-                        if (item_index != index) arrayOfIngredients.push(item.value);
+                    const current_ingredients = {item_id: [], menu_item_id: []};
+
+                    $('#form .ingredient').each(function(ingredientIndex) {
+                        const ingredient = $(this);
+                        if (ingredientIndex != $('#form .ingredient').index(entry.find('.ingredient'))) {
+                            if (ingredient.attr('item_id'))  current_ingredients.item_id.push(ingredient.attr('item_id'));
+                            if (ingredient.attr('menu_item_id')) current_ingredients.menu_item_id.push(ingredient.attr('menu_item_id'));
+                        }
                     });
     
                     const result = [...searchResult]
-                        .filter(e => (query.every(f => e.full_item_description?.toLowerCase().includes(f))
-                                || query.every(f => e.brand_description?.toLowerCase().includes(f))
-                                || query.every(f => e.tasteless_code?.includes(f)))
-                                // for menu
-                                || query.every(f => e.menu_item_description?.toLowerCase().includes(f))
-                                || query.every(f => e.tasteless_menu_code?.includes(f))
-                                && !arrayOfIngredients.includes(e.item_masters_id?.toString()))
-                        .sort((a, b) => (a.full_item_description || a.menu_item_description)?.localeCompare(b.full_item_description || b.menu_item_description));
+                        .filter(ingredient => !current_ingredients.item_id.includes(ingredient.item_masters_id?.toString()))
+                        .sort((a, b) => (a.full_item_description || a.menu_item_description)
+                        ?.localeCompare(b.full_item_description || b.menu_item_description));
     
                     if (!result.length) {
                         result.push({full_item_description: 'No Item Found'});

@@ -173,11 +173,11 @@ class MenuItemsExport implements FromQuery, WithHeadings, WithMapping
                 ->get('menu_segment_column_name')
                 ->toArray();
 
-            foreach ($concepts as $id => $value) {
-                $menu_items->where(function($subQuery) use ($value){
-                    $subQuery->orWhere('menu_items.' . $value->menu_segment_column_name, '1');
-                });
-            }
+            $menu_items->where(function($subQuery) use ($concepts) {
+                foreach($concepts as $concept) {
+                    $subQuery->orWhere('menu_items.' . $concept->menu_segment_column_name, '1');
+                }
+            });
         }
 
         if (request()->has('filter_column')) {
