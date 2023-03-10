@@ -471,57 +471,14 @@
 				->get()
 				->toArray();
 
-			$item_masters = DB::table('item_masters')
-				->where('sku_statuses_id', '!=', '2')
-				->select(\DB::raw('item_masters.id as item_masters_id'),
-					'item_masters.packagings_id',
-					\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-					'item_masters.full_item_description',
-					'item_masters.tasteless_code',
-					'packagings.packaging_description',
-					'brands.brand_description')
-				->leftJoin('packagings','item_masters.packagings_id', '=', 'packagings.id')
-				->leftJoin('brands', 'item_masters.brands_id', '=', 'brands.id')
-				->orderby('full_item_description')
-				->get()
-				->toArray();
-
-			$menu_items = DB::table('menu_items')
-				->where('menu_items.status', 'ACTIVE')
-				->where('menu_items.id', '!=', $id)
-				->select('menu_items.id as menu_item_id',
-					'menu_item_description',
-					'tasteless_menu_code',
-					'food_cost',
-					'food_cost_percentage',
-					'menu_items.uoms_id',
-					'uom_description')
-				->leftJoin('uoms', 'uoms.id', '=', 'menu_items.uoms_id')
+			$versions = DB::table('menu_ingredients_versions')
+				->where('menu_items_id', $id)
+				->select('ingredients_json', 'created_at')
 				->get()
 				->toArray();
 			
-				$data['ingredient_versions'] = DB::table('menu_ingredients_details_temp')
-					->where('menu_ingredients_details_temp.status', 'ACTIVE')
-					->leftJoin('item_masters', 'menu_ingredients_details_temp.item_masters_id', '=', 'item_masters.id')
-					->select(\DB::raw('item_masters.id as item_masters_id'),
-						'is_selected',
-						'is_primary',
-						'qty',
-						'cost',
-						'ingredient_group',
-						'uom_id',
-						'packagings.packaging_description',
-						\DB::raw('item_masters.ttp / item_masters.packaging_size as ingredient_cost'),
-						'item_masters.full_item_description')
-					->leftJoin('packagings', 'menu_ingredients_details_temp.uom_id', '=', 'packagings.id')
-					->orderBy('ingredient_group', 'ASC')
-					->orderBy('row_id', 'ASC')
-					->get();
-				
+			$data['versions'] = $versions;
 			$data['current_ingredients'] = array_map(fn ($object) =>(object) array_filter((array) $object), $current_ingredients);
-			$data['item_masters'] = array_map(fn ($object) =>(object) array_filter((array) $object), $item_masters);
-			$data['menu_items'] = array_map(fn ($object) =>(object) array_filter((array) $object), $menu_items);
-
 			return $this->view('menu-items/edit-item', $data);
 		}
 
