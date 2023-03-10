@@ -446,6 +446,8 @@
             [menuItem.accounting_approval_status, menuItem.marketing_approval_status].every(status => status == 'PENDING');
 
     $(document).ready(function() {
+        $('body').addClass('sidebar-collapse');
+
         const debounce = (func, wait, immediate)=> {
             let timeout;
 
