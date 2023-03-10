@@ -171,7 +171,7 @@
         const percentage = (totalCost / item.menu_price_dine * 100).toFixed(2);
         $(totalCostElem).text(totalCost);
         percentageSpan = $(document.createElement('span')).text(`(${item.menu_price_dine == 0 ? '0' : percentage}%)`).addClass('percentage-text');
-        percentageSpan.css('color', item.menu_price_dine != 0 && percentage > 30 ? 'red' : '');
+        percentageSpan.css('color', item.menu_price_dine != 0 && percentage > (Number(sessionStorage.setPercentage) || 30) ? 'red' : '');
         totalCostLabelTD.text(`Total Cost `).append(percentageSpan);
         function formatNumbers() {
             const elems = jQuery.makeArray($('.peso'));
